@@ -67,19 +67,19 @@ const mapLayout = [
     "W............................W",
     "W.B...B...B...B...B...B...B..W",
     "W.B...B...B...B...B...B...B..W",
-    "W............................W",
-    "W..PPPP..............PPPP....W",
-    "W..PPPP....RRRRRR....PPPP....W",
+    "W........L..........L........W",
+    "W..PPPP..L..........L..PPPP..W",
+    "W..PPPP..L.RRRRRR...L..PPPP..W",
     "W..........RRRRRR............W",
     "W...L....................L...W",
-    "W...L...PPPP......PPPP...L...W",
-    "W.......PPPP......PPPP.......W",
-    "W........................CCC.W",
+    "W...L...PPPP..W...PPPP...L...W",
+    "W.......PPPP..W...PPPP.......W",
+    "W.............W..........CCC.W",
+    "W.......RRRRRRW..........CCC.W",
     "W.......RRRRRR...........CCC.W",
-    "W.......RRRRRR...........CCC.W",
-    "W............................W",
-    "W...L........PPPP........L...W",
-    "W...L........PPPP........L...W",
+    "W...L................L.......W",
+    "W...L........PPPP....L.......W",
+    "W...L........PPPP....L.......W",
     "W............................W",
     "WE...........................W",
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
@@ -237,6 +237,34 @@ function getNextStep(startR, startC, targetR, targetC) {
     return null;
 }
 
+function checkLoS(x1, y1, x2, y2) {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    let steps = 20;
+    let targetCol = Math.floor(x2 / TILE_SIZE);
+    let targetRow = Math.floor(y2 / TILE_SIZE);
+    let startCol = Math.floor(x1 / TILE_SIZE);
+    let startRow = Math.floor(y1 / TILE_SIZE);
+
+    for(let i=1; i<=steps; i++) {
+        let cx = x1 + dx * (i/steps);
+        let cy = y1 + dy * (i/steps);
+        let col = Math.floor(cx / TILE_SIZE);
+        let row = Math.floor(cy / TILE_SIZE);
+        
+        if(col === targetCol && row === targetRow) continue;
+        if(col === startCol && row === startRow) continue;
+
+        if(row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+            let tile = mapLayout[row][col];
+            if(tile === 'W' || tile === 'L' || tile === 'B') {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 // Spawn Panty
 function spawnPanty() {
     let spawned = false;
@@ -333,9 +361,15 @@ function startLevel() {
     women = [];
     enemy.active = false;
     
-    // Spawn player at top left
-    player.x = 2 * TILE_SIZE;
-    player.y = 1 * TILE_SIZE;
+    // Spawn player at Door (E)
+    for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
+            if(mapLayout[r][c] === 'E') {
+                player.x = c * TILE_SIZE;
+                player.y = r * TILE_SIZE;
+            }
+        }
+    }
 
     // Initial panties spawn
     for(let i=0; i<4; i++) spawnPanty();
@@ -447,27 +481,10 @@ function update(dt) {
         let dist = Math.sqrt(dx*dx + dy*dy);
         
         // Women face right (door is on the right of the stall).
-        // Field of view: dx > 0 (player is to the right), and vertical distance is small.
-        if(dist < 200 && !player.isHiding && dx > 0 && Math.abs(dy) < 80) {
-            // Raycast check for walls between woman and player
-            let steps = 10;
-            let blocked = false;
-            for(let i=1; i<=steps; i++) {
-                let checkX = (w.x + w.size/2) + (dx * (i/steps));
-                let checkY = (w.y + w.size/2) + (dy * (i/steps));
-                let col = Math.floor(checkX / TILE_SIZE);
-                let row = Math.floor(checkY / TILE_SIZE);
-                if(row >= 0 && row < ROWS && col >= 0 && col < COLS) {
-                    let tile = mapLayout[row][col];
-                    if (tile === 'W' || tile === 'L' || tile === 'B') {
-                        // Skip if it's the stall she is currently in
-                        if (tile === 'B' && col === Math.floor(w.x/TILE_SIZE) && row === Math.floor(w.y/TILE_SIZE)) continue;
-                        blocked = true;
-                        break;
-                    }
-                }
-            }
-            if(!blocked) {
+        // Field of view: dx > -20 (player is to the right or very close), and vertical distance is small.
+        if(dist < 350 && !player.isHiding && dx > -20 && Math.abs(dy) < 120) {
+            let hasLoS = checkLoS(w.x + w.size/2, w.y + w.size/2, player.x + player.size/2, player.y + player.size/2);
+            if(hasLoS) {
                 w.alerted = true;
                 showToast("😱 AHHH! UM INVASOR!");
                 suspicion = 100;
@@ -547,18 +564,49 @@ function update(dt) {
 
     // Enemy AI
     if(enemy.active) {
-        if(!player.isHiding) {
+        let hasLoS = checkLoS(enemy.x + enemy.size/2, enemy.y + enemy.size/2, player.x + player.size/2, player.y + player.size/2);
+        let distToPlayer = Math.sqrt(Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2));
+        
+        let playerVisible = false;
+        if (!player.isHiding) {
+            // Track if high suspicion or direct vision
+            if (suspicion >= 100 || (hasLoS && distToPlayer < 400)) {
+                playerVisible = true;
+            }
+        } else {
+            // Keep tracking if saw them hide
+            if (enemy.state === 'chase' && hasLoS) {
+                playerVisible = true;
+            }
+        }
+
+        if(playerVisible) {
             enemy.state = 'chase';
             enemy.targetX = player.x;
             enemy.targetY = player.y;
-            enemy.speed = 160; // Runs fast
-            enemy.loseTimer = 5; // 5 seconds to give up if hid
-        } else if(enemy.state === 'chase') {
-            // Player hid, move to last known position then give up
-            enemy.loseTimer -= dt;
-            if(enemy.loseTimer <= 0) {
+            enemy.speed = 145; // Slower than run, faster than walk
+            suspicion = 100; // Keep high while chasing
+        } else if(enemy.state === 'chase' || enemy.state === 'search') {
+            enemy.state = 'search';
+            enemy.speed = 110;
+            
+            let edx = enemy.targetX - enemy.x;
+            let edy = enemy.targetY - enemy.y;
+            let distToTarget = Math.sqrt(edx*edx + edy*edy);
+            
+            if(distToTarget < 20 || Math.random() < 0.02) {
+                let r = Math.floor(enemy.y/TILE_SIZE) + Math.floor((Math.random() - 0.5) * 12);
+                let c = Math.floor(enemy.x/TILE_SIZE) + Math.floor((Math.random() - 0.5) * 12);
+                if(r>=0 && r<ROWS && c>=0 && c<COLS && !['W', 'B', 'L'].includes(mapLayout[r][c])) {
+                    enemy.targetX = c * TILE_SIZE;
+                    enemy.targetY = r * TILE_SIZE;
+                }
+            }
+
+            suspicion -= 10 * dt; // Decay suspicion over 10s
+            if(suspicion <= 0) {
                 enemy.state = 'leave';
-                enemy.speed = 120;
+                enemy.speed = 100;
                 showToast("Ufa... Ela desistiu!");
                 suspicion = 0;
             }
@@ -640,8 +688,14 @@ function update(dt) {
             }
 
             // Check catch
-            if(!player.isHiding && checkCollision(player, enemy)) {
-                gameOver();
+            if(checkCollision(player, enemy)) {
+                if (player.isHiding) {
+                    player.isHiding = false;
+                    showToast("Te achei!");
+                    suspicion = 100;
+                } else {
+                    gameOver();
+                }
             }
         }
     }
