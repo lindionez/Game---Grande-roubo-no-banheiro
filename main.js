@@ -194,6 +194,7 @@ shootBtn.addEventListener('mousedown', shootStart);
 const pauseAction = (e) => {
     if(e) e.preventDefault();
     if(gameState === 'PLAYING') {
+        if(window.audioMgr && window.audioMgr.ctx) window.audioMgr.ctx.suspend();
         gameState = 'PAUSED';
         let isMobile = window.innerWidth <= 1250;
         document.getElementById('pause-desc').innerHTML = isMobile ? 
@@ -215,6 +216,7 @@ window.addEventListener('keydown', e => {
         if(gameState === 'PLAYING') {
             pauseAction();
         } else if(gameState === 'PAUSED') {
+            if(window.audioMgr && window.audioMgr.ctx) window.audioMgr.ctx.resume();
             gameState = 'PLAYING';
             document.getElementById('pause-screen').classList.add('hidden');
         }
@@ -708,6 +710,7 @@ function update(dt) {
             let hasLoS = checkLoS(w.x + w.size/2, w.y + w.size/2, player.x + player.size/2, player.y + player.size/2);
             if(hasLoS) {
                 w.alerted = true; fasePerfeitaSemVisto = false;
+                if(window.audioMgr) window.audioMgr.batherScream();
                 if (Date.now() - lastInvasionToast > 2000) {
                     showToast("😱 AHHH! UM INVASOR!");
                     lastInvasionToast = Date.now();
@@ -737,8 +740,10 @@ function update(dt) {
         }
 
         if(isSeeingPlayer) {
+            if(b.seeTimer === 0 && window.audioMgr) window.audioMgr.batherHmm();
             b.seeTimer += dt;
             if(b.seeTimer >= (b.reactTime + disfarceDelay)) {
+                if(window.audioMgr) window.audioMgr.batherScream();
                 b.state = 'scream'; fasePerfeitaSemVisto = false; faseGritos++;
                 if(faseGritos >= 3) unlockConquista('c26');
                 b.alertTimer = 1.0; 
@@ -822,6 +827,7 @@ function update(dt) {
                 if(checkCollision(pRect, p)) {
                     if(p.type.trap) {
                         unlockConquista('c32');
+                        if(window.audioMgr) window.audioMgr.collectTrap();
                         score = Math.max(0, score - 10); suspicion += 30 * resMult;
                         showToast("🚨 ARMADILHA!"); combo = 0;
                         spawnNoiseRing(player.x, player.y);
@@ -829,6 +835,7 @@ function update(dt) {
                         combo++; comboTimer = 2.5;
                         if(combo === 2) unlockConquista('c16');
                         if(combo === 5) unlockConquista('c17');
+                        if(window.audioMgr) window.audioMgr.collectPanty(p.type.pts >= 25);
                         let mult = combo >= 5 ? 2 : (combo >= 3 ? 1.5 : 1);
                         let gained = Math.floor(p.type.pts * mult); score += gained;
                         backpackCollected++;
@@ -890,6 +897,7 @@ function update(dt) {
             suspicion = Math.max(0, suspicion - 25 * dt * alertaMult);
         } else if((suspicion >= 100 && !player.isHiding) || (hasLoS && distToPlayer < 400 && !player.isHiding)) {
             fasePerfeitaSemVisto = false;
+            if(enemy.state !== 'chase' && window.audioMgr) window.audioMgr.donaMad();
             enemy.state = 'chase'; enemy.targetX = player.x; enemy.targetY = player.y; 
             enemy.speed = 145 * eSpeedMult; suspicion = 100;
         } else if(enemy.state === 'chase' || enemy.state === 'search' || enemy.state === 'distracted') {
@@ -940,6 +948,13 @@ function update(dt) {
             if(player.isHiding) { player.isHiding = false; showToast("Te achei!"); suspicion = 100; }
             else gameOver();
         }
+        
+        if (window.audioMgr) {
+            window.audioMgr.setChase(enemy.state === 'chase');
+            window.audioMgr.updateHeartbeat(Math.hypot(enemy.x - player.x, enemy.y - player.y), dt);
+        }
+    } else {
+        if (window.audioMgr) window.audioMgr.setChase(false);
     }
 
     if(mousePressed && hasAK47 && enemy.active && !enemy.dead) {
@@ -949,6 +964,7 @@ function update(dt) {
         let px = player.x + player.size/2; let py = player.y + player.size/2;
         player.shootAngle = Math.atan2(ey - py, ex - px);
         
+        if(window.audioMgr) window.audioMgr.ak47Shoot();
         spawnParticle(px + Math.cos(player.shootAngle)*30, py + Math.sin(player.shootAngle)*30, "💥", "#ffcf40");
         unlockConquista('c28');
         enemy.dead = true;
@@ -983,6 +999,7 @@ function update(dt) {
 }
 
 function triggerWin() {
+    if(window.audioMgr) { window.audioMgr.setChase(false); window.audioMgr.win(); }
     gameState = 'VICTORY';
     score += Math.floor(timeRemaining * 2); 
     score += 200 + (stage * 50); 
@@ -1013,6 +1030,7 @@ function triggerAK47Win() {
 
 let gameOverAnimTimer = 0; let gameOverSnapshot = null;
 function gameOver() {
+    if(window.audioMgr) { window.audioMgr.setChase(false); window.audioMgr.gameOver(); }
     gameState = 'GAMEOVER'; gameOverAnimTimer = 0;
     gameOverSnapshot = document.createElement('canvas');
     gameOverSnapshot.width = canvas.width; gameOverSnapshot.height = canvas.height;
@@ -1323,6 +1341,7 @@ document.getElementById('btn-pause-mobile').addEventListener('mousedown', pauseA
 
 document.getElementById('btn-resume').addEventListener('click', () => {
     if(gameState === 'PAUSED') {
+        if(window.audioMgr && window.audioMgr.ctx) window.audioMgr.ctx.resume();
         gameState = 'PLAYING';
         document.getElementById('pause-screen').classList.add('hidden');
     }
@@ -1330,8 +1349,17 @@ document.getElementById('btn-resume').addEventListener('click', () => {
 document.getElementById('btn-resume').addEventListener('touchstart', (e) => {
     e.preventDefault();
     if(gameState === 'PAUSED') {
+        if(window.audioMgr && window.audioMgr.ctx) window.audioMgr.ctx.resume();
         gameState = 'PLAYING';
         document.getElementById('pause-screen').classList.add('hidden');
+    }
+});
+
+document.getElementById('btn-mute').addEventListener('click', (e) => {
+    if(window.audioMgr) {
+        let isMuted = window.audioMgr.toggleMute();
+        e.target.innerHTML = isMuted ? "🔇 SOM: DESLIGADO" : "🔊 SOM: LIGADO";
+        e.target.style.background = isMuted ? "#882222" : "#555";
     }
 });
 
@@ -1450,6 +1478,7 @@ document.getElementById('btn-next-stage').addEventListener('click', () => {
 
 document.getElementById('btn-buy-ak47').addEventListener('click', (e) => {
     if(shopPoints >= 10000 && !hasAK47) {
+        if(window.audioMgr) window.audioMgr.buyUpgrade();
         shopPoints -= 10000; hasAK47 = true; unlockConquista('c24');
         e.target.textContent = 'EQUIPADA'; e.target.disabled = true; renderShop();
     }
@@ -1737,6 +1766,7 @@ document.querySelectorAll('.c-filter-btn').forEach(btn => {
 
 window.buyUpgrade = function(cat, cost) {
     if(shopPoints >= cost && upgrades[cat] < 5) {
+        if(window.audioMgr) window.audioMgr.buyUpgrade();
         shopPoints -= cost; upgrades[cat]++; 
         addProgressoConquista('c21', 1);
         addProgressoConquista('c22', 1);
@@ -1746,3 +1776,10 @@ window.buyUpgrade = function(cat, cost) {
 };
 
 requestAnimationFrame(loop);
+
+document.addEventListener('click', () => {
+    if(window.audioMgr && !window.audioMgr.initialized) {
+        window.audioMgr.init();
+    }
+}, {once: true});
+
