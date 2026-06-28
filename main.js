@@ -94,19 +94,50 @@ let player = {
         ctx.translate(this.x, this.y);
         
         // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.beginPath();
-        ctx.ellipse(this.size/2, this.size - 4, this.size/2, 6, 0, 0, Math.PI*2);
+        ctx.ellipse(this.size/2, this.size - 2, this.size/2 + 2, 6, 0, 0, Math.PI*2);
         ctx.fill();
 
-        // If hiding, draw transparent
-        if(this.isHiding) ctx.globalAlpha = 0.5;
+        // Draw smaller if hiding (crouching)
+        let drawSize = this.isHiding ? this.size * 0.8 : this.size;
+        let offsetY = this.isHiding ? this.size * 0.2 : 0;
+        
+        ctx.translate(this.size/2, this.size/2 + offsetY);
+        
+        // Body (Striped shirt)
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(0, drawSize*0.3, drawSize*0.4, Math.PI, 0); // shoulders
+        ctx.fill();
+        ctx.fillStyle = '#000'; // Stripes
+        ctx.fillRect(-drawSize*0.4, drawSize*0.05, drawSize*0.8, drawSize*0.1);
+        ctx.fillRect(-drawSize*0.4, drawSize*0.2, drawSize*0.8, drawSize*0.1);
 
-        // Player sprite (emoji for now)
-        ctx.font = '28px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🥷', this.size/2, this.size/2);
+        // Head
+        ctx.fillStyle = '#ffcc99'; // Skin
+        ctx.beginPath();
+        ctx.arc(0, -drawSize*0.2, drawSize*0.4, 0, Math.PI*2);
+        ctx.fill();
+
+        // Mask
+        ctx.fillStyle = '#111';
+        ctx.beginPath();
+        ctx.ellipse(0, -drawSize*0.2, drawSize*0.45, drawSize*0.15, 0, 0, Math.PI*2);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(-drawSize*0.15, -drawSize*0.2, drawSize*0.06, 0, Math.PI*2);
+        ctx.arc(drawSize*0.15, -drawSize*0.2, drawSize*0.06, 0, Math.PI*2);
+        ctx.fill();
+
+        // Beanie/Hat
+        ctx.fillStyle = '#222';
+        ctx.beginPath();
+        ctx.arc(0, -drawSize*0.4, drawSize*0.35, Math.PI, 0);
+        ctx.fill();
 
         ctx.restore();
     }
@@ -126,22 +157,71 @@ let enemy = {
         ctx.translate(this.x, this.y);
         
         // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.beginPath();
-        ctx.ellipse(this.size/2, this.size - 4, this.size/2, 6, 0, 0, Math.PI*2);
+        ctx.ellipse(this.size/2, this.size - 2, this.size/2 + 4, 8, 0, 0, Math.PI*2);
         ctx.fill();
 
-        // Enemy sprite
-        ctx.font = '32px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🙎‍♀️', this.size/2, this.size/2);
+        ctx.translate(this.size/2, this.size/2);
 
-        // Alert indicator if chasing
+        // Club (Porrete)
+        ctx.save();
+        if(this.state === 'chase') {
+            ctx.rotate(Math.sin(Date.now()/100) * 0.5 + 0.5); // Swinging animation
+        } else {
+            ctx.rotate(0.2); // Resting on shoulder
+        }
+        ctx.fillStyle = '#8b4513';
+        ctx.beginPath();
+        ctx.moveTo(10, 0); ctx.lineTo(25, -20); ctx.lineTo(32, -18); ctx.lineTo(15, 5);
+        ctx.fill();
+        ctx.fillStyle = '#654321'; // Wood line
+        ctx.beginPath(); ctx.moveTo(25, -15); ctx.lineTo(30, -12); ctx.stroke();
+        ctx.restore();
+
+        // Body (Dress)
+        ctx.fillStyle = '#800020';
+        ctx.beginPath();
+        ctx.moveTo(0, -this.size*0.1);
+        ctx.lineTo(-this.size*0.6, this.size*0.5);
+        ctx.lineTo(this.size*0.6, this.size*0.5);
+        ctx.fill();
+
+        // Head
+        ctx.fillStyle = '#f5cba7'; // Skin
+        ctx.beginPath();
+        ctx.arc(0, -this.size*0.3, this.size*0.35, 0, Math.PI*2);
+        ctx.fill();
+
+        // Hair (Bun)
+        ctx.fillStyle = '#4a2311'; // Brown
+        ctx.beginPath(); ctx.arc(0, -this.size*0.6, this.size*0.2, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(0, -this.size*0.4, this.size*0.36, Math.PI, 0); ctx.fill();
+
+        // Angry Face
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        // Eyebrows
+        ctx.beginPath();
+        ctx.moveTo(-this.size*0.2, -this.size*0.4); ctx.lineTo(-this.size*0.05, -this.size*0.25);
+        ctx.moveTo(this.size*0.2, -this.size*0.4); ctx.lineTo(this.size*0.05, -this.size*0.25);
+        ctx.stroke();
+        // Eyes
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(-this.size*0.1, -this.size*0.25, 3, 0, Math.PI*2);
+        ctx.arc(this.size*0.1, -this.size*0.25, 3, 0, Math.PI*2);
+        ctx.fill();
+
+        // Alert indicator
         if(this.state === 'chase') {
             ctx.fillStyle = 'red';
-            ctx.font = '20px Fredoka One';
-            ctx.fillText('!', this.size/2, -10);
+            ctx.font = 'bold 24px Fredoka One';
+            ctx.fillText('!', 0, -this.size);
+        } else if(this.state === 'search') {
+            ctx.fillStyle = '#ffcf40';
+            ctx.font = 'bold 20px Fredoka One';
+            ctx.fillText('?', 0, -this.size);
         }
 
         ctx.restore();
@@ -810,14 +890,66 @@ function draw() {
         }
     }
 
-    // Draw Women
+    // Draw Women in Showers
     women.forEach(w => {
-        ctx.font = '24px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🚿', w.x + w.size/2, w.y + w.size/2);
+        let cx = w.x + w.size/2;
+        let cy = w.y + w.size/2;
+        
+        // Shower head
+        ctx.fillStyle = '#aaa';
+        ctx.fillRect(w.x + 5, w.y + 5, 15, 5);
+        ctx.fillStyle = '#888';
+        ctx.beginPath();
+        ctx.arc(w.x + 20, w.y + 7, 6, Math.PI, 0);
+        ctx.fill();
+
+        // Water streams (animated)
+        ctx.strokeStyle = 'rgba(0, 150, 255, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        let dropY = (Date.now() / 20) % 15;
+        ctx.moveTo(w.x + 15, w.y + 15 + dropY); ctx.lineTo(w.x + 15, w.y + 25 + dropY);
+        ctx.moveTo(w.x + 20, w.y + 10 + dropY); ctx.lineTo(w.x + 20, w.y + 20 + dropY);
+        ctx.moveTo(w.x + 25, w.y + 15 + dropY); ctx.lineTo(w.x + 25, w.y + 25 + dropY);
+        ctx.stroke();
+
+        // Woman Body
+        ctx.fillStyle = '#f1c27d'; // Skin
+        ctx.beginPath();
+        ctx.arc(cx, cy + 10, 12, Math.PI, 0); // Shoulders
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx, cy, 10, 0, Math.PI*2); // Head
+        ctx.fill();
+
+        // Towel Turban
+        ctx.fillStyle = '#ff69b4';
+        ctx.beginPath(); ctx.arc(cx, cy - 4, 11, Math.PI, 0); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy - 12, 6, 0, Math.PI*2); ctx.fill();
+
         if(w.alerted) {
-            ctx.fillText('😱', w.x + w.size/2, w.y - 10);
+            // Scream face
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(cx - 3, cy, 2, 0, Math.PI*2);
+            ctx.arc(cx + 3, cy, 2, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(cx, cy + 4, 3, 5, 0, 0, Math.PI*2);
+            ctx.fill();
+
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('😱', cx, w.y - 10);
+        } else {
+            // Relaxed face
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cx - 5, cy); ctx.quadraticCurveTo(cx - 3, cy + 2, cx - 1, cy);
+            ctx.moveTo(cx + 1, cy); ctx.quadraticCurveTo(cx + 3, cy + 2, cx + 5, cy);
+            ctx.stroke();
         }
     });
 
