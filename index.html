@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ladrão de Calcinhas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <!-- HUD / UI during gameplay -->
+        <div id="hud" class="hidden">
+            <div class="hud-top">
+                <div class="hud-left">
+                    <div id="stage-name">Fase 1: O Banheiro</div>
+                    <div id="timer">⏱️ 01:30</div>
+                </div>
+                <div class="hud-center">
+                    <div class="suspicion-container">
+                        <div class="suspicion-label">ALERTA</div>
+                        <div class="suspicion-bar-bg">
+                            <div id="suspicion-bar" class="suspicion-bar-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hud-right">
+                    <div id="score">Score: 0</div>
+                    <div id="combo" class="hidden">Combo x2!</div>
+                    <div id="panty-counter">🩲 0/5</div>
+                </div>
+            </div>
+            <div class="hud-bottom">
+                <div id="inventory">
+                    <!-- Power-ups will appear here -->
+                </div>
+                <div id="message-toast" class="hidden">Mensagem!</div>
+            </div>
+        </div>
+
+        <!-- The Game Canvas -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <!-- Mobile Controls -->
+        <div id="mobile-controls" class="hidden">
+            <div class="d-pad">
+                <button class="d-btn up" id="btn-up">▲</button>
+                <button class="d-btn left" id="btn-left">◀</button>
+                <button class="d-btn right" id="btn-right">▶</button>
+                <button class="d-btn down" id="btn-down">▼</button>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" id="btn-shift">🏃</button>
+                <button class="action-btn primary" id="btn-space">🖐️</button>
+            </div>
+        </div>
+
+        <!-- Screens -->
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen">
+            <h1 class="title-anim">LADRÃO DE CALCINHAS</h1>
+            <p class="subtitle">Um jogo furtivo casual... e muito atrapalhado!</p>
+            <button id="btn-play" class="btn-large">JOGAR</button>
+        </div>
+
+        <!-- Tutorial Screen -->
+        <div id="tutorial-screen" class="screen hidden">
+            <h2>Como Jogar</h2>
+            <div class="tutorial-content">
+                <div class="tut-slide active">
+                    <div class="tut-icon">⌨️</div>
+                    <p>Use <strong>WASD</strong> ou <strong>Setas</strong> para andar.<br>Pressione <strong>ESPAÇO</strong> para pegar as calcinhas!</p>
+                </div>
+                <div class="tut-slide hidden">
+                    <div class="tut-icon">🥷</div>
+                    <p>Segure <strong>SHIFT</strong> para correr, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.</p>
+                </div>
+                <div class="tut-slide hidden">
+                    <div class="tut-icon">🪴</div>
+                    <p>Esconda-se atrás de plantas ou no tapete para não ser visto.<br>Se a Dona do Banheiro te pegar... Game Over!</p>
+                </div>
+            </div>
+            <div class="tut-nav">
+                <button id="btn-tut-next" class="btn">Próximo</button>
+                <button id="btn-tut-start" class="btn-large hidden">Começar!</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="screen hidden">
+            <h1>VOCÊ FOI PEGO!</h1>
+            <div class="dona-angry">😡</div>
+            <p id="game-over-stats">Pontuação Final: 0</p>
+            <button id="btn-restart" class="btn-large">Tentar Novamente</button>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="screen hidden">
+            <h1>FASE CONCLUÍDA!</h1>
+            <div class="victory-icon">🏆</div>
+            <p id="victory-stats">Você sobreviveu mais um dia!</p>
+            <button id="btn-shop" class="btn-large">Ir para Loja</button>
+        </div>
+
+        <!-- Shop Screen -->
+        <div id="shop-screen" class="screen hidden">
+            <h2>LOJA DE UPGRADES</h2>
+            <div class="shop-pts">Seus Pontos: <span id="shop-points">0</span></div>
+            <div class="shop-items">
+                <div class="shop-item">
+                    <div class="item-icon">🎒</div>
+                    <div class="item-info">
+                        <h3>Mochila Maior</h3>
+                        <p>Carrega mais itens</p>
+                    </div>
+                    <button class="btn-buy" data-item="mochila" data-cost="100">100 pts</button>
+                </div>
+                <div class="shop-item">
+                    <div class="item-icon">👟</div>
+                    <div class="item-info">
+                        <h3>Tênis Silencioso</h3>
+                        <p>Reduz barulho ao andar</p>
+                    </div>
+                    <button class="btn-buy" data-item="tenis" data-cost="200">200 pts</button>
+                </div>
+                <div class="shop-item">
+                    <div class="item-icon">🧲</div>
+                    <div class="item-info">
+                        <h3>Luva Magnética</h3>
+                        <p>Maior área de coleta</p>
+                    </div>
+                    <button class="btn-buy" data-item="luva" data-cost="300">300 pts</button>
+                </div>
+            </div>
+            <button id="btn-next-stage" class="btn-large">Próxima Fase ➡️</button>
+        </div>
+
+    </div>
+    
+    <!-- Audio Elements -->
+    <audio id="bgm" loop>
+        <source src="data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" type="audio/mpeg">
+    </audio>
+
+    <script src="main.js"></script>
+</body>
+</html>
