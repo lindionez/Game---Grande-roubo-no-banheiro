@@ -13,7 +13,7 @@
         <div id="hud" class="hidden">
             <div class="hud-top">
                 <div class="hud-left">
-                    <div id="stage-name">Fase 1: O Banheiro</div>
+                    <div id="stage-name">Fase 1</div>
                     <div id="timer">⏱️ 01:30</div>
                 </div>
                 <div class="hud-center">
@@ -28,11 +28,12 @@
                     <div id="score">Score: 0</div>
                     <div id="combo" class="hidden">Combo x2!</div>
                     <div id="panty-counter">🩲 0/5</div>
+                    <div id="capacity-counter" class="hidden" style="color: #ffcf40; font-weight: bold; font-size: 0.9em;">Mochila CHEIA! (Vá à porta 🚪)</div>
                 </div>
             </div>
             <div class="hud-bottom">
                 <div id="inventory">
-                    <!-- Power-ups will appear here -->
+                    <div id="distraction-counter" class="inv-slot hidden" title="Distrações" style="width: auto; padding: 0 10px; font-size: 1.2rem;">💨 <span id="dist-count">0</span></div>
                 </div>
                 <div id="message-toast" class="hidden">Mensagem!</div>
             </div>
@@ -49,14 +50,17 @@
                 <button class="d-btn right" id="btn-right">▶</button>
                 <button class="d-btn down" id="btn-down">▼</button>
             </div>
-            <div class="action-buttons">
-                <button class="action-btn" id="btn-shift">🏃</button>
-                <button class="action-btn primary" id="btn-space">🖐️</button>
+            <div class="action-buttons-container">
+                <button class="action-btn top-btn hidden" id="btn-distraction" style="background: rgba(100,100,255,0.6);">💨</button>
+                <div class="action-buttons">
+                    <button class="action-btn" id="btn-shift">🏃</button>
+                    <button class="action-btn primary" id="btn-space">🖐️</button>
+                    <button class="action-btn ak47-btn hidden" id="btn-shoot">🔫</button>
+                </div>
             </div>
         </div>
 
         <!-- Screens -->
-        
         <!-- Start Screen -->
         <div id="start-screen" class="screen">
             <h1 class="title-anim">LADRÃO DE CALCINHAS</h1>
@@ -77,14 +81,36 @@
                     <p id="tut-text-run">Segure <strong>SHIFT</strong> para correr, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.</p>
                 </div>
                 <div class="tut-slide hidden">
+                    <div class="tut-icon">🎒</div>
+                    <p>Sua mochila tem limite! Você precisará depositar as calcinhas<br>na <strong>janela/porta (🚪)</strong> antes de poder pegar mais.</p>
+                </div>
+                <div class="tut-slide hidden">
                     <div class="tut-icon">🪴</div>
-                    <p>Esconda-se atrás de plantas ou no tapete para não ser visto.<br>Se a Dona do Banheiro te pegar... Game Over!</p>
+                    <p>Esconda-se atrás de plantas ou no tapete para não ser visto.<br>Cuidado com as banhistas e a Dona do Banheiro!</p>
                 </div>
             </div>
             <div class="tut-nav">
                 <button id="btn-tut-next" class="btn">Próximo</button>
                 <button id="btn-tut-start" class="btn-large hidden">Começar!</button>
             </div>
+        </div>
+
+        <!-- AK47 Tutorial Screen -->
+        <div id="ak47-tutorial-screen" class="screen hidden" style="background: rgba(0,0,0,0.95); z-index: 200;">
+            <h1 style="color: #ff3333; text-shadow: 0 0 10px red;">🔥 NOVA ARMA DESBLOQUEADA! 🔫</h1>
+            <h2 style="color: gold; margin-bottom: 20px;">AK-47 DO DESESPERO</h2>
+            <div class="tutorial-content" style="background: rgba(255,0,0,0.1); border: 2px solid red;">
+                <p style="font-size: 1.2rem; line-height: 1.6; text-align: left; color: white;">
+                    Acabou a furtividade. Agora é bala!<br><br>
+                    🖥️ <strong>NO PC:</strong> Clique com o botão ESQUERDO do mouse para atirar<br>
+                    📱 <strong>NO CELULAR:</strong> Use o botão de ATIRAR no canto da tela<br><br>
+                    ⚡ A mira é AUTOMÁTICA no inimigo mais próximo<br>
+                    💀 1 tiro = Dona do Banheiro neutralizada<br>
+                    🩸 Deixa marca de sangue no chão (estilo cartoon)<br><br>
+                    ⚠️ Use com sabedoria. Você ainda pode ser pego se errar o timing!
+                </p>
+            </div>
+            <button id="btn-ak47-continue" class="btn-large" style="background: #ff3333; color: white; border: 2px solid gold;">ENTENDIDO</button>
         </div>
 
         <!-- Game Over Screen -->
@@ -94,7 +120,19 @@
             <button id="btn-restart" class="btn-large">Tentar Novamente</button>
         </div>
 
-        <!-- Victory Screen -->
+        <!-- Victory Screen Special (AK-47 Kill) -->
+        <div id="ak47-victory-screen" class="screen hidden" style="background: radial-gradient(circle, #400 0%, #000 100%); z-index: 200;">
+            <div id="ak47-particles-container" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none;"></div>
+            <h1 class="shake-text" style="color: #ff3333; font-size: 4rem; text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff; z-index: 2;">A CAÇADORA VIROU CAÇA!</h1>
+            <p style="color: #ffcc00; font-size: 1.5rem; margin-bottom: 20px; z-index: 2;">Ninguém mais vai te impedir!</p>
+            <div class="ak47-victory-anim" style="z-index: 2;">
+                <!-- Animated in JS/CSS -->
+                <div class="thug-player">😎🔫💨</div>
+            </div>
+            <button id="btn-ak47-next" class="btn-large" style="background: #ffcf40; margin-top: 50px; z-index: 2; position: relative;">CONTINUAR ROUBANDO (+500 pts)</button>
+        </div>
+
+        <!-- Victory Screen Normal -->
         <div id="victory-screen" class="screen hidden">
             <h1>FASE CONCLUÍDA!</h1>
             <div class="victory-icon">🏆</div>
@@ -106,42 +144,35 @@
         <div id="shop-screen" class="screen hidden">
             <h2>LOJA DE UPGRADES</h2>
             <div class="shop-pts">Seus Pontos: <span id="shop-points">0</span></div>
-            <div class="shop-items">
-                <div class="shop-item">
-                    <div class="item-icon">🎒</div>
-                    <div class="item-info">
-                        <h3>Mochila Maior</h3>
-                        <p>Carrega mais itens</p>
-                    </div>
-                    <button class="btn-buy" data-item="mochila" data-cost="100">100 pts</button>
-                </div>
-                <div class="shop-item">
-                    <div class="item-icon">👟</div>
-                    <div class="item-info">
-                        <h3>Tênis Silencioso</h3>
-                        <p>Reduz barulho ao andar</p>
-                    </div>
-                    <button class="btn-buy" data-item="tenis" data-cost="200">200 pts</button>
-                </div>
-                <div class="shop-item">
-                    <div class="item-icon">🧲</div>
-                    <div class="item-info">
-                        <h3>Luva Magnética</h3>
-                        <p>Maior área de coleta</p>
-                    </div>
-                    <button class="btn-buy" data-item="luva" data-cost="300">300 pts</button>
+            
+            <div class="shop-tabs">
+                <button class="tab-btn active" data-tab="mochila" title="Mochila">🎒</button>
+                <button class="tab-btn" data-tab="tenis" title="Tênis">👟</button>
+                <button class="tab-btn" data-tab="luva" title="Luva Magnética">🧤</button>
+                <button class="tab-btn" data-tab="distracao" title="Distração">💨</button>
+                <button class="tab-btn" data-tab="disfarce" title="Disfarce">🎭</button>
+                <button class="tab-btn" data-tab="velocidade" title="Velocidade">⚡</button>
+                <button class="tab-btn" data-tab="resistencia" title="Resistência à Suspeita">🛡️</button>
+            </div>
+
+            <div class="shop-content" id="shop-content">
+                <!-- Populated by JS -->
+            </div>
+
+            <div id="ak47-shop-item" class="hidden" style="margin-top: 20px; text-align: center;">
+                <div class="ak47-container" style="background: linear-gradient(45deg, #400, #a00); padding: 15px; border-radius: 12px; border: 2px solid gold; display: inline-block;">
+                    <div style="font-size: 3rem; animation: bounce 2s infinite;">🔫</div>
+                    <h3 style="color: gold; text-shadow: 0 0 5px red; margin: 10px 0;">AK-47 DO DESESPERO</h3>
+                    <button class="btn-buy" id="btn-buy-ak47" style="background: gold; color: red; font-size: 1.2rem; padding: 10px 20px;">10.000 pts</button>
                 </div>
             </div>
-            <button id="btn-next-stage" class="btn-large">Próxima Fase ➡️</button>
+
+            <div class="shop-footer" style="margin-top: 20px; text-align: center;">
+                <div class="level-progress" style="margin-bottom: 10px; font-weight: bold; color: #ffcf40;">Level Total: <span id="total-level">0</span>/35</div>
+                <button id="btn-next-stage" class="btn-large">Próxima Fase ➡️</button>
+            </div>
         </div>
-
     </div>
-    
-    <!-- Audio Elements -->
-    <audio id="bgm" loop>
-        <source src="data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" type="audio/mpeg">
-    </audio>
-
     <script src="main.js"></script>
 </body>
 </html>

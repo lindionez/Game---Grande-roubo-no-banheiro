@@ -282,12 +282,41 @@ canvas {
 }
 
 /* Shop */
-.shop-items {
+.shop-tabs {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tab-btn {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid transparent;
+    padding: 10px 20px;
+    border-radius: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tab-btn.active {
+    background: rgba(255,255,255,0.4);
+    border: 2px solid #ffcf40;
+    transform: scale(1.1);
+}
+
+.shop-content {
+    background: rgba(0,0,0,0.5);
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    min-height: 250px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin: 30px 0;
-    width: 80%;
+    gap: 10px;
+    overflow-y: auto;
 }
 
 .shop-item {
@@ -295,12 +324,33 @@ canvas {
     align-items: center;
     justify-content: space-between;
     background: rgba(255,255,255,0.1);
-    padding: 15px;
+    padding: 10px 15px;
     border-radius: 12px;
 }
 
+.shop-item.locked {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.shop-item.acquired {
+    border: 1px solid #4facfe;
+    background: rgba(79, 172, 254, 0.2);
+}
+
+.shop-item.next {
+    border: 2px solid #ffcf40;
+    animation: pulseBorder 1.5s infinite;
+}
+
+@keyframes pulseBorder {
+    0% { border-color: rgba(255, 207, 64, 0.4); }
+    50% { border-color: rgba(255, 207, 64, 1); }
+    100% { border-color: rgba(255, 207, 64, 0.4); }
+}
+
 .shop-item .item-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
 }
 
 .item-info {
@@ -308,6 +358,9 @@ canvas {
     text-align: left;
     padding: 0 15px;
 }
+
+.item-info h3 { margin-bottom: 5px; font-size: 1.1rem; }
+.item-info p { font-size: 0.9rem; color: #ccc; }
 
 .btn-buy {
     background: #ffcf40;
@@ -321,14 +374,14 @@ canvas {
 .btn-buy:hover { transform: scale(1.05); }
 .btn-buy:disabled { background: #555; color: #888; cursor: not-allowed; }
 
-.dona-angry {
-    font-size: 6rem;
-    animation: shake 0.5s infinite;
-    margin: 20px 0;
+.btn-buy.acquired-btn {
+    background: #4facfe;
+    color: white;
 }
-.victory-icon {
-    font-size: 6rem;
-    margin: 20px 0;
+
+/* Animations */
+.shake-text {
+    animation: shake 0.5s infinite;
 }
 
 @keyframes shake {
@@ -345,6 +398,16 @@ canvas {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
+.thug-player {
+    font-size: 5rem;
+    animation: shootUp 0.3s infinite alternate;
+}
+
+@keyframes shootUp {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+}
+
 /* Mobile Controls */
 #mobile-controls {
     position: absolute;
@@ -358,13 +421,15 @@ canvas {
     pointer-events: none; /* Let touches pass through except on buttons */
 }
 
-.d-pad, .action-buttons {
+.d-pad, .action-buttons-container {
     pointer-events: auto;
-    display: grid;
-    gap: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .d-pad {
+    display: grid;
     grid-template-areas: 
         ". up ."
         "left . right"
@@ -392,15 +457,25 @@ canvas {
 .d-btn.right { grid-area: right; }
 .d-btn.down { grid-area: down; }
 
+.action-buttons-container {
+    align-items: flex-end;
+}
+
 .action-buttons {
     display: flex;
     align-items: flex-end;
-    gap: 15px;
+    gap: 10px;
 }
 
 .action-btn { width: 60px; height: 60px; }
 .action-btn.primary { width: 80px; height: 80px; background: rgba(255,105,180,0.4); border-color: #ff69b4; }
 .action-btn.primary:active { background: rgba(255,105,180,0.8); }
+
+.action-btn.ak47-btn {
+    background: rgba(255,0,0,0.6);
+    border-color: red;
+    animation: pulseBorder 1s infinite;
+}
 
 @media (max-width: 1250px) {
     #game-container {
@@ -440,10 +515,12 @@ canvas {
     #victory-screen h1 { font-size: 2.5rem; }
     
     /* Shop Fixes */
-    .shop-items { width: 95%; margin: 15px 0; gap: 10px; }
-    .shop-item { flex-direction: column; text-align: center; gap: 5px; padding: 10px; }
-    .shop-item .item-icon { font-size: 2rem; }
-    .item-info { padding: 0; }
+    .shop-content { width: 95%; padding: 10px; }
+    .shop-item { padding: 5px 10px; }
+    .shop-item .item-icon { font-size: 1.5rem; }
+    .item-info h3 { font-size: 0.9rem; }
+    .item-info p { font-size: 0.7rem; }
+    .tab-btn { font-size: 1.2rem; padding: 5px 10px; }
     
     /* Mobile Controls Scaling */
     .d-pad { width: 120px; height: 120px; }
