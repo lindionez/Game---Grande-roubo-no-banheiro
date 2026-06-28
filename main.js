@@ -1127,6 +1127,12 @@ function drawGameOverAnimation(dt) {
     let cx = canvas.width/2; let cy = canvas.height/2; let swing = Math.sin(gameOverAnimTimer*10);
     
     let squish = swing < -0.5 ? 0.6 : 1.0;
+    if (squish === 0.6 && !window.lastHitSquish) {
+        if(window.audioMgr) window.audioMgr.enemyHit();
+        window.lastHitSquish = true;
+    } else if (squish === 1.0) {
+        window.lastHitSquish = false;
+    }
     player.draw(ctx, cx - 140, cy + 20, 5, squish);
     
     let clubSwing = (swing + 1) / 2;
@@ -1173,6 +1179,7 @@ function drawAK47VictoryAnimation(dt) {
     
     // Spawn bullets from barrel tip
     if(Math.random() < 0.5) {
+        if(window.audioMgr) window.audioMgr.ak47VictoryShoot();
         // Spawn right at tipY (moved down slightly closer to barrel)
         victoryBullets.push({x: tipX, y: tipY, vy: -1400, life: 0.8, maxLife: 0.8});
     }
@@ -1625,6 +1632,7 @@ let exibindoConquista = false;
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playDing() {
     if(gameState === 'PAUSED' || gameState === 'SHOP') return;
+    if(window.audioMgr && window.audioMgr.isMuted) return;
     if(audioCtx.state === 'suspended') audioCtx.resume();
     let osc = audioCtx.createOscillator();
     let gain = audioCtx.createGain();

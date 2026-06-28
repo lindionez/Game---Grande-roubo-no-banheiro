@@ -114,13 +114,22 @@ class AudioManager {
     }
 
     batherHmm() {
-        this.playTone(300, 'triangle', 0.3, 0.4, 400);
+        if(!this.initialized) return;
+        let now = this.ctx.currentTime;
+        if(this.lastHmmTime && now - this.lastHmmTime < 1.0) return;
+        this.lastHmmTime = now;
+        this.playTone(300, 'triangle', 0.3, 0.2, 400);
     }
 
     batherScream() {
+        if(!this.initialized) return;
+        let now = this.ctx.currentTime;
+        if(this.lastScreamTime && now - this.lastScreamTime < 1.5) return;
+        this.lastScreamTime = now;
+        
         // High pitch noise + tone
-        this.playTone(800, 'sawtooth', 1.0, 0.6, 1200);
-        this.playNoise(1.0, 0.4);
+        this.playTone(800, 'sawtooth', 0.8, 0.15, 1200);
+        this.playNoise(0.8, 0.1);
     }
 
     donaAlert() {
@@ -148,7 +157,17 @@ class AudioManager {
         setTimeout(() => this.playTone(200, 'sawtooth', 0.6, 0.7, 50), 400);
     }
 
+    enemyHit() {
+        if(!this.initialized) return;
+        this.playTone(80, 'sawtooth', 0.1, 0.7);
+        this.playNoise(0.1, 1.0, 'step'); 
+    }
 
+    ak47VictoryShoot() {
+        if(!this.initialized) return;
+        this.playNoise(0.1, 0.3); 
+        this.playTone(80, 'square', 0.1, 0.2, 40);
+    }
 
 
     buyUpgrade() {
