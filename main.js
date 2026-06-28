@@ -82,11 +82,33 @@ const shopData = {
         { level: 3, name: 'Álibi Falso', cost: 360, effect: 'Suspeita enche 30% mais devagar', val: 0.7 },
         { level: 4, name: 'Dupla Personalidade', cost: 720, effect: 'Suspeita enche 40% mais devagar', val: 0.6 },
         { level: 5, name: 'Inocente até Provar', cost: 1440, effect: 'Suspeita enche 50% mais devagar', val: 0.5 }
+    ],
+    spawn: [
+        { level: 1, name: 'Atração Básica', cost: 100, effect: 'Calcinhas spawnam 10% mais rápido', val: 0.9 },
+        { level: 2, name: 'Cheiro Suave', cost: 200, effect: 'Calcinhas spawnam 20% mais rápido', val: 0.8 },
+        { level: 3, name: 'Ímã Natural', cost: 400, effect: 'Calcinhas spawnam 35% mais rápido', val: 0.65 },
+        { level: 4, name: 'Chuva de Renda', cost: 800, effect: 'Calcinhas spawnam 50% mais rápido', val: 0.5 },
+        { level: 5, name: 'Tempestade Íntima', cost: 1600, effect: 'Calcinhas spawnam 70% mais rápido', val: 0.3 }
+    ],
+    visao: [
+        { level: 1, name: 'Miopia Leve', cost: 150, effect: 'Banhistas enxergam 10% menos longe', val: 0.9 },
+        { level: 2, name: 'Astigmatismo', cost: 300, effect: 'Banhistas enxergam 20% menos longe', val: 0.8 },
+        { level: 3, name: 'Vista Cansada', cost: 600, effect: 'Banhistas enxergam 30% menos longe', val: 0.7 },
+        { level: 4, name: 'Catarata Precoce', cost: 1200, effect: 'Banhistas enxergam 40% menos longe', val: 0.6 },
+        { level: 5, name: 'Quase Cegas', cost: 2400, effect: 'Banhistas enxergam 50% menos longe', val: 0.5 }
+    ],
+    alerta: [
+        { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 20% mais rápido', val: 1.2 },
+        { level: 2, name: 'Mente Ocupada', cost: 240, effect: 'Alerta desce 50% mais rápido', val: 1.5 },
+        { level: 3, name: 'Desatenção', cost: 480, effect: 'Alerta desce 80% mais rápido', val: 1.8 },
+        { level: 4, name: 'Amnésia', cost: 960, effect: 'Alerta desce 120% mais rápido', val: 2.2 },
+        { level: 5, name: 'Paz Interior', cost: 1920, effect: 'Alerta desce 200% mais rápido', val: 3.0 }
     ]
 };
 
 let upgrades = {
-    mochila: 0, tenis: 0, luva: 0, distracao: 0, disfarce: 0, velocidade: 0, resistencia: 0
+    mochila: 0, tenis: 0, luva: 0, distracao: 0, disfarce: 0, velocidade: 0, resistencia: 0,
+    spawn: 0, visao: 0, alerta: 0
 };
 let hasAK47 = false;
 let ak47TutorialShown = false;
@@ -393,17 +415,27 @@ let distractions = [];
 let lastPantySpawn = 0;
 
 const pantyTypes = [
-    { type: 'Bolinhas', pts: 5, icon: '🩲', color: '#ffb3ba' },
-    { type: 'Listrada', pts: 10, icon: '🩲', color: '#baffc9' },
-    { type: 'Renda', pts: 15, icon: '👙', color: '#000', noise: true },
-    { type: 'Neon', pts: 30, icon: '👙', color: '#ffffba', rare: true },
-    { type: 'Armadilha', pts: -10, icon: '🩲', color: 'red', trap: true }
+    { type: 'Bolinhas', pts: 25, icon: '🩲', color: '#ffb3ba' },
+    { type: 'Listrada', pts: 50, icon: '🩲', color: '#baffc9' },
+    { type: 'Renda', pts: 75, icon: '👙', color: '#000', noise: true },
+    { type: 'Neon', pts: 150, icon: '👙', color: '#ffffba', rare: true },
+    { type: 'Armadilha', pts: -50, icon: '🩲', color: 'red', trap: true }
 ];
 
 function checkCollision(rect1, rect2) {
     let r1w = rect1.width || rect1.size; let r1h = rect1.height || rect1.size;
     let r2w = rect2.width || rect2.size; let r2h = rect2.height || rect2.size;
     return rect1.x < rect2.x + r2w && rect1.x + r1w > rect2.x && rect1.y < rect2.y + r2h && rect1.y + r1h > rect2.y;
+}
+
+function checkBatherCollision(x, y, size) {
+    let rect1 = {x: x, y: y, size: size};
+    for(let i=0; i<bathers.length; i++) {
+        let b = bathers[i];
+        let rect2 = {x: b.x, y: b.y, size: b.size};
+        if(checkCollision(rect1, rect2)) return true;
+    }
+    return false;
 }
 
 function checkMapCollision(x, y, size) {
@@ -602,7 +634,8 @@ function update(dt) {
     if(comboTimer > 0) { comboTimer -= dt; if(comboTimer <= 0) combo = 0; }
     
     let resMult = getUpgradeVal('resistencia', 1.0);
-    if(suspicion > 0 && !enemy.active) suspicion = Math.max(0, suspicion - 2*dt);
+    let alertaMult = getUpgradeVal('alerta', 1.0);
+    if(suspicion > 0 && !enemy.active) suspicion = Math.max(0, suspicion - 2*dt*alertaMult);
 
     let dx = 0; let dy = 0;
     let speed = player.baseSpeed * getUpgradeVal('velocidade', 1.0);
@@ -622,8 +655,8 @@ function update(dt) {
     let isMoving = dx !== 0 || dy !== 0;
     if(isMoving) player.facingAngle = Math.atan2(dy, dx);
 
-    if(!checkMapCollision(player.x + dx*dt, player.y, player.size)) player.x += dx*dt;
-    if(!checkMapCollision(player.x, player.y + dy*dt, player.size)) player.y += dy*dt;
+    if(!checkMapCollision(player.x + dx*dt, player.y, player.size) && !checkBatherCollision(player.x + dx*dt, player.y, player.size)) player.x += dx*dt;
+    if(!checkMapCollision(player.x, player.y + dy*dt, player.size) && !checkBatherCollision(player.x, player.y + dy*dt, player.size)) player.y += dy*dt;
     player.isMoving = isMoving;
 
     let currentTile = getTileAt(player.x, player.y, player.size);
@@ -681,7 +714,7 @@ function update(dt) {
         if(angleDiff > Math.PI) angleDiff = 2*Math.PI - angleDiff;
         
         let isSeeingPlayer = false;
-        if(!player.isHiding && distToPlayer < 350) {
+        if(!player.isHiding && distToPlayer < (350 * getUpgradeVal('visao', 1.0))) {
             if(b.cone === 360 || angleDiff < (b.cone/2 * Math.PI/180)) {
                 if(checkLoS(b.x + b.size/2, b.y + b.size/2, player.x + player.size/2, player.y + player.size/2)) {
                     isSeeingPlayer = true;
@@ -801,7 +834,7 @@ function update(dt) {
         if(totalCollected >= requiredPanties) showToast("PODE FUGIR!");
     }
 
-    let spawnRate = Math.max(5, 15 - stage*0.5);
+    let spawnRate = Math.max(5, 15 - stage*0.5) * getUpgradeVal('spawn', 1.0);
     lastPantySpawn += dt;
     let maxOnScreen = 5;
     if(panties.length >= maxOnScreen) lastPantySpawn = 0;
@@ -829,10 +862,11 @@ function update(dt) {
 
         if(distTarget) {
             enemy.state = 'distracted'; enemy.targetX = distTarget.x; enemy.targetY = distTarget.y; enemy.speed = enemy.baseSpeed * eSpeedMult;
+            suspicion = Math.max(0, suspicion - 25 * dt * alertaMult);
         } else if((suspicion >= 100 && !player.isHiding) || (hasLoS && distToPlayer < 400 && !player.isHiding)) {
             enemy.state = 'chase'; enemy.targetX = player.x; enemy.targetY = player.y; 
             enemy.speed = 145 * eSpeedMult; suspicion = 100;
-        } else if(enemy.state === 'chase' || enemy.state === 'search') {
+        } else if(enemy.state === 'chase' || enemy.state === 'search' || enemy.state === 'distracted') {
             enemy.state = 'search'; enemy.speed = 110 * eSpeedMult;
             if(Math.hypot(enemy.targetX - enemy.x, enemy.targetY - enemy.y) < 20 || Math.random() < 0.02) {
                 let r = Math.floor(enemy.y/TILE_SIZE) + Math.floor((Math.random()-0.5)*12);
@@ -841,7 +875,7 @@ function update(dt) {
                     enemy.targetX = c*TILE_SIZE; enemy.targetY = r*TILE_SIZE;
                 }
             }
-            suspicion -= 10*dt;
+            suspicion -= 10 * dt * alertaMult;
             if(suspicion <= 0) { enemy.state = 'leave'; enemy.speed = 100 * eSpeedMult; showToast("Ela desistiu!"); suspicion = 0; }
         } else if(enemy.state === 'patrol') {
             if(Math.random() < 0.02) {
@@ -924,8 +958,8 @@ function update(dt) {
 
 function triggerWin() {
     gameState = 'VICTORY';
-    score += Math.floor(timeRemaining * 0.5); 
-    score += 50 + (stage * 10); 
+    score += Math.floor(timeRemaining * 2); 
+    score += 200 + (stage * 50); 
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('victory-screen').classList.remove('hidden');
@@ -1416,7 +1450,7 @@ function renderShop() {
     let totalLvl = Object.values(upgrades).reduce((a, b) => a + b, 0);
     document.getElementById('total-level').textContent = totalLvl;
 
-    if(totalLvl === 35) {
+    if(totalLvl === 50) {
         document.getElementById('ak47-shop-item').classList.remove('hidden');
         drawAK47ShopCanvas();
         if(hasAK47) {
