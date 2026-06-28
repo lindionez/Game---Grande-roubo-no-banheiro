@@ -111,6 +111,7 @@ let upgrades = {
     spawn: 0, visao: 0, alerta: 0
 };
 let hasAK47 = false;
+let ak47SecretUnlocked = false;
 let ak47TutorialShown = false;
 let ak47VictoryShown = false;
 
@@ -593,6 +594,7 @@ function setupBathers() {
 }
 
 function startLevel() {
+    ak47SecretUnlocked = false;
     timeRemaining = 300 + (stage * 30); 
     suspicion = 0; totalCollected = 0; backpackCollected = 0;
     faseGritos = 0; fasePerfeitaSemVisto = true; tempoSemSuspeita = 0;
@@ -736,6 +738,7 @@ function update(dt) {
     });
 
     bathers.forEach(b => {
+        if(b.dead) return;
         let pdx = (player.x + player.size/2) - (b.x + b.size/2);
         let pdy = (player.y + player.size/2) - (b.y + b.size/2);
         let distToPlayer = Math.hypot(pdx, pdy);
@@ -995,6 +998,7 @@ function update(dt) {
         suspicion = 0;
         spawnBlood(enemy.x, enemy.y);
         showToast("BANG!");
+        ak47SecretUnlocked = true;
         
         setTimeout(() => { 
             player.isShooting = false; 
@@ -1003,6 +1007,43 @@ function update(dt) {
                 triggerAK47Win(); 
             }
         }, 500);
+    } else if (mousePressed && hasAK47 && ak47SecretUnlocked) {
+        let closestBather = null;
+        let minBatherDist = Infinity;
+        for (let i = 0; i < bathers.length; i++) {
+            let b = bathers[i];
+            if (b.state === 'scream' && !b.dead) {
+                let pdx = (player.x + player.size/2) - (b.x + b.size/2);
+                let pdy = (player.y + player.size/2) - (b.y + b.size/2);
+                let dist = Math.hypot(pdx, pdy);
+                if (dist < minBatherDist) {
+                    minBatherDist = dist;
+                    closestBather = b;
+                }
+            }
+        }
+
+        if (closestBather) {
+            mousePressed = false;
+            player.isShooting = true;
+            let ex = closestBather.x + closestBather.size/2; let ey = closestBather.y + closestBather.size/2;
+            let px = player.x + player.size/2; let py = player.y + player.size/2;
+            player.shootAngle = Math.atan2(ey - py, ex - px);
+            
+            if(window.audioMgr) window.audioMgr.ak47Shoot();
+            spawnParticle(px + Math.cos(player.shootAngle)*30, py + Math.sin(player.shootAngle)*30, "💥", "#ffcf40");
+            
+            closestBather.dead = true;
+            closestBather.state = 'dead';
+            spawnBlood(closestBather.x, closestBather.y);
+            showToast("BANG!");
+            
+            setTimeout(() => { 
+                player.isShooting = false; 
+            }, 500);
+        } else {
+            mousePressed = false;
+        }
     } else {
         mousePressed = false;
     }
@@ -1111,6 +1152,18 @@ function draw() {
     });
 
     bathers.forEach(b => {
+        if(b.dead) {
+            ctx.save();
+            ctx.translate(b.x, b.y);
+            ctx.fillStyle = '#800020';
+            ctx.fillRect(0, 16, 24, 8);
+            ctx.fillStyle = 'red';
+            ctx.beginPath(); ctx.ellipse(12, 24, 20, 8, 0, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#f5cba7';
+            ctx.beginPath(); ctx.arc(24, 20, 8, 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+            return;
+        }
         let cx = b.x + b.size/2; let cy = b.y + b.size/2;
         ctx.fillStyle = '#f1c27d'; ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2); ctx.fill(); 
         ctx.fillStyle = b.type === 'fofoqueira' ? 'purple' : (b.type === 'atleta' ? 'blue' : 'green');
