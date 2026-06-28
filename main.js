@@ -78,13 +78,7 @@ const shopData = {
 };
 
 let upgrades = {
-    mochila: 0,
-    tenis: 0,
-    luva: 0,
-    distracao: 0,
-    disfarce: 0,
-    velocidade: 0,
-    resistencia: 0
+    mochila: 0, tenis: 0, luva: 0, distracao: 0, disfarce: 0, velocidade: 0, resistencia: 0
 };
 let hasAK47 = false;
 let ak47TutorialShown = false;
@@ -164,7 +158,7 @@ const mapLayout = [
 // Entities
 let player = {
     x: 100, y: 100, size: 28, baseSpeed: 120,
-    isHiding: false, facing: 'down',
+    isHiding: false, facingAngle: Math.PI/2,
     draw(ctx, ox, oy, scale = 1, squish = 1) {
         ctx.save();
         let dx = ox !== undefined ? ox : this.x;
@@ -183,32 +177,18 @@ let player = {
         ctx.translate(this.size/2, this.size/2 + offsetY);
         ctx.scale(1, squish);
 
-        if(hasAK47 && ox === undefined) {
-            ctx.save();
-            ctx.rotate(Math.PI/4);
-            ctx.fillStyle = '#444';
-            ctx.fillRect(-15, -2, 30, 4);
-            ctx.fillStyle = '#8b4513';
-            ctx.fillRect(-10, -2, 10, 6);
-            ctx.restore();
-        }
-
+        // Body
         ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(0, drawSize*0.3, drawSize*0.4, Math.PI, 0); 
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(0, drawSize*0.3, drawSize*0.4, Math.PI, 0); ctx.fill();
         ctx.fillStyle = '#000';
         ctx.fillRect(-drawSize*0.4, drawSize*0.05, drawSize*0.8, drawSize*0.1);
         ctx.fillRect(-drawSize*0.4, drawSize*0.2, drawSize*0.8, drawSize*0.1);
         ctx.fillStyle = '#ffcc99'; 
-        ctx.beginPath();
-        ctx.arc(0, -drawSize*0.2, drawSize*0.4, 0, Math.PI*2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(0, -drawSize*0.2, drawSize*0.4, 0, Math.PI*2); ctx.fill();
         ctx.fillStyle = '#111';
-        ctx.beginPath();
-        ctx.ellipse(0, -drawSize*0.2, drawSize*0.45, drawSize*0.15, 0, 0, Math.PI*2);
-        ctx.fill();
+        ctx.beginPath(); ctx.ellipse(0, -drawSize*0.2, drawSize*0.45, drawSize*0.15, 0, 0, Math.PI*2); ctx.fill();
         
+        // Eyes
         if(ox !== undefined && squish < 0.9) {
             ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath();
             let eyeX = drawSize*0.15; let eyeY = -drawSize*0.2; let es = 2;
@@ -226,19 +206,34 @@ let player = {
         }
 
         ctx.fillStyle = '#222';
-        ctx.beginPath();
-        ctx.arc(0, -drawSize*0.4, drawSize*0.35, Math.PI, 0);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(0, -drawSize*0.4, drawSize*0.35, Math.PI, 0); ctx.fill();
 
-        if(this.isShooting && ox === undefined) {
-            ctx.fillStyle = '#444';
+        // AK47 logic
+        if(hasAK47 && (ox === undefined || this.isShooting)) {
             ctx.save();
-            ctx.rotate(this.shootAngle);
-            ctx.fillRect(0, -2, 30, 4);
-            ctx.fillStyle = '#8b4513';
-            ctx.fillRect(0, 0, 8, 8);
-            ctx.fillStyle = 'gold';
-            ctx.beginPath(); ctx.arc(32, 0, 6, 0, Math.PI*2); ctx.fill();
+            let aim = this.isShooting ? this.shootAngle : (this.facingAngle || 0);
+            ctx.rotate(aim);
+            
+            // Offset to the side of the body
+            ctx.translate(14, -8);
+            
+            // Draw a proper looking side-view AK47
+            ctx.fillStyle = '#444'; // Metal parts
+            ctx.fillRect(0, -2, 28, 4); // Barrel
+            ctx.fillRect(26, -4, 2, 4); // Iron Sight Front
+            
+            ctx.fillStyle = '#8b4513'; // Wood parts
+            ctx.fillRect(6, -3, 10, 6); // Handguard
+            ctx.fillRect(0, -3, -12, 6); // Stock Base
+            
+            ctx.fillStyle = '#222'; // Magazine and Grip
+            ctx.fillRect(10, 2, 4, 8); // Mag
+            ctx.fillRect(0, 2, 3, 6);  // Grip
+            
+            if(this.isShooting) {
+                ctx.fillStyle = 'gold';
+                ctx.beginPath(); ctx.arc(32, 0, 6, 0, Math.PI*2); ctx.fill();
+            }
             ctx.restore();
         }
 
@@ -249,10 +244,8 @@ let player = {
 let enemy = {
     active: false, dead: false,
     x: 0, y: 0, size: 30, baseSpeed: 100,
-    state: 'patrol',
-    targetX: 0, targetY: 0,
+    state: 'patrol', targetX: 0, targetY: 0,
     pathTimer: 0, nextTarget: null,
-    distractionTimer: 0,
     draw(ctx, ox, oy, scale = 1, swing = 0) {
         if(!this.active && ox === undefined) return;
         ctx.save();
@@ -279,13 +272,9 @@ let enemy = {
         ctx.translate(this.size/2, this.size/2 - bob);
 
         ctx.save();
-        if(ox !== undefined) {
-            ctx.rotate(-1.2 + swing*1.8);
-        } else if(this.state === 'chase') {
-            ctx.rotate(Math.sin(Date.now()/100) * 0.5 + 0.5); 
-        } else {
-            ctx.rotate(0.2); 
-        }
+        if(ox !== undefined) { ctx.rotate(-1.2 + swing*1.8); }
+        else if(this.state === 'chase') { ctx.rotate(Math.sin(Date.now()/100) * 0.5 + 0.5); }
+        else { ctx.rotate(0.2); }
         ctx.fillStyle = '#8b4513';
         ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(25, -20); ctx.lineTo(32, -18); ctx.lineTo(15, 5); ctx.fill();
         ctx.fillStyle = '#654321'; 
@@ -333,11 +322,11 @@ let distractions = [];
 let lastPantySpawn = 0;
 
 const pantyTypes = [
-    { type: 'Bolinhas', pts: 10, icon: '🩲', color: '#ffb3ba' },
-    { type: 'Listrada', pts: 15, icon: '🩲', color: '#baffc9' },
-    { type: 'Renda', pts: 25, icon: '👙', color: '#000', noise: true },
-    { type: 'Neon', pts: 50, icon: '👙', color: '#ffffba', rare: true },
-    { type: 'Armadilha', pts: -20, icon: '🩲', color: 'red', trap: true }
+    { type: 'Bolinhas', pts: 5, icon: '🩲', color: '#ffb3ba' },
+    { type: 'Listrada', pts: 10, icon: '🩲', color: '#baffc9' },
+    { type: 'Renda', pts: 15, icon: '👙', color: '#000', noise: true },
+    { type: 'Neon', pts: 30, icon: '👙', color: '#ffffba', rare: true },
+    { type: 'Armadilha', pts: -10, icon: '🩲', color: 'red', trap: true }
 ];
 
 function checkCollision(rect1, rect2) {
@@ -498,11 +487,8 @@ function setupBathers() {
 }
 
 function startLevel() {
-    timeRemaining = 300 + (stage * 30); // Começa com 5 minutos e aumenta 30s por fase
-    
-    suspicion = 0;
-    totalCollected = 0;
-    backpackCollected = 0;
+    timeRemaining = 300 + (stage * 30); 
+    suspicion = 0; totalCollected = 0; backpackCollected = 0;
     requiredPanties = 4 + stage;
     panties = []; particles = []; distractions = [];
     distractionsLeft = getUpgradeVal('distracao', 0);
@@ -528,12 +514,8 @@ function startLevel() {
     
     gameState = 'PLAYING';
     document.getElementById('hud').classList.remove('hidden');
-    if(hasAK47) {
-        document.getElementById('btn-shoot').classList.remove('hidden');
-    }
-    if(distractionsLeft > 0) {
-        document.getElementById('btn-distraction').classList.remove('hidden');
-    }
+    if(hasAK47) document.getElementById('btn-shoot').classList.remove('hidden');
+    if(distractionsLeft > 0) document.getElementById('btn-distraction').classList.remove('hidden');
     if(window.innerWidth <= 1250) document.getElementById('mobile-controls').classList.remove('hidden');
 }
 
@@ -584,7 +566,7 @@ function update(dt) {
         if(Math.random() < 0.2) spawnNoiseRing(player.x, player.y);
     }
 
-    let disfarceDelay = getUpgradeVal('disfarce', 0); // 0 to 5s
+    let disfarceDelay = getUpgradeVal('disfarce', 0);
     
     if(ePressed && distractionsLeft > 0) {
         ePressed = false; distractionsLeft--;
@@ -598,7 +580,6 @@ function update(dt) {
         if(distractions[i].life <= 0) distractions.splice(i,1);
     }
 
-    // Shower bathers (Fixed) logic
     women.forEach(w => {
         if(w.alerted) return;
         let pcdx = (player.x + player.size/2) - (w.x + w.size/2);
@@ -615,7 +596,6 @@ function update(dt) {
         }
     });
 
-    // Wandering Bathers Logic
     bathers.forEach(b => {
         let pdx = (player.x + player.size/2) - (b.x + b.size/2);
         let pdy = (player.y + player.size/2) - (b.y + b.size/2);
@@ -625,7 +605,6 @@ function update(dt) {
         let angleDiff = Math.abs(angleToPlayer - b.angle);
         if(angleDiff > Math.PI) angleDiff = 2*Math.PI - angleDiff;
         
-        // Vision check
         let isSeeingPlayer = false;
         if(!player.isHiding && distToPlayer < 350) {
             if(b.cone === 360 || angleDiff < (b.cone/2 * Math.PI/180)) {
@@ -715,13 +694,13 @@ function update(dt) {
                 let p = panties[i];
                 if(checkCollision(pRect, p)) {
                     if(p.type.trap) {
-                        score = Math.max(0, score - 20); suspicion += 30 * resMult;
+                        score = Math.max(0, score - 10); suspicion += 30 * resMult;
                         showToast("🚨 ARMADILHA!"); combo = 0;
                         spawnNoiseRing(player.x, player.y);
                     } else {
                         combo++; comboTimer = 2.5;
-                        let mul = combo >= 5 ? 3 : (combo >= 3 ? 2 : 1);
-                        let gained = p.type.pts * mul; score += gained;
+                        let mult = combo >= 5 ? 2 : (combo >= 3 ? 1.5 : 1);
+                        let gained = Math.floor(p.type.pts * mult); score += gained;
                         backpackCollected++;
                         if(p.type.noise) { suspicion += 10 * resMult; spawnNoiseRing(player.x, player.y); }
                         if(combo > 2) suspicion += 5 * resMult;
@@ -861,8 +840,8 @@ function update(dt) {
 
 function triggerWin() {
     gameState = 'VICTORY';
-    score += timeRemaining * 5; 
-    score += 100 + (stage * 50); 
+    score += Math.floor(timeRemaining * 0.5); 
+    score += 50 + (stage * 10); 
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('victory-screen').classList.remove('hidden');
@@ -873,6 +852,7 @@ function triggerWin() {
 
 function triggerAK47Win() {
     gameState = 'AK47_VICTORY';
+    gameOverAnimTimer = 0;
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('ak47-victory-screen').classList.remove('hidden');
@@ -982,11 +962,38 @@ function drawGameOverAnimation(dt) {
     enemy.draw(ctx, cx + 80, cy, 5, swing);
 }
 
+function drawAK47VictoryAnimation(dt) {
+    gameOverAnimTimer += dt;
+    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    
+    let cx = canvas.width/2; let cy = canvas.height/2 + 50;
+    
+    player.isShooting = true;
+    player.shootAngle = -Math.PI/2 + (Math.random()*0.1 - 0.05); 
+    player.draw(ctx, cx, cy, 6, 1);
+    
+    if(Math.random() < 0.4) {
+        particles.push({x: cx + (Math.random()-0.5)*20, y: cy - 70, vy: -600, life: 1, maxLife: 1, type: 'bullet'});
+    }
+
+    particles.forEach((p, i) => {
+        if(p.type === 'bullet') {
+            p.y += p.vy * dt;
+            ctx.fillStyle = 'gold';
+            ctx.fillRect(p.x, p.y, 4, 15);
+            p.life -= dt;
+            if(p.life <= 0) particles.splice(i, 1);
+        }
+    });
+}
+
 let lastTime = 0;
 function loop(timestamp) {
     let dt = (timestamp - lastTime)/1000; lastTime = timestamp; if(dt > 0.1) dt = 0.1;
     if(gameState === 'PLAYING') { update(dt); draw(); }
     else if(gameState === 'GAMEOVER') drawGameOverAnimation(dt);
+    else if(gameState === 'AK47_VICTORY') drawAK47VictoryAnimation(dt);
     requestAnimationFrame(loop);
 }
 
@@ -1038,6 +1045,10 @@ document.getElementById('btn-next-stage').addEventListener('click', () => {
     stage++;
     if(hasAK47 && !ak47TutorialShown) {
         ak47TutorialShown = true;
+        let isMobile = window.innerWidth <= 1250;
+        document.getElementById('ak47-tut-text').innerHTML = isMobile ?
+            `Acabou a furtividade. Agora é bala!<br><br>📱 <strong>Use o botão de ATIRAR</strong> no canto da tela para neutralizar a Dona do Banheiro.` :
+            `Acabou a furtividade. Agora é bala!<br><br>🖥️ <strong>Clique com o botão ESQUERDO do mouse</strong> para neutralizar a Dona do Banheiro.`;
         document.getElementById('ak47-tutorial-screen').classList.remove('hidden');
     } else {
         startLevel();

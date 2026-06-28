@@ -105,18 +105,11 @@
             <h1 style="color: #ff3333; text-shadow: 0 0 10px red;">🔥 NOVA ARMA DESBLOQUEADA! 🔫</h1>
             <h2 style="color: gold; margin-bottom: 20px;">AK-47 DO DESESPERO</h2>
             <div class="tutorial-content" style="background: rgba(255,0,0,0.1); border: 2px solid red;">
-
-                <p style="font-size: 1.2rem; line-height: 1.6; text-align: left; color: white;">
+                <p id="ak47-tut-text" style="font-size: 1.2rem; line-height: 1.6; text-align: left; color: white; padding: 20px;">
                     Acabou a furtividade. Agora é bala!<br><br>
-                    🖥️ <strong>NO PC:</strong> Clique com o botão ESQUERDO do mouse para atirar<br>
-                    📱 <strong>NO CELULAR:</strong> Use o botão de ATIRAR no canto da tela<br><br>
-                    ⚡ A mira é AUTOMÁTICA no inimigo mais próximo<br>
-                    💀 1 tiro = Dona do Banheiro neutralizada<br>
-                    🩸 Deixa marca de sangue no chão (estilo cartoon)<br><br>
-                    ⚠️ Use com sabedoria. Você ainda pode ser pego se errar o timing!
                 </p>
             </div>
-            <button id="btn-ak47-continue" class="btn-large" style="background: #ff3333; color: white; border: 2px solid gold;">ENTENDIDO</button>
+            <button id="btn-ak47-continue" class="btn-large" style="margin-top: 30px; background: red; border-color: darkred;">VINGANÇA!</button>
         </div>
 
         <!-- Game Over Screen -->
@@ -127,15 +120,8 @@
         </div>
 
         <!-- Victory Screen Special (AK-47 Kill) -->
-        <div id="ak47-victory-screen" class="screen hidden" style="background: radial-gradient(circle, #400 0%, #000 100%); z-index: 200;">
-            <div id="ak47-particles-container" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none;"></div>
-            <h1 class="shake-text" style="color: #ff3333; font-size: 4rem; text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff; z-index: 2;">A CAÇADORA VIROU CAÇA!</h1>
-            <p style="color: #ffcc00; font-size: 1.5rem; margin-bottom: 20px; z-index: 2;">Ninguém mais vai te impedir!</p>
-            <div class="ak47-victory-anim" style="z-index: 2;">
-                <!-- Animated in JS/CSS -->
-                <div class="thug-player">😎🔫💨</div>
-            </div>
-            <button id="btn-ak47-next" class="btn-large" style="background: #ffcf40; margin-top: 50px; z-index: 2; position: relative;">CONTINUAR ROUBANDO (+500 pts)</button>
+        <div id="ak47-victory-screen" class="screen hidden" style="background: transparent; z-index: 300;">
+            <button id="btn-ak47-next" class="btn-large" style="background: #ffcf40; position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); z-index: 2;">CONTINUAR ROUBANDO (+500 pts)</button>
         </div>
 
         <!-- Victory Screen Normal -->
