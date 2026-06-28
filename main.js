@@ -901,7 +901,7 @@ function update(dt) {
         mousePressed = false;
     }
 
-    if(totalCollected >= requiredPanties && currentTile === 'E' && !enemy.dead) triggerWin();
+    if(totalCollected >= requiredPanties && currentTile === 'E') triggerWin();
 
     for(let i=particles.length-1; i>=0; i--) {
         let p = particles[i]; p.life -= dt;
