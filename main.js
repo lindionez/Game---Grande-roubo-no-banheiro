@@ -303,10 +303,7 @@ let player = {
             ctx.fillRect(10, 2, 4, 8); 
             ctx.fillRect(0, 2, 3, 6);  // Grip
             
-            if(this.isShooting) {
-                ctx.fillStyle = 'gold';
-                ctx.beginPath(); ctx.arc(32, 0, 6, 0, Math.PI*2); ctx.fill();
-            }
+            // Muzzle flash only shown explicitly in victory animation, NOT in gameplay
             ctx.restore();
         }
 
@@ -1042,16 +1039,18 @@ function drawGameOverAnimation(dt) {
     enemy.draw(ctx, cx + 80, cy, 5, swing);
 }
 
+// Floating emoji particles for victory screen
+let victoryEmojis = [];
+
 function drawAK47VictoryAnimation(dt) {
     gameOverAnimTimer += dt;
     
-    // === TOTAL BLUR FIX: clearRect wipes everything, solid fill, no transparency ===
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Draw the game board behind (visible blurred by the CSS overlay on the div)
+    draw();
     
-    // Disable any smoothing every frame (resize can reset it)
-    ctx.imageSmoothingEnabled = false;
+    // Semi-transparent dark overlay so the board is visible but dimmed
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     let cx = canvas.width / 2 - 30;
     let cy = canvas.height / 2 + 50;
@@ -1059,15 +1058,13 @@ function drawAK47VictoryAnimation(dt) {
     player.isShooting = true;
     player.shootAngle = -Math.PI / 2;
     
-    // AK recoil shake — only the gun arm trembles
-    let shakeX = Math.round((Math.random() - 0.5) * 4); // round to whole pixels = no subpixel blur
+    // AK recoil shake
+    let shakeX = Math.round((Math.random() - 0.5) * 4);
     let shakeY = Math.round((Math.random() - 0.5) * 3);
     
     player.draw(ctx, Math.round(cx) + shakeX, Math.round(cy) + shakeY, 6, 1);
     
-    // Gun tip offset: gun translate is (+16, +2), barrel is 28px long, scale 6x
-    // So tip X = 16+28 = 44, scaled = ~150px right of player center
-    let tipX = Math.round(cx) + shakeX + 150;
+    let tipX = Math.round(cx) + shakeX + 170;
     let tipY = Math.round(cy) + shakeY - 180;
     
     // Muzzle flash at barrel tip
@@ -1083,6 +1080,22 @@ function drawAK47VictoryAnimation(dt) {
         particles.push({x: tipX, y: tipY - 10, vy: -1400, life: 0.8, maxLife: 0.8, type: 'bullet'});
     }
 
+    // Spawn floating emojis randomly
+    if(Math.random() < 0.15) {
+        let emojis = ['💥','🔥','💀','😈','🔫','🩸','⚡','👿','😤','💪'];
+        victoryEmojis.push({
+            x: Math.random() * canvas.width,
+            y: canvas.height + 20,
+            emoji: emojis[Math.floor(Math.random() * emojis.length)],
+            vy: -(80 + Math.random() * 120),
+            vx: (Math.random() - 0.5) * 60,
+            rot: (Math.random() - 0.5) * 4,
+            angle: 0,
+            size: 28 + Math.random() * 24,
+            life: 1.0
+        });
+    }
+
     // Draw bullets going UP
     for(let i = particles.length - 1; i >= 0; i--) {
         let p = particles[i];
@@ -1095,16 +1108,53 @@ function drawAK47VictoryAnimation(dt) {
         }
     }
     
-    // Victory message — crisp text with stroke outline, no shadowBlur
+    // Draw + update floating emojis
+    for(let i = victoryEmojis.length - 1; i >= 0; i--) {
+        let e = victoryEmojis[i];
+        e.x += e.vx * dt;
+        e.y += e.vy * dt;
+        e.angle += e.rot * dt;
+        e.life -= dt * 0.4;
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, e.life);
+        ctx.translate(Math.round(e.x), Math.round(e.y));
+        ctx.rotate(e.angle);
+        ctx.font = `${e.size}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(e.emoji, 0, 0);
+        ctx.restore();
+        if(e.life <= 0) victoryEmojis.splice(i, 1);
+    }
+    
+    // Pulsing scale for the victory text — macabre style
+    let pulse = 1 + 0.07 * Math.sin(gameOverAnimTimer * 5);
+    // Color flicker between dark red and blood red
+    let flicker = Math.sin(gameOverAnimTimer * 18);
+    let r = Math.floor(180 + flicker * 40);
+    let textColor = `rgb(${r}, 0, 0)`;
+    let textY = 60;
+    
     ctx.save();
-    ctx.font = 'bold 42px "Fredoka One", cursive';
+    ctx.translate(Math.round(canvas.width / 2), textY);
+    ctx.scale(pulse, pulse);
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.lineWidth = 5;
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 44px "Fredoka One", cursive';
+    
+    // Drip shadow effect: draw shifted copies below in dark red
+    ctx.fillStyle = 'rgba(80,0,0,0.6)';
+    ctx.fillText('☠ AGORA NADA VAI ME PARAR! ☠', 2, 5);
+    ctx.fillText('☠ AGORA NADA VAI ME PARAR! ☠', 1, 8);
+    
+    // Black stroke outline
+    ctx.lineWidth = 6;
     ctx.strokeStyle = '#000';
-    ctx.strokeText('AGORA NADA VAI ME PARAR!', Math.round(canvas.width / 2), 30);
-    ctx.fillStyle = '#ff3333';
-    ctx.fillText('AGORA NADA VAI ME PARAR!', Math.round(canvas.width / 2), 30);
+    ctx.strokeText('☠ AGORA NADA VAI ME PARAR! ☠', 0, 0);
+    
+    // Main fill with flicker color
+    ctx.fillStyle = textColor;
+    ctx.fillText('☠ AGORA NADA VAI ME PARAR! ☠', 0, 0);
     ctx.restore();
 }
 
@@ -1228,12 +1278,13 @@ document.getElementById('btn-cheat-apply').addEventListener('click', () => {
 
 document.getElementById('btn-cheat-close').addEventListener('click', () => {
     document.getElementById('cheat-screen').classList.add('hidden');
+    document.getElementById('pause-screen').classList.add('hidden');
     
-    if (gameState === 'PAUSED') {
-        if (cheatLastGameState !== 'PLAYING' && cheatLastGameState !== 'PAUSED') {
-            gameState = cheatLastGameState;
-            document.getElementById('pause-screen').classList.add('hidden');
-        }
+    // Always resume game if it was playing, regardless of previous state
+    if (cheatLastGameState === 'PLAYING' || gameState === 'PAUSED') {
+        gameState = 'PLAYING';
+    } else {
+        gameState = cheatLastGameState;
     }
 });
 
@@ -1328,6 +1379,7 @@ function renderShop() {
 
     if(totalLvl === 35) {
         document.getElementById('ak47-shop-item').classList.remove('hidden');
+        drawAK47ShopCanvas();
         if(hasAK47) {
             document.getElementById('btn-buy-ak47').textContent = 'EQUIPADA';
             document.getElementById('btn-buy-ak47').disabled = true;
@@ -1335,6 +1387,55 @@ function renderShop() {
             document.getElementById('btn-buy-ak47').disabled = (shopPoints < 10000);
         }
     }
+}
+
+function drawAK47ShopCanvas() {
+    const sc = document.getElementById('ak47-shop-canvas');
+    if(!sc) return;
+    const sx = sc.getContext('2d');
+    sx.clearRect(0, 0, sc.width, sc.height);
+    
+    // Draw AK-47 centered, scale=3, pointing right
+    sx.save();
+    sx.translate(20, 30); // Start from left center
+    
+    const s = 3; // scale
+    
+    // Stock (back)
+    sx.fillStyle = '#8b4513';
+    sx.fillRect(-10*s, -3*s, 10*s, 6*s);
+    
+    // Handguard (mid)
+    sx.fillStyle = '#8b4513';
+    sx.fillRect(6*s, -3*s, 10*s, 6*s);
+    
+    // Barrel (metal, long)
+    sx.fillStyle = '#444';
+    sx.fillRect(0, -2*s, 28*s, 4*s);
+    
+    // Iron sight
+    sx.fillStyle = '#333';
+    sx.fillRect(26*s, -5*s, 2*s, 4*s);
+    
+    // Magazine
+    sx.fillStyle = '#222';
+    sx.fillRect(10*s, 2*s, 4*s, 8*s);
+    
+    // Grip
+    sx.fillStyle = '#222';
+    sx.fillRect(0, 2*s, 3*s, 6*s);
+    
+    // Muzzle flash glow
+    sx.fillStyle = '#ffdd00';
+    sx.beginPath();
+    sx.arc(28*s + 6, 0, 7, 0, Math.PI*2);
+    sx.fill();
+    sx.fillStyle = '#fff';
+    sx.beginPath();
+    sx.arc(28*s + 6, 0, 3, 0, Math.PI*2);
+    sx.fill();
+    
+    sx.restore();
 }
 window.buyUpgrade = function(cat, cost) {
     if(shopPoints >= cost && upgrades[cat] < 5) {
