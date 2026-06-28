@@ -1333,7 +1333,7 @@ document.getElementById('btn-play').addEventListener('click', () => {
     document.getElementById('tutorial-screen').classList.remove('hidden');
 });
 document.getElementById('btn-tut-next').addEventListener('click', () => {
-    const slides = document.querySelectorAll('.tut-slide');
+    const slides = document.querySelectorAll('#tutorial-screen .tut-slide');
     let active = [...slides].findIndex(s => !s.classList.contains('hidden'));
     slides[active].classList.add('hidden');
     if(active + 1 < slides.length) {
