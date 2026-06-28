@@ -15,6 +15,7 @@
                 <div class="hud-left">
                     <div id="stage-name">Fase 1</div>
                     <div id="timer">⏱️ 01:30</div>
+                    <div id="backpack-counter" style="color: #ffcf40; font-weight: bold; margin-top: 5px;">🎒 0/2</div>
                 </div>
                 <div class="hud-center">
                     <div class="suspicion-container">
@@ -25,10 +26,10 @@
                     </div>
                 </div>
                 <div class="hud-right">
-                    <div id="score">Score: 0</div>
+                    <div id="score">Pontos: 0</div>
                     <div id="combo" class="hidden">Combo x2!</div>
                     <div id="panty-counter">🩲 0/5</div>
-                    <div id="capacity-counter" class="hidden" style="color: #ffcf40; font-weight: bold; font-size: 0.9em;">Mochila CHEIA! (Vá à porta 🚪)</div>
+                    <div id="capacity-counter" class="hidden" style="color: #ffcf40; font-weight: bold; font-size: 0.9em;">🎒 CHEIA! (Vá à porta 🚪)</div>
                 </div>
             </div>
             <div class="hud-bottom">
@@ -116,7 +117,7 @@
         <!-- Game Over Screen -->
         <div id="game-over-screen" class="screen hidden">
             <h1 style="text-shadow: 2px 2px 10px #000; margin-bottom: 300px;">VOCÊ FOI PEGO!</h1>
-            <p id="game-over-stats" style="text-shadow: 2px 2px 5px #000;">Pontuação Final: 0</p>
+            <p id="game-over-stats" style="text-shadow: 2px 2px 5px #000;">Fase Alcançada: 0</p>
             <button id="btn-restart" class="btn-large">Tentar Novamente</button>
         </div>
 
@@ -168,7 +169,7 @@
             </div>
 
             <div class="shop-footer" style="margin-top: 20px; text-align: center;">
-                <div class="level-progress" style="margin-bottom: 10px; font-weight: bold; color: #ffcf40;">Level Total: <span id="total-level">0</span>/35</div>
+                <div class="level-progress" style="margin-bottom: 10px; font-weight: bold; color: #ffcf40;">Nível Total: <span id="total-level">0</span>/35</div>
                 <button id="btn-next-stage" class="btn-large">Próxima Fase ➡️</button>
             </div>
         </div>

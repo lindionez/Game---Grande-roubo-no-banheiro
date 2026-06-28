@@ -300,6 +300,7 @@ let enemy = {
 let panties = [];
 let particles = [];
 let bathers = [];
+let women = [];
 let distractions = [];
 let lastPantySpawn = 0;
 
@@ -409,7 +410,7 @@ function updateHUD() {
     let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
     let s = Math.floor(timeRemaining % 60).toString().padStart(2, '0');
     document.getElementById('timer').textContent = `⏱️ ${m}:${s}`;
-    document.getElementById('score').textContent = `Score: ${score}`;
+    document.getElementById('score').textContent = `Pontos: ${score}`;
     
     if(combo > 1) { document.getElementById('combo').textContent = `Combo x${combo}!`; document.getElementById('combo').classList.remove('hidden'); }
     else document.getElementById('combo').classList.add('hidden');
@@ -418,6 +419,7 @@ function updateHUD() {
     
     let cap = getUpgradeVal('mochila', 1);
     let capLabel = document.getElementById('capacity-counter');
+    document.getElementById('backpack-counter').textContent = `🎒 ${backpackCollected}/${cap}`;
     if(backpackCollected >= cap) capLabel.classList.remove('hidden');
     else capLabel.classList.add('hidden');
     
@@ -433,9 +435,10 @@ function updateHUD() {
 
 function setupBathers() {
     bathers = [];
-    let batherCount = stage <= 2 ? 0 : (stage <= 6 ? 1 : (stage <= 10 ? 2 : 3 + Math.floor((stage-11)/3)));
+    let batherCount = stage <= 2 ? 0 : (stage <= 5 ? 1 : (stage <= 8 ? 2 : 3 + Math.floor((stage-10)/3)));
     
-    let speedMult = stage <= 3 ? 1.0 : (stage <= 6 ? 1.1 : (stage <= 9 ? 1.2 : (stage <= 12 ? 1.3 : 1.5)));
+    // Slow initial speed, getting faster gradually
+    let speedMult = stage <= 3 ? 0.5 : (stage <= 6 ? 0.7 : (stage <= 9 ? 0.9 : (stage <= 12 ? 1.1 : 1.3)));
     let cone = stage <= 3 ? 90 : (stage <= 6 ? 100 : (stage <= 9 ? 110 : (stage <= 12 ? 120 : 130)));
     let reaction = stage <= 3 ? 0.8 : (stage <= 6 ? 0.6 : (stage <= 9 ? 0.5 : (stage <= 12 ? 0.4 : 0.3)));
     let screamSus = stage <= 3 ? 40 : (stage <= 6 ? 45 : (stage <= 9 ? 50 : (stage <= 12 ? 55 : 60)));
@@ -479,6 +482,16 @@ function startLevel() {
     
     enemy.active = false; enemy.dead = false;
     setupBathers();
+
+    // Shower bathers
+    women = [];
+    for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
+            if(mapLayout[r][c] === 'B' && Math.random() < 0.6) {
+                women.push({ x: c * TILE_SIZE, y: r * TILE_SIZE, size: TILE_SIZE, alerted: false });
+            }
+        }
+    }
 
     for(let r=0; r<ROWS; r++) {
         for(let c=0; c<COLS; c++) {
@@ -555,13 +568,29 @@ function update(dt) {
         spawnNoiseRing(player.x, player.y); spawnNoiseRing(player.x, player.y);
     }
 
-    // Update distractions
     for(let i=distractions.length-1; i>=0; i--) {
         distractions[i].life -= dt;
         if(distractions[i].life <= 0) distractions.splice(i,1);
     }
 
-    // Bathers Logic
+    // Shower bathers (Fixed) logic
+    women.forEach(w => {
+        if(w.alerted) return;
+        let pcdx = (player.x + player.size/2) - (w.x + w.size/2);
+        let pcdy = (player.y + player.size/2) - (w.y + w.size/2);
+        let dist = Math.hypot(pcdx, pcdy);
+        
+        if(dist < 350 && !player.isHiding && pcdx > -20 && Math.abs(pcdy) < 120) {
+            let hasLoS = checkLoS(w.x + w.size/2, w.y + w.size/2, player.x + player.size/2, player.y + player.size/2);
+            if(hasLoS) {
+                w.alerted = true; showToast("😱 AHHH! UM INVASOR!");
+                suspicion += 50 * resMult; spawnParticle(w.x + w.size/2, w.y, "😱", "#fff");
+                spawnNoiseRing(w.x, w.y); spawnNoiseRing(w.x, w.y);
+            }
+        }
+    });
+
+    // Wandering Bathers Logic
     bathers.forEach(b => {
         if(b.state === 'scream') {
             b.alertTimer -= dt;
@@ -569,7 +598,6 @@ function update(dt) {
             return;
         }
 
-        // Check nearest distraction
         let distTarget = null;
         distractions.forEach(dist => {
             if(Math.hypot(dist.x - b.x, dist.y - b.y) < 300) distTarget = dist;
@@ -597,13 +625,13 @@ function update(dt) {
             }
         }
 
-        // Vision cone check
+        // Vision cone check (They always scream when seeing the player because they know he shouldn't be there)
         if(!player.isHiding) {
             let pdx = (player.x + player.size/2) - (b.x + b.size/2);
             let pdy = (player.y + player.size/2) - (b.y + b.size/2);
             let dist = Math.hypot(pdx, pdy);
             
-            if(dist < 250) {
+            if(dist < 300) {
                 let angleToPlayer = Math.atan2(pdy, pdx);
                 let angleDiff = Math.abs(angleToPlayer - b.angle);
                 if(angleDiff > Math.PI) angleDiff = 2*Math.PI - angleDiff;
@@ -618,9 +646,9 @@ function update(dt) {
                             spawnParticle(b.x, b.y, "😱", "#fff");
                             spawnNoiseRing(b.x, b.y);
                         }
-                    } else b.seeTimer = 0;
-                } else b.seeTimer = 0;
-            } else b.seeTimer = 0;
+                    } else b.seeTimer = Math.max(0, b.seeTimer - dt);
+                } else b.seeTimer = Math.max(0, b.seeTimer - dt);
+            } else b.seeTimer = Math.max(0, b.seeTimer - dt);
         } else b.seeTimer = 0;
     });
 
@@ -793,7 +821,7 @@ function triggerWin() {
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('victory-screen').classList.remove('hidden');
-    document.getElementById('victory-stats').textContent = `Score da Fase: ${Math.floor(score)}`;
+    document.getElementById('victory-stats').textContent = `Pontos da Fase: ${Math.floor(score)}`;
     shopPoints += Math.floor(score);
     score = 0;
 }
@@ -836,7 +864,35 @@ function draw() {
         }
     }
 
-    // Bathers
+    // Shower bathers
+    women.forEach(w => {
+        let cx = w.x + w.size/2; let cy = w.y + w.size/2;
+        ctx.fillStyle = '#aaa'; ctx.fillRect(w.x + 5, w.y + 5, 15, 5);
+        ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(w.x + 20, w.y + 7, 6, Math.PI, 0); ctx.fill();
+        ctx.strokeStyle = 'rgba(0, 150, 255, 0.6)'; ctx.lineWidth = 2; ctx.beginPath();
+        let dropY = (Date.now() / 20) % 15;
+        ctx.moveTo(w.x + 15, w.y + 15 + dropY); ctx.lineTo(w.x + 15, w.y + 25 + dropY);
+        ctx.moveTo(w.x + 20, w.y + 10 + dropY); ctx.lineTo(w.x + 20, w.y + 20 + dropY);
+        ctx.moveTo(w.x + 25, w.y + 15 + dropY); ctx.lineTo(w.x + 25, w.y + 25 + dropY); ctx.stroke();
+
+        ctx.fillStyle = '#f1c27d'; ctx.beginPath(); ctx.arc(cx, cy + 10, 12, Math.PI, 0); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI*2); ctx.fill();
+
+        ctx.fillStyle = '#ff69b4'; ctx.beginPath(); ctx.arc(cx, cy - 4, 11, Math.PI, 0); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cy - 12, 6, 0, Math.PI*2); ctx.fill();
+
+        if(w.alerted) {
+            ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(cx - 3, cy, 2, 0, Math.PI*2); ctx.arc(cx + 3, cy, 2, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(cx, cy + 4, 3, 5, 0, 0, Math.PI*2); ctx.fill();
+            ctx.font = '24px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('😱', cx, w.y - 10);
+        } else {
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.beginPath();
+            ctx.moveTo(cx - 5, cy); ctx.quadraticCurveTo(cx - 3, cy + 2, cx - 1, cy);
+            ctx.moveTo(cx + 1, cy); ctx.quadraticCurveTo(cx + 3, cy + 2, cx + 5, cy); ctx.stroke();
+        }
+    });
+
+    // Wandering Bathers
     bathers.forEach(b => {
         let cx = b.x + b.size/2; let cy = b.y + b.size/2;
         ctx.fillStyle = '#f1c27d'; ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2); ctx.fill(); // body
@@ -917,7 +973,12 @@ document.getElementById('btn-tut-next').addEventListener('click', () => {
     }
 });
 document.getElementById('btn-tut-start').addEventListener('click', () => { document.getElementById('tutorial-screen').classList.add('hidden'); startLevel(); });
-document.getElementById('btn-restart').addEventListener('click', () => { document.getElementById('game-over-screen').classList.add('hidden'); score = 0; shopPoints = 0; stage = 1; startLevel(); });
+
+document.getElementById('btn-restart').addEventListener('click', () => { 
+    document.getElementById('game-over-screen').classList.add('hidden'); 
+    startLevel(); 
+});
+
 document.getElementById('btn-shop').addEventListener('click', () => { document.getElementById('victory-screen').classList.add('hidden'); document.getElementById('shop-screen').classList.remove('hidden'); renderShop(); });
 
 document.getElementById('btn-ak47-next').addEventListener('click', () => {
@@ -973,7 +1034,7 @@ function renderShop() {
 
         div.innerHTML = `
             <div class="item-info">
-                <h3>Lvl ${item.level}: ${item.name}</h3>
+                <h3>Nível ${item.level}: ${item.name}</h3>
                 <p>${item.effect}</p>
             </div>
             <button class="btn-buy ${isAcquired ? 'acquired-btn' : ''}" ${!isNext || shopPoints < item.cost ? 'disabled' : ''} onclick="buyUpgrade('${currentTab}', ${item.cost})">${isAcquired ? 'Adquirido' : item.cost + ' pts'}</button>
