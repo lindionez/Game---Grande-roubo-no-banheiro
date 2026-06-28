@@ -30,6 +30,8 @@ let cheatLastW = 0;
 let cheatHoldingSpace = false;
 let cheatTimer = 0;
 
+let lastInvasionToast = 0;
+
 // Upgrades Data
 const shopData = {
     mochila: [
@@ -284,9 +286,10 @@ let player = {
         if(hasAK47 && (ox === undefined || this.isShooting)) {
             ctx.save();
             let aim = this.isShooting ? this.shootAngle : (this.facingAngle || 0);
-            ctx.rotate(aim);
             
-            ctx.translate(14, -8);
+            // Move gun to the right side of the body
+            ctx.translate(16, 2);
+            ctx.rotate(aim);
             
             ctx.fillStyle = '#444'; // Metal
             ctx.fillRect(0, -2, 28, 4); // Barrel
@@ -294,7 +297,7 @@ let player = {
             
             ctx.fillStyle = '#8b4513'; // Wood
             ctx.fillRect(6, -3, 10, 6); // Handguard
-            ctx.fillRect(0, -3, -12, 6); // Stock
+            ctx.fillRect(-10, -3, 10, 6); // Stock
             
             ctx.fillStyle = '#222'; // Mag
             ctx.fillRect(10, 2, 4, 8); 
@@ -659,7 +662,11 @@ function update(dt) {
         if(dist < 350 && !player.isHiding && pcdx > -20 && Math.abs(pcdy) < 120) {
             let hasLoS = checkLoS(w.x + w.size/2, w.y + w.size/2, player.x + player.size/2, player.y + player.size/2);
             if(hasLoS) {
-                w.alerted = true; showToast("😱 AHHH! UM INVASOR!");
+                w.alerted = true; 
+                if (Date.now() - lastInvasionToast > 2000) {
+                    showToast("😱 AHHH! UM INVASOR!");
+                    lastInvasionToast = Date.now();
+                }
                 suspicion += 50 * resMult; spawnParticle(w.x + w.size/2, w.y, "😱", "#fff");
                 spawnNoiseRing(w.x, w.y); spawnNoiseRing(w.x, w.y);
             }
@@ -691,7 +698,10 @@ function update(dt) {
                 b.alertTimer = 1.0; 
                 suspicion += b.screamSus * dt * 2 * resMult; 
                 if(Math.random() < 0.1) {
-                    showToast("😱 AHHH! INVASOR!");
+                    if (Date.now() - lastInvasionToast > 2000) {
+                        showToast("😱 AHHH! INVASOR!");
+                        lastInvasionToast = Date.now();
+                    }
                     spawnParticle(b.x, b.y, "😱", "#fff");
                     spawnNoiseRing(b.x, b.y);
                 }
@@ -1034,28 +1044,68 @@ function drawGameOverAnimation(dt) {
 
 function drawAK47VictoryAnimation(dt) {
     gameOverAnimTimer += dt;
-    ctx.fillStyle = 'rgba(0,0,0,0.8)';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
     
-    let cx = canvas.width/2; let cy = canvas.height/2 + 50;
+    // === TOTAL BLUR FIX: clearRect wipes everything, solid fill, no transparency ===
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Disable any smoothing every frame (resize can reset it)
+    ctx.imageSmoothingEnabled = false;
+    
+    let cx = canvas.width / 2 - 30;
+    let cy = canvas.height / 2 + 50;
     
     player.isShooting = true;
-    player.shootAngle = -Math.PI/2 + (Math.random()*0.1 - 0.05); 
-    player.draw(ctx, cx, cy, 6, 1);
+    player.shootAngle = -Math.PI / 2;
     
-    if(Math.random() < 0.4) {
-        particles.push({x: cx + (Math.random()-0.5)*20, y: cy - 70, vy: -600, life: 1, maxLife: 1, type: 'bullet'});
+    // AK recoil shake — only the gun arm trembles
+    let shakeX = Math.round((Math.random() - 0.5) * 4); // round to whole pixels = no subpixel blur
+    let shakeY = Math.round((Math.random() - 0.5) * 3);
+    
+    player.draw(ctx, Math.round(cx) + shakeX, Math.round(cy) + shakeY, 6, 1);
+    
+    // Gun tip offset: gun translate is (+16, +2), barrel is 28px long, scale 6x
+    // So tip X = 16+28 = 44, scaled = ~150px right of player center
+    let tipX = Math.round(cx) + shakeX + 150;
+    let tipY = Math.round(cy) + shakeY - 180;
+    
+    // Muzzle flash at barrel tip
+    if(Math.random() < 0.6) {
+        ctx.fillStyle = '#ffdd00';
+        ctx.beginPath();
+        ctx.arc(tipX, tipY, 8 + Math.random() * 5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    // Spawn bullets from barrel tip
+    if(Math.random() < 0.5) {
+        particles.push({x: tipX, y: tipY - 10, vy: -1400, life: 0.8, maxLife: 0.8, type: 'bullet'});
     }
 
-    particles.forEach((p, i) => {
+    // Draw bullets going UP
+    for(let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
         if(p.type === 'bullet') {
             p.y += p.vy * dt;
-            ctx.fillStyle = 'gold';
-            ctx.fillRect(p.x, p.y, 4, 15);
+            ctx.fillStyle = '#ffd700';
+            ctx.fillRect(Math.round(p.x) - 2, Math.round(p.y), 4, 14);
             p.life -= dt;
             if(p.life <= 0) particles.splice(i, 1);
         }
-    });
+    }
+    
+    // Victory message — crisp text with stroke outline, no shadowBlur
+    ctx.save();
+    ctx.font = 'bold 42px "Fredoka One", cursive';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#000';
+    ctx.strokeText('AGORA NADA VAI ME PARAR!', Math.round(canvas.width / 2), 30);
+    ctx.fillStyle = '#ff3333';
+    ctx.fillText('AGORA NADA VAI ME PARAR!', Math.round(canvas.width / 2), 30);
+    ctx.restore();
 }
 
 let lastTime = 0;
@@ -1087,7 +1137,7 @@ document.getElementById('btn-play').addEventListener('click', () => {
     
     document.getElementById('tut-text-move').innerHTML = isMobile ?
         `Use os <strong>botões de SETAS</strong> na tela para andar.<br>Pressione o botão <strong>AÇÃO</strong> para pegar as calcinhas!` :
-        `Use <strong>WASD</strong> ou <strong>Setas</strong> para andar.<br>Pressione <strong>ESPAÇO</strong> para pegar as calcinhas!`;
+        `Use <strong>WASD</strong> para andar.<br>Pressione <strong>ESPAÇO</strong> para pegar as calcinhas!`;
         
     document.getElementById('tut-text-run').innerHTML = isMobile ?
         `Segure o botão <strong>CORRER</strong> para correr, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.` :
@@ -1141,8 +1191,11 @@ document.getElementById('btn-shop').addEventListener('click', () => {
 });
 
 document.getElementById('btn-ak47-next').addEventListener('click', () => {
-    shopPoints += 500; document.getElementById('ak47-victory-screen').classList.add('hidden');
-    document.getElementById('shop-screen').classList.remove('hidden'); renderShop();
+    document.getElementById('ak47-victory-screen').classList.add('hidden');
+    
+    gameState = 'PLAYING';
+    document.getElementById('hud').classList.remove('hidden');
+    if(window.innerWidth <= 1250) document.getElementById('mobile-controls').classList.remove('hidden');
 });
 document.getElementById('btn-ak47-continue').addEventListener('click', () => {
     document.getElementById('ak47-tutorial-screen').classList.add('hidden');

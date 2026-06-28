@@ -72,6 +72,11 @@ canvas {
     backdrop-filter: none !important;
 }
 
+#ak47-victory-screen {
+    background: transparent !important;
+    backdrop-filter: none !important;
+}
+
 /* Start Screen */
 .title-anim {
     font-size: 4rem;
