@@ -675,7 +675,21 @@ function update(dt) {
     player.isMoving = isMoving;
 
     let currentTile = getTileAt(player.x, player.y, player.size);
-    player.isHiding = (currentTile === 'P' || currentTile === 'R') && !isMoving;
+    let wantsToHide = (currentTile === 'P' || currentTile === 'R') && !isMoving;
+    
+    if (wantsToHide) {
+        if (!player.isHiding) {
+            let enemySawHiding = false;
+            if (enemy.active && !enemy.dead) {
+                let distToEnemy = Math.hypot(enemy.x - player.x, enemy.y - player.y);
+                let hasLoS = checkLoS(enemy.x + enemy.size/2, enemy.y + enemy.size/2, player.x + player.size/2, player.y + player.size/2);
+                if (hasLoS && (distToEnemy < 300 || suspicion >= 100)) enemySawHiding = true;
+            }
+            if (!enemySawHiding) player.isHiding = true;
+        }
+    } else {
+        player.isHiding = false;
+    }
     
     let noiseFactor = getUpgradeVal('tenis', 1.0);
     if(currentTile === 'R') noiseFactor *= 0.5;
@@ -923,9 +937,11 @@ function update(dt) {
             if(getTileAt(enemy.x, enemy.y, enemy.size) === 'E') enemy.active = false;
         }
 
+        let hasLoSToTarget = checkLoS(enemy.x + enemy.size/2, enemy.y + enemy.size/2, enemy.targetX, enemy.targetY);
+        
         enemy.pathTimer -= dt;
         if(enemy.pathTimer <= 0 || !enemy.nextTarget) {
-            enemy.pathTimer = 0.2;
+            enemy.pathTimer = 0.5;
             let eC = Math.floor((enemy.x + enemy.size/2)/TILE_SIZE); let eR = Math.floor((enemy.y + enemy.size/2)/TILE_SIZE);
             let tC = Math.floor((enemy.targetX)/TILE_SIZE); let tR = Math.floor((enemy.targetY)/TILE_SIZE);
             let step = getNextStep(eR, eC, tR, tC);
@@ -933,20 +949,27 @@ function update(dt) {
             else enemy.nextTarget = null;
         }
 
+        if(hasLoSToTarget && enemy.state === 'chase') enemy.nextTarget = null;
+
         let mTX = enemy.nextTarget ? enemy.nextTarget.x : enemy.targetX;
         let mTY = enemy.nextTarget ? enemy.nextTarget.y : enemy.targetY;
         let edx = mTX - enemy.x; let edy = mTY - enemy.y; let dist = Math.hypot(edx, edy);
         
         if(dist > 2) {
             let moveX = (edx/dist)*enemy.speed*dt; let moveY = (edy/dist)*enemy.speed*dt;
-            if(!checkMapCollision(enemy.x + moveX, enemy.y, enemy.size)) enemy.x += moveX;
-            if(!checkMapCollision(enemy.x, enemy.y + moveY, enemy.size)) enemy.y += moveY;
+            let movedX = false; let movedY = false;
+            if(!checkMapCollision(enemy.x + moveX, enemy.y, enemy.size)) { enemy.x += moveX; movedX = true; }
+            if(!checkMapCollision(enemy.x, enemy.y + moveY, enemy.size)) { enemy.y += moveY; movedY = true; }
+            
+            if(!movedX && !movedY) enemy.nextTarget = null;
             if(Math.hypot(mTX - enemy.x, mTY - enemy.y) < 5) enemy.nextTarget = null;
+        } else {
+            enemy.nextTarget = null;
         }
 
         if(checkCollision(player, enemy)) {
-            if(player.isHiding) { player.isHiding = false; showToast("Te achei!"); suspicion = 100; }
-            else gameOver();
+            if(player.isHiding) { showToast("Te achei!"); }
+            gameOver();
         }
         
         if (window.audioMgr) {
