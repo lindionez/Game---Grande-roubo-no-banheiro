@@ -1099,14 +1099,14 @@ function drawAK47VictoryAnimation(dt) {
         });
     }
     
-    // Spawn blood drips from the text
-    if(Math.random() < 0.4) {
+    // Spawn melting drips from the text (starts after 3s)
+    if(gameOverAnimTimer > 3.0 && Math.random() < 0.8) {
         bloodDrips.push({
-            x: canvas.width / 2 + (Math.random() - 0.5) * 600, // Spread across text width
-            y: 80, // Start just below text
-            vy: 20 + Math.random() * 40, // Drip down slowly
-            size: 2 + Math.random() * 4,
-            life: 1.0
+            x: (Math.random() - 0.5) * 650, // Spread across text width
+            y: 5 + Math.random() * 15, // Start near the bottom edge of the text
+            vy: 30 + Math.random() * 60, // Grow down
+            size: 1.5 + Math.random() * 2.5, // Drip thickness
+            length: 0
         });
     }
 
@@ -1120,17 +1120,7 @@ function drawAK47VictoryAnimation(dt) {
         if(p.life <= 0) victoryBullets.splice(i, 1);
     }
     
-    // Draw blood drips
-    for(let i = bloodDrips.length - 1; i >= 0; i--) {
-        let d = bloodDrips[i];
-        d.y += d.vy * dt;
-        d.life -= dt * 0.3;
-        ctx.fillStyle = `rgba(180, 0, 0, ${Math.max(0, d.life)})`;
-        ctx.beginPath();
-        ctx.arc(Math.round(d.x), Math.round(d.y), d.size, 0, Math.PI * 2);
-        ctx.fill();
-        if(d.life <= 0) bloodDrips.splice(i, 1);
-    }
+    // (Blood drips are now drawn inside the text transform below)
     
     // Draw + update floating emojis
     for(let i = victoryEmojis.length - 1; i >= 0; i--) {
@@ -1157,7 +1147,7 @@ function drawAK47VictoryAnimation(dt) {
     let flicker = Math.sin(gameOverAnimTimer * 18);
     let r = Math.floor(180 + flicker * 40);
     let textColor = `rgb(${r}, 0, 0)`;
-    let textY = 60;
+    let textY = 40; // Moved higher
     
     ctx.save();
     ctx.translate(Math.round(canvas.width / 2), textY);
@@ -1179,6 +1169,24 @@ function drawAK47VictoryAnimation(dt) {
     // Main fill with flicker color
     ctx.fillStyle = textColor;
     ctx.fillText('☠ AGORA NADA VAI ME PARAR! ☠', 0, 0);
+    
+    // Draw melting blood drips attached to the text
+    for(let i = bloodDrips.length - 1; i >= 0; i--) {
+        let d = bloodDrips[i];
+        d.length += d.vy * dt;
+        
+        ctx.fillStyle = textColor;
+        ctx.beginPath();
+        // The drip body (rectangle)
+        ctx.fillRect(d.x - d.size, d.y, d.size * 2, d.length);
+        // The rounded tip of the drip
+        ctx.arc(d.x, d.y + d.length, d.size, 0, Math.PI);
+        ctx.fill();
+        
+        // Remove if it gets too long (melts off screen)
+        if(d.length > 800) bloodDrips.splice(i, 1);
+    }
+    
     ctx.restore();
 }
 
