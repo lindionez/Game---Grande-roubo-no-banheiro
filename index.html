@@ -40,6 +40,7 @@
             <h1 style="color: white; font-size: 4rem; margin-bottom: 20px;">PAUSADO</h1>
             <p id="pause-desc" style="color: #ffcf40; font-size: 1.5rem; margin-bottom: 40px;">Pressione ESC ou clique no botão para voltar</p>
             <button id="btn-resume" class="btn-large">RETOMAR O ROUBO</button>
+            <button id="btn-conquistas-pause" class="btn-large" style="margin-top: 15px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">🏆 CONQUISTAS</button>
         </div>
 
         <!-- HUD / UI during gameplay -->
@@ -75,6 +76,15 @@
         
         <div id="message-toast" class="hidden">Mensagem!</div>
 
+        <!-- Conquista Pop-up -->
+        <div id="conquista-popup">
+            <div class="conquista-icon">🏆</div>
+            <div class="conquista-text">
+                <div class="conquista-title">CONQUISTA!</div>
+                <div class="conquista-name" id="conquista-name-popup">Nome</div>
+            </div>
+        </div>
+
         <!-- The Game Canvas -->
         <canvas id="gameCanvas" width="1200" height="800"></canvas>
 
@@ -97,6 +107,22 @@
         </div>
 
         <!-- Screens -->
+        <!-- Achievements Screen -->
+        <div id="conquistas-screen" class="screen hidden" style="z-index: 200;">
+            <div class="conquistas-modal">
+                <h2 style="color: #ffcf40; margin-bottom: 10px;">🏆 CONQUISTAS (<span id="conquistas-count">0</span>/30)</h2>
+                <div class="conquistas-filters">
+                    <button class="c-filter-btn active" data-filter="all">Todas</button>
+                    <button class="c-filter-btn" data-filter="unlocked">Ganhas</button>
+                    <button class="c-filter-btn" data-filter="locked">Faltando</button>
+                </div>
+                <div class="conquistas-list" id="conquistas-list">
+                    <!-- Populated by JS -->
+                </div>
+                <button id="btn-conquistas-close" class="btn-large" style="margin-top: 20px;">FECHAR</button>
+            </div>
+        </div>
+
         <!-- Start Screen -->
         <div id="start-screen" class="screen">
             <h1 class="title-anim">LADRÃO DE CALCINHAS</h1>

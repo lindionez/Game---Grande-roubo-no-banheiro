@@ -595,3 +595,161 @@ canvas {
     .action-btn { width: 50px; height: 50px; }
     .action-btn.primary { width: 65px; height: 65px; }
 }
+
+/* Conquistas Pop-up */
+#conquista-popup {
+    position: absolute;
+    top: 20px;
+    left: -350px;
+    width: 250px;
+    background: rgba(20, 20, 20, 0.85);
+    border: 2px solid #ffcf40;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(255, 207, 64, 0.5);
+    z-index: 1000;
+    transition: left 0.5s ease-out;
+}
+
+#conquista-popup.show {
+    left: 20px;
+}
+
+.conquista-icon {
+    font-size: 2rem;
+    margin-right: 15px;
+    text-shadow: 0 0 5px #ffcf40;
+}
+
+.conquista-icon.glow {
+    animation: glowIcon 0.3s ease-in-out alternate;
+}
+
+@keyframes glowIcon {
+    from { text-shadow: 0 0 5px #ffcf40; transform: scale(1); }
+    to { text-shadow: 0 0 20px #ffcf40, 0 0 30px #fff; transform: scale(1.2); }
+}
+
+.conquista-text {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.conquista-title {
+    color: #ffcf40;
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+
+.conquista-name {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Conquistas Screen */
+.conquistas-modal {
+    background: rgba(0,0,0,0.85);
+    border: 3px solid #ffcf40;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.conquistas-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.c-filter-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid #ffcf40;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-family: 'Fredoka One', cursive;
+    transition: 0.2s;
+}
+
+.c-filter-btn.active {
+    background: #ffcf40;
+    color: black;
+}
+
+.conquistas-list {
+    width: 100%;
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 5px;
+}
+
+.conquista-item {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.conquista-item.unlocked {
+    background: rgba(255, 207, 64, 0.15);
+    border: 1px solid #ffcf40;
+}
+
+.c-item-icon {
+    font-size: 2rem;
+    margin-right: 15px;
+    width: 40px;
+    text-align: center;
+}
+
+.c-item-info {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.c-item-info h4 {
+    margin-bottom: 3px;
+    color: #ffcf40;
+}
+
+.c-item-info p {
+    font-size: 0.85rem;
+    color: #ccc;
+    margin-bottom: 5px;
+}
+
+.c-status {
+    font-size: 1.5rem;
+}
+
+.c-progress-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.c-progress-fill {
+    height: 100%;
+    background: #4caf50;
+    width: 0%;
+}

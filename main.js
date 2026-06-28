@@ -592,6 +592,7 @@ function setupBathers() {
 function startLevel() {
     timeRemaining = 300 + (stage * 30); 
     suspicion = 0; totalCollected = 0; backpackCollected = 0;
+    faseGritos = 0; fasePerfeitaSemVisto = true; tempoSemSuspeita = 0;
     requiredPanties = 4 + stage;
     panties = []; particles = []; distractions = [];
     distractionsLeft = getUpgradeVal('distracao', 0);
@@ -623,6 +624,18 @@ function startLevel() {
 }
 
 function update(dt) {
+    let oldSec = Math.floor(tempoTotalJogo);
+    tempoTotalJogo += dt;
+    if(Math.floor(tempoTotalJogo) > oldSec) {
+        localStorage.setItem('tempoTotalJogo', tempoTotalJogo);
+        addProgressoConquista('c29', 1);
+    }
+    if(suspicion <= ultimaSuspeita) {
+        tempoSemSuspeita += dt;
+        if(tempoSemSuspeita >= 60) unlockConquista('c15');
+    } else { tempoSemSuspeita = 0; }
+    ultimaSuspeita = suspicion;
+
     if(timeRemaining > 0) {
         timeRemaining -= dt;
         if(timeRemaining <= 0) {
@@ -674,6 +687,7 @@ function update(dt) {
     
     if(ePressed && distractionsLeft > 0) {
         ePressed = false; distractionsLeft--;
+        addProgressoConquista('c27', 1);
         distractions.push({x: player.x, y: player.y, life: 5});
         spawnParticle(player.x, player.y, "🎶", "#fff");
         spawnNoiseRing(player.x, player.y); spawnNoiseRing(player.x, player.y);
@@ -693,7 +707,7 @@ function update(dt) {
         if(dist < 350 && !player.isHiding && pcdx > -20 && Math.abs(pcdy) < 120) {
             let hasLoS = checkLoS(w.x + w.size/2, w.y + w.size/2, player.x + player.size/2, player.y + player.size/2);
             if(hasLoS) {
-                w.alerted = true; 
+                w.alerted = true; fasePerfeitaSemVisto = false;
                 if (Date.now() - lastInvasionToast > 2000) {
                     showToast("😱 AHHH! UM INVASOR!");
                     lastInvasionToast = Date.now();
@@ -725,7 +739,8 @@ function update(dt) {
         if(isSeeingPlayer) {
             b.seeTimer += dt;
             if(b.seeTimer >= (b.reactTime + disfarceDelay)) {
-                b.state = 'scream';
+                b.state = 'scream'; fasePerfeitaSemVisto = false; faseGritos++;
+                if(faseGritos >= 3) unlockConquista('c26');
                 b.alertTimer = 1.0; 
                 suspicion += b.screamSus * dt * 2 * resMult; 
                 if(Math.random() < 0.1) {
@@ -738,6 +753,7 @@ function update(dt) {
                 }
             }
         } else {
+            if(b.seeTimer > 0 && b.state !== 'scream') unlockConquista('c25');
             b.seeTimer = Math.max(0, b.seeTimer - dt);
             if(b.state === 'scream') {
                 b.alertTimer -= dt;
@@ -810,6 +826,8 @@ function update(dt) {
                         spawnNoiseRing(player.x, player.y);
                     } else {
                         combo++; comboTimer = 2.5;
+                        if(combo === 2) unlockConquista('c16');
+                        if(combo === 5) unlockConquista('c17');
                         let mult = combo >= 5 ? 2 : (combo >= 3 ? 1.5 : 1);
                         let gained = Math.floor(p.type.pts * mult); score += gained;
                         backpackCollected++;
@@ -827,6 +845,12 @@ function update(dt) {
     }
     
     if(currentTile === 'E' && backpackCollected > 0) {
+        addProgressoConquista('c1', backpackCollected);
+        addProgressoConquista('c2', backpackCollected);
+        addProgressoConquista('c3', backpackCollected);
+        addProgressoConquista('c4', backpackCollected);
+        addProgressoConquista('c5', backpackCollected);
+        addProgressoConquista('c6', backpackCollected);
         totalCollected += backpackCollected;
         backpackCollected = 0;
         showToast("Calcinhas Guardadas!");
@@ -864,6 +888,7 @@ function update(dt) {
             enemy.state = 'distracted'; enemy.targetX = distTarget.x; enemy.targetY = distTarget.y; enemy.speed = enemy.baseSpeed * eSpeedMult;
             suspicion = Math.max(0, suspicion - 25 * dt * alertaMult);
         } else if((suspicion >= 100 && !player.isHiding) || (hasLoS && distToPlayer < 400 && !player.isHiding)) {
+            fasePerfeitaSemVisto = false;
             enemy.state = 'chase'; enemy.targetX = player.x; enemy.targetY = player.y; 
             enemy.speed = 145 * eSpeedMult; suspicion = 100;
         } else if(enemy.state === 'chase' || enemy.state === 'search' || enemy.state === 'distracted') {
@@ -924,7 +949,7 @@ function update(dt) {
         player.shootAngle = Math.atan2(ey - py, ex - px);
         
         spawnParticle(px + Math.cos(player.shootAngle)*30, py + Math.sin(player.shootAngle)*30, "💥", "#ffcf40");
-        
+        unlockConquista('c28');
         enemy.dead = true;
         enemy.state = 'dead';
         suspicion = 0;
@@ -960,6 +985,15 @@ function triggerWin() {
     gameState = 'VICTORY';
     score += Math.floor(timeRemaining * 2); 
     score += 200 + (stage * 50); 
+    if(stage === 1) unlockConquista('c7');
+    if(stage === 5) unlockConquista('c8');
+    if(stage === 15) unlockConquista('c9');
+    if(stage === 20) unlockConquista('c10');
+    if(stage === 30) unlockConquista('c11');
+    if(fasePerfeitaSemVisto) { unlockConquista('c12'); addProgressoConquista('c13', 1); addProgressoConquista('c14', 1); }
+    if(score >= 500) unlockConquista('c18');
+    if(score >= 1000) unlockConquista('c19');
+    addProgressoConquista('c20', score);
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('victory-screen').classList.remove('hidden');
@@ -1415,7 +1449,7 @@ document.getElementById('btn-next-stage').addEventListener('click', () => {
 
 document.getElementById('btn-buy-ak47').addEventListener('click', (e) => {
     if(shopPoints >= 10000 && !hasAK47) {
-        shopPoints -= 10000; hasAK47 = true;
+        shopPoints -= 10000; hasAK47 = true; unlockConquista('c24');
         e.target.textContent = 'EQUIPADA'; e.target.disabled = true; renderShop();
     }
 });
@@ -1510,9 +1544,201 @@ function drawAK47ShopCanvas() {
     
     sx.restore();
 }
+// --- SISTEMA DE CONQUISTAS ---
+const conquistasData = [
+    { id: 'c1', cat: 1, nome: 'Primeira Calcinha', desc: 'Roube sua primeira calcinha', tipo: 'acumulo', max: 1 },
+    { id: 'c2', cat: 1, nome: 'Colecionador Iniciante', desc: 'Roube 10 calcinhas no total', tipo: 'acumulo', max: 10 },
+    { id: 'c3', cat: 1, nome: 'Colecionador Dedicado', desc: 'Roube 50 calcinhas no total', tipo: 'acumulo', max: 50 },
+    { id: 'c4', cat: 1, nome: 'Colecionador Profissional', desc: 'Roube 100 calcinhas no total', tipo: 'acumulo', max: 100 },
+    { id: 'c5', cat: 1, nome: 'Mestre das Calcinhas', desc: 'Roube 500 calcinhas no total', tipo: 'acumulo', max: 500 },
+    { id: 'c6', cat: 1, nome: 'Rei das Calcinhas', desc: 'Roube 1000 calcinhas no total', tipo: 'acumulo', max: 1000 },
+    { id: 'c7', cat: 2, nome: 'Primeiro Dia', desc: 'Complete a fase 1', tipo: 'unico' },
+    { id: 'c8', cat: 2, nome: 'Uma Semana de Trabalho', desc: 'Complete 5 fases', tipo: 'unico' },
+    { id: 'c9', cat: 2, nome: 'Mês de Experiência', desc: 'Complete 15 fases', tipo: 'unico' },
+    { id: 'c10', cat: 2, nome: 'Profissional do Ano', desc: 'Complete 20 fases', tipo: 'unico' },
+    { id: 'c11', cat: 2, nome: 'Imparável', desc: 'Complete 30 fases', tipo: 'unico' },
+    { id: 'c12', cat: 3, nome: 'Ninja Silencioso', desc: 'Complete uma fase sem ser visto', tipo: 'unico' },
+    { id: 'c13', cat: 3, nome: 'Fantasma', desc: 'Complete 5 fases sem ser visto', tipo: 'acumulo', max: 5 },
+    { id: 'c14', cat: 3, nome: 'Sombra', desc: 'Complete 10 fases sem ser visto', tipo: 'acumulo', max: 10 },
+    { id: 'c15', cat: 3, nome: 'Invisível', desc: 'Fique 60 segundos sem aumentar a barra de suspeita', tipo: 'unico' },
+    { id: 'c16', cat: 4, nome: 'Primeiro Combo', desc: 'Faça um combo x2', tipo: 'unico' },
+    { id: 'c17', cat: 4, nome: 'Combo Emocionante', desc: 'Faça um combo x5', tipo: 'unico' },
+    { id: 'c18', cat: 4, nome: 'Pontuador', desc: 'Alcance 500 pontos em uma fase', tipo: 'unico' },
+    { id: 'c19', cat: 4, nome: 'Pontuador de Elite', desc: 'Alcance 1000 pontos em uma fase', tipo: 'unico' },
+    { id: 'c20', cat: 4, nome: 'Milionário', desc: 'Acumule 50.000 pontos totais', tipo: 'acumulo', max: 50000 },
+    { id: 'c21', cat: 5, nome: 'Primeira Melhoria', desc: 'Compre seu primeiro upgrade', tipo: 'unico' },
+    { id: 'c22', cat: 5, nome: 'Viciado em Compras', desc: 'Compre 10 upgrades', tipo: 'acumulo', max: 10 },
+    { id: 'c23', cat: 5, nome: 'Colecionador de Melhorias', desc: 'Compre 20 upgrades', tipo: 'acumulo', max: 20 },
+    { id: 'c24', cat: 5, nome: 'Armeiro', desc: 'Desbloqueie a AK-47', tipo: 'unico' },
+    { id: 'c25', cat: 6, nome: 'Espertinho', desc: 'Escape de uma banhista antes dela gritar', tipo: 'unico' },
+    { id: 'c26', cat: 6, nome: 'Sobrevivente', desc: 'Sobreviva a 3 gritos em uma fase', tipo: 'unico' },
+    { id: 'c27', cat: 6, nome: 'Distraidor', desc: 'Use 10 itens de distração', tipo: 'acumulo', max: 10 },
+    { id: 'c28', cat: 6, nome: 'Vingador', desc: 'Mate a Dona do Banheiro com AK-47', tipo: 'unico' },
+    { id: 'c29', cat: 7, nome: 'Paciência', desc: 'Jogue por 2 horas no total', tipo: 'acumulo', max: 7200 },
+    { id: 'c30', cat: 7, nome: 'Lenda', desc: 'Desbloqueie TODAS as conquistas', tipo: 'unico' }
+];
+
+let conquistasSalvas = JSON.parse(localStorage.getItem('conquistas')) || {};
+conquistasData.forEach(c => {
+    if(!conquistasSalvas[c.id]) conquistasSalvas[c.id] = { desbloqueada: false, progresso: 0 };
+});
+
+function salvarConquistas() {
+    localStorage.setItem('conquistas', JSON.stringify(conquistasSalvas));
+    verificarLenda();
+}
+
+let filaConquistas = [];
+let exibindoConquista = false;
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playDing() {
+    if(gameState === 'PAUSED' || gameState === 'SHOP') return;
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    let osc = audioCtx.createOscillator();
+    let gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+    osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); 
+    
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.05); 
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.5);
+}
+
+function exibirProximaConquista() {
+    if(exibindoConquista || filaConquistas.length === 0) return;
+    exibindoConquista = true;
+    let conquistaId = filaConquistas.shift();
+    let data = conquistasData.find(c => c.id === conquistaId);
+    if(!data) { exibindoConquista = false; return; }
+    
+    document.getElementById('conquista-name-popup').textContent = data.nome;
+    let popup = document.getElementById('conquista-popup');
+    
+    popup.classList.add('show');
+    let icon = popup.querySelector('.conquista-icon');
+    
+    playDing();
+    
+    setTimeout(() => {
+        icon.classList.add('glow');
+        setTimeout(() => icon.classList.remove('glow'), 300);
+    }, 500);
+
+    setTimeout(() => {
+        popup.classList.remove('show');
+        setTimeout(() => {
+            exibindoConquista = false;
+            exibirProximaConquista();
+        }, 500);
+    }, 4500);
+}
+
+function unlockConquista(id) {
+    if(conquistasSalvas[id].desbloqueada) return;
+    conquistasSalvas[id].desbloqueada = true;
+    conquistasSalvas[id].data = new Date().toISOString().split('T')[0];
+    salvarConquistas();
+    filaConquistas.push(id);
+    exibirProximaConquista();
+}
+
+function addProgressoConquista(id, val) {
+    if(conquistasSalvas[id].desbloqueada) return;
+    conquistasSalvas[id].progresso += val;
+    let c = conquistasData.find(x => x.id === id);
+    if(c && c.tipo === 'acumulo' && conquistasSalvas[id].progresso >= c.max) {
+        unlockConquista(id);
+    } else {
+        salvarConquistas();
+    }
+}
+
+function verificarLenda() {
+    if(conquistasSalvas['c30'].desbloqueada) return;
+    let total = Object.values(conquistasSalvas).filter(c => c.desbloqueada).length;
+    if(total >= 29) unlockConquista('c30');
+}
+
+let tempoTotalJogo = parseFloat(localStorage.getItem('tempoTotalJogo') || "0");
+let faseGritos = 0;
+let fasePerfeitaSemVisto = true;
+let ultimaSuspeita = 0;
+let tempoSemSuspeita = 0;
+
+function renderTelaConquistas(filtro = 'all') {
+    let list = document.getElementById('conquistas-list');
+    list.innerHTML = '';
+    
+    let totalUnlocks = Object.values(conquistasSalvas).filter(c => c.desbloqueada).length;
+    document.getElementById('conquistas-count').textContent = totalUnlocks;
+    
+    conquistasData.forEach(c => {
+        let save = conquistasSalvas[c.id];
+        if(filtro === 'unlocked' && !save.desbloqueada) return;
+        if(filtro === 'locked' && save.desbloqueada) return;
+        
+        let div = document.createElement('div');
+        div.className = 'conquista-item ' + (save.desbloqueada ? 'unlocked' : '');
+        
+        let icon = save.desbloqueada ? '🏆' : '🔒';
+        let statusStr = save.desbloqueada ? '✅ OK' : '❌';
+        
+        let prog = '';
+        if(!save.desbloqueada && c.tipo === 'acumulo') {
+            let pct = Math.min(100, (save.progresso / c.max) * 100);
+            prog = `
+                <div style="font-size:0.8rem; margin-top:5px;">Progresso: ${save.progresso}/${c.max} (${Math.floor(pct)}%)</div>
+                <div class="c-progress-bar"><div class="c-progress-fill" style="width: ${pct}%"></div></div>
+            `;
+        }
+        
+        div.innerHTML = `
+            <div class="c-item-icon">${icon}</div>
+            <div class="c-item-info">
+                <h4>${c.nome}</h4>
+                <p>${c.desc}</p>
+                ${prog}
+            </div>
+            <div class="c-status">${statusStr}</div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+document.getElementById('btn-conquistas-pause').addEventListener('click', () => {
+    document.getElementById('pause-screen').classList.add('hidden');
+    document.getElementById('conquistas-screen').classList.remove('hidden');
+    renderTelaConquistas();
+});
+
+document.getElementById('btn-conquistas-close').addEventListener('click', () => {
+    document.getElementById('conquistas-screen').classList.add('hidden');
+    document.getElementById('pause-screen').classList.remove('hidden');
+});
+
+document.querySelectorAll('.c-filter-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.c-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderTelaConquistas(btn.dataset.filter);
+    });
+});
+
 window.buyUpgrade = function(cat, cost) {
     if(shopPoints >= cost && upgrades[cat] < 5) {
-        shopPoints -= cost; upgrades[cat]++; renderShop();
+        shopPoints -= cost; upgrades[cat]++; 
+        addProgressoConquista('c21', 1);
+        addProgressoConquista('c22', 1);
+        addProgressoConquista('c23', 1);
+        renderShop();
     }
 };
 
