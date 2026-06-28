@@ -1049,92 +1049,134 @@ function drawGameOverAnimation(dt) {
     // ---------------- Draw Player ----------------
     ctx.save();
     ctx.translate(cx - 80, cy + 50);
-    ctx.scale(3, 3);
+    ctx.scale(5, 5);
+    
+    let pSize = 28;
     
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    ctx.beginPath(); ctx.ellipse(0, 15, 20, 5, 0, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(0, pSize/2 - 2, pSize/2 + 2, 4, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    let headSquish = swing < -0.5 ? 0.6 : 1.0;
+    ctx.scale(1, headSquish); // Squish the entire player vertically on impact
     
-    // Body
+    // Body (Striped shirt)
     ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(0, 5, 12, Math.PI, 0); ctx.fill();
-    ctx.fillStyle = '#000'; 
-    ctx.fillRect(-12, -2, 24, 3); ctx.fillRect(-12, 2, 24, 3);
+    ctx.beginPath();
+    ctx.arc(0, pSize*0.3, pSize*0.4, Math.PI, 0); // shoulders
+    ctx.fill();
+    ctx.fillStyle = '#000'; // Stripes
+    ctx.fillRect(-pSize*0.4, pSize*0.05, pSize*0.8, pSize*0.1);
+    ctx.fillRect(-pSize*0.4, pSize*0.2, pSize*0.8, pSize*0.1);
 
     // Head
-    let headSquish = swing < -0.5 ? 0.6 : 1.0;
-    let headY = swing < -0.5 ? -4 : -8;
-    ctx.fillStyle = '#ffcc99'; 
-    ctx.beginPath(); ctx.ellipse(0, headY, 12, 12 * headSquish, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ffcc99'; // Skin
+    ctx.beginPath();
+    ctx.arc(0, -pSize*0.2, pSize*0.4, 0, Math.PI*2);
+    ctx.fill();
 
     // Mask
     ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.ellipse(0, headY, 14, 5 * headSquish, 0, 0, Math.PI*2); ctx.fill();
-    
+    ctx.beginPath();
+    ctx.ellipse(0, -pSize*0.2, pSize*0.45, pSize*0.15, 0, 0, Math.PI*2);
+    ctx.fill();
+
     // Dead Eyes "X"
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#fff'; 
+    ctx.lineWidth = 1.5;
     ctx.beginPath(); 
-    ctx.moveTo(-6, headY-2); ctx.lineTo(-2, headY+2); ctx.moveTo(-2, headY-2); ctx.lineTo(-6, headY+2);
-    ctx.moveTo(2, headY-2); ctx.lineTo(6, headY+2); ctx.moveTo(6, headY-2); ctx.lineTo(2, headY+2);
+    let eyeX = pSize*0.15; let eyeY = -pSize*0.2; let es = 2;
+    ctx.moveTo(-eyeX - es, eyeY - es); ctx.lineTo(-eyeX + es, eyeY + es);
+    ctx.moveTo(-eyeX + es, eyeY - es); ctx.lineTo(-eyeX - es, eyeY + es);
+    
+    ctx.moveTo(eyeX - es, eyeY - es); ctx.lineTo(eyeX + es, eyeY + es);
+    ctx.moveTo(eyeX + es, eyeY - es); ctx.lineTo(eyeX - es, eyeY + es);
     ctx.stroke();
+
+    // Beanie/Hat
+    ctx.fillStyle = '#222';
+    ctx.beginPath();
+    ctx.arc(0, -pSize*0.4, pSize*0.35, Math.PI, 0);
+    ctx.fill();
 
     ctx.restore();
 
     // ---------------- Draw Dona ----------------
     ctx.save();
-    ctx.translate(cx + 80, cy);
-    ctx.scale(4, 4);
+    ctx.translate(cx + 80, cy + 20);
+    ctx.scale(5, 5);
     
+    let eSize = 30;
+
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    ctx.beginPath(); ctx.ellipse(0, 18, 18, 5, 0, 0, Math.PI*2); ctx.fill();
-
-    // Arm + Club
-    ctx.save();
-    ctx.translate(-5, 5);
-    // Club rotation
-    let clubRot = -0.5 + swing * 1.5; 
-    ctx.rotate(clubRot);
-    ctx.fillStyle = '#8b4513'; // Club
     ctx.beginPath();
-    ctx.moveTo(0, 0); ctx.lineTo(-20, -30); ctx.lineTo(-25, -27); ctx.lineTo(-5, 5); ctx.fill();
-    ctx.fillStyle = '#f5cba7'; // Hand
-    ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI*2); ctx.fill();
+    ctx.ellipse(0, eSize/2 - 2, eSize/2 + 4, 5, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // Club (Porrete)
+    ctx.save();
+    // Club rotation
+    let clubRot = -1.2 + swing * 1.8; 
+    ctx.rotate(clubRot);
+    ctx.fillStyle = '#8b4513';
+    ctx.beginPath();
+    ctx.moveTo(10, 0); ctx.lineTo(25, -20); ctx.lineTo(32, -18); ctx.lineTo(15, 5);
+    ctx.fill();
+    ctx.fillStyle = '#654321'; // Wood line
+    ctx.beginPath(); ctx.moveTo(25, -15); ctx.lineTo(30, -12); ctx.stroke();
     ctx.restore();
 
-    // Body
+    // Body (Dress)
     ctx.fillStyle = '#800020';
     ctx.beginPath();
-    ctx.moveTo(0, -2); ctx.lineTo(-12, 18); ctx.lineTo(12, 18); ctx.fill();
+    ctx.moveTo(0, -eSize*0.1);
+    ctx.lineTo(-eSize*0.6, eSize*0.5);
+    ctx.lineTo(eSize*0.6, eSize*0.5);
+    ctx.fill();
 
     // Head
-    ctx.fillStyle = '#f5cba7'; 
-    ctx.beginPath(); ctx.arc(0, -10, 10, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#f5cba7'; // Skin
+    ctx.beginPath();
+    ctx.arc(0, -eSize*0.3, eSize*0.35, 0, Math.PI*2);
+    ctx.fill();
 
-    // Hair
-    ctx.fillStyle = '#4a2311'; 
-    ctx.beginPath(); ctx.arc(0, -18, 6, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(0, -12, 11, Math.PI, 0); ctx.fill();
+    // Hair (Bun)
+    ctx.fillStyle = '#4a2311'; // Brown
+    ctx.beginPath(); ctx.arc(0, -eSize*0.6, eSize*0.2, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -eSize*0.4, eSize*0.36, Math.PI, 0); ctx.fill();
 
     // Angry face
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(-6, -13); ctx.lineTo(-2, -10); ctx.moveTo(6, -13); ctx.lineTo(2, -10); ctx.stroke();
+    ctx.strokeStyle = '#000'; 
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-eSize*0.2, -eSize*0.4); ctx.lineTo(-eSize*0.05, -eSize*0.25);
+    ctx.moveTo(eSize*0.2, -eSize*0.4); ctx.lineTo(eSize*0.05, -eSize*0.25);
+    ctx.stroke();
+    
+    // Eyes
     ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(-3, -9, 1.5, 0, Math.PI*2); ctx.arc(3, -9, 1.5, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(-eSize*0.1, -eSize*0.25, 2.5, 0, Math.PI*2);
+    ctx.arc(eSize*0.1, -eSize*0.25, 2.5, 0, Math.PI*2);
+    ctx.fill();
+    
     // Yell
-    ctx.beginPath(); ctx.arc(0, -6, 3, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -eSize*0.15, 4, 0, Math.PI*2); ctx.fill();
 
     // ---------------- Impact Flash ----------------
     if(swing < -0.8) {
         ctx.fillStyle = '#ffcf40'; 
         ctx.beginPath();
-        ctx.arc(-25, 10, 15 + Math.random()*15, 0, Math.PI*2);
+        ctx.arc(-32, 6, 15 + Math.random()*10, 0, Math.PI*2);
         ctx.fill();
         ctx.fillStyle = '#ff0000';
         ctx.font = 'bold 8px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('BAM!', -25, 10);
+        ctx.fillText('BAM!', -32, 6);
     }
 
     ctx.restore();
