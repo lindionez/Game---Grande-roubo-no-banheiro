@@ -1042,7 +1042,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 document.getElementById('btn-next-stage').addEventListener('click', () => {
     document.getElementById('shop-screen').classList.add('hidden');
-    stage++;
+    if (stage < 35) stage++;
+    
     if(hasAK47 && !ak47TutorialShown) {
         ak47TutorialShown = true;
         let isMobile = window.innerWidth <= 1250;
