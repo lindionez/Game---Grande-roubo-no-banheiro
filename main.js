@@ -27,11 +27,11 @@ let distractionsLeft = 0;
 // Upgrades Data
 const shopData = {
     mochila: [
-        { level: 1, name: 'Mochila de Pano', cost: 50, effect: 'Carrega até 2 itens', val: 2 },
-        { level: 2, name: 'Mochila de Couro', cost: 100, effect: 'Carrega até 3 itens', val: 3 },
-        { level: 3, name: 'Bolsa Tática', cost: 200, effect: 'Carrega até 4 itens', val: 4 },
-        { level: 4, name: 'Mochila Militar', cost: 400, effect: 'Carrega até 5 itens', val: 5 },
-        { level: 5, name: 'Bolso Dimensional', cost: 800, effect: 'Carrega até 6 itens', val: 6 }
+        { level: 1, name: 'Mochila de Pano', cost: 50, effect: 'Carrega até 3 itens', val: 3 },
+        { level: 2, name: 'Mochila de Couro', cost: 100, effect: 'Carrega até 4 itens', val: 4 },
+        { level: 3, name: 'Bolsa Tática', cost: 200, effect: 'Carrega até 6 itens', val: 6 },
+        { level: 4, name: 'Mochila Militar', cost: 400, effect: 'Carrega até 8 itens', val: 8 },
+        { level: 5, name: 'Bolso Dimensional', cost: 800, effect: 'Carrega até 12 itens', val: 12 }
     ],
     tenis: [
         { level: 1, name: 'Chinelo de Dedo', cost: 50, effect: 'Reduz barulho em 10%', val: 0.9 },
@@ -444,7 +444,7 @@ function updateHUD() {
 
     document.getElementById('panty-counter').textContent = `🩲 ${totalCollected}/${requiredPanties}`;
     
-    let cap = getUpgradeVal('mochila', 1);
+    let cap = getUpgradeVal('mochila', 2);
     let capLabel = document.getElementById('capacity-counter');
     document.getElementById('backpack-counter').textContent = `🎒 ${backpackCollected}/${cap}`;
     if(backpackCollected >= cap) capLabel.classList.remove('hidden');
@@ -498,7 +498,7 @@ function setupBathers() {
 }
 
 function startLevel() {
-    timeRemaining = 120 + (stage * 20); // Aumenta 10s por fase para compensar aumento de calcinhas
+    timeRemaining = 300 + (stage * 30); // Começa com 5 minutos e aumenta 30s por fase
     
     suspicion = 0;
     totalCollected = 0;
@@ -706,7 +706,7 @@ function update(dt) {
 
     if(spacePressed) {
         spacePressed = false;
-        let cap = getUpgradeVal('mochila', 1);
+        let cap = getUpgradeVal('mochila', 2);
         if(backpackCollected < cap) {
             let pickRange = getUpgradeVal('luva', 0);
             let pRect = {x: player.x - pickRange, y: player.y - pickRange, width: player.size + pickRange*2, height: player.size + pickRange*2};
