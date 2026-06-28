@@ -147,6 +147,7 @@ function handleSpaceRelease() {
 }
 
 function openCheatMenu() {
+    unlockConquista('c31');
     cheatLastGameState = gameState;
     if(gameState === 'PLAYING') {
         gameState = 'PAUSED';
@@ -820,6 +821,7 @@ function update(dt) {
                 let p = panties[i];
                 if(checkCollision(pRect, p)) {
                     if(p.type.trap) {
+                        unlockConquista('c32');
                         score = Math.max(0, score - 10); suspicion += 30 * resMult;
                         showToast("🚨 ARMADILHA!"); combo = 0;
                         spawnNoiseRing(player.x, player.y);
@@ -1568,13 +1570,15 @@ const conquistasData = [
     { id: 'c21', cat: 5, nome: 'Primeira Melhoria', desc: 'Compre seu primeiro upgrade', tipo: 'unico' },
     { id: 'c22', cat: 5, nome: 'Viciado em Compras', desc: 'Compre 10 upgrades', tipo: 'acumulo', max: 10 },
     { id: 'c23', cat: 5, nome: 'Colecionador de Melhorias', desc: 'Compre 20 upgrades', tipo: 'acumulo', max: 20 },
-    { id: 'c24', cat: 5, nome: 'Armeiro', desc: 'Desbloqueie a AK-47', tipo: 'unico' },
+    { id: 'c24', cat: 5, nome: 'Armeiro', desc: 'Desbloqueie a AK-47', tipo: 'unico', secreta: true },
     { id: 'c25', cat: 6, nome: 'Espertinho', desc: 'Escape de uma banhista antes dela gritar', tipo: 'unico' },
     { id: 'c26', cat: 6, nome: 'Sobrevivente', desc: 'Sobreviva a 3 gritos em uma fase', tipo: 'unico' },
     { id: 'c27', cat: 6, nome: 'Distraidor', desc: 'Use 10 itens de distração', tipo: 'acumulo', max: 10 },
     { id: 'c28', cat: 6, nome: 'Vingador', desc: 'Mate a Dona do Banheiro com AK-47', tipo: 'unico' },
     { id: 'c29', cat: 7, nome: 'Paciência', desc: 'Jogue por 2 horas no total', tipo: 'acumulo', max: 7200 },
-    { id: 'c30', cat: 7, nome: 'Lenda', desc: 'Desbloqueie TODAS as conquistas', tipo: 'unico' }
+    { id: 'c30', cat: 7, nome: 'Lenda', desc: 'Desbloqueie TODAS as conquistas', tipo: 'unico' },
+    { id: 'c31', cat: 7, nome: 'Hacker de Calcinhas', desc: 'Você abriu o menu secreto!', tipo: 'unico', secreta: true },
+    { id: 'c32', cat: 7, nome: 'Cuidado com o Vermelho', desc: 'Caiu em uma armadilha...', tipo: 'unico', secreta: true }
 ];
 
 let conquistasSalvas = {};
@@ -1660,9 +1664,9 @@ function addProgressoConquista(id, val) {
 }
 
 function verificarLenda() {
-    if(conquistasSalvas['c30'].desbloqueada) return;
+    if(conquistasSalvas['c30'] && conquistasSalvas['c30'].desbloqueada) return;
     let total = Object.values(conquistasSalvas).filter(c => c.desbloqueada).length;
-    if(total >= 29) unlockConquista('c30');
+    if(total >= 31) unlockConquista('c30');
 }
 
 let tempoTotalJogo = 0;
@@ -1680,6 +1684,7 @@ function renderTelaConquistas(filtro = 'all') {
     
     conquistasData.forEach(c => {
         let save = conquistasSalvas[c.id];
+        if(c.secreta && !save.desbloqueada) return;
         if(filtro === 'unlocked' && !save.desbloqueada) return;
         if(filtro === 'locked' && save.desbloqueada) return;
         
