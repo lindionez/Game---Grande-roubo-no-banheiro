@@ -101,7 +101,7 @@ let player = {
 
         // Draw smaller if hiding (crouching)
         let drawSize = this.isHiding ? this.size * 0.8 : this.size;
-        let offsetY = this.isHiding ? this.size * 0.2 : 0;
+        let offsetY = this.isHiding ? this.size * 0.2 : (this.isMoving ? -Math.abs(Math.sin(Date.now()/100)) * 4 : 0);
         
         ctx.translate(this.size/2, this.size/2 + offsetY);
         
@@ -162,7 +162,8 @@ let enemy = {
         ctx.ellipse(this.size/2, this.size - 2, this.size/2 + 4, 8, 0, 0, Math.PI*2);
         ctx.fill();
 
-        ctx.translate(this.size/2, this.size/2);
+        let bob = (this.state === 'chase') ? Math.abs(Math.sin(Date.now()/100)) * 6 : Math.abs(Math.sin(Date.now()/150)) * 3;
+        ctx.translate(this.size/2, this.size/2 - bob);
 
         // Club (Porrete)
         ctx.save();
@@ -540,6 +541,8 @@ function update(dt) {
         player.y += dy * dt;
     }
 
+    player.isMoving = isMoving;
+
     // Tile checks
     let currentTile = getTileAt(player.x, player.y, player.size);
     player.isHiding = (currentTile === 'P' || currentTile === 'R') && !isMoving;
@@ -808,11 +811,15 @@ function update(dt) {
     updateHUD();
 }
 
+let gameOverAnimTimer = 0;
+
 function gameOver() {
     gameState = 'GAMEOVER';
+    gameOverAnimTimer = 0;
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('game-over-screen').classList.remove('hidden');
+    document.getElementById('game-over-screen').style.background = 'rgba(0,0,0,0.8)';
     document.getElementById('game-over-stats').textContent = `Pontuação Final: ${score}`;
 }
 
@@ -1025,6 +1032,114 @@ function draw() {
     }
 }
 
+function drawGameOverAnimation(dt) {
+    gameOverAnimTimer += dt;
+    
+    // Clear background
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Center coords
+    let cx = canvas.width / 2;
+    let cy = canvas.height / 2;
+
+    // Swing cycle
+    let swing = Math.sin(gameOverAnimTimer * 10);
+    
+    // ---------------- Draw Player ----------------
+    ctx.save();
+    ctx.translate(cx - 80, cy + 50);
+    ctx.scale(3, 3);
+    
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath(); ctx.ellipse(0, 15, 20, 5, 0, 0, Math.PI*2); ctx.fill();
+    
+    // Body
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(0, 5, 12, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = '#000'; 
+    ctx.fillRect(-12, -2, 24, 3); ctx.fillRect(-12, 2, 24, 3);
+
+    // Head
+    let headSquish = swing < -0.5 ? 0.6 : 1.0;
+    let headY = swing < -0.5 ? -4 : -8;
+    ctx.fillStyle = '#ffcc99'; 
+    ctx.beginPath(); ctx.ellipse(0, headY, 12, 12 * headSquish, 0, 0, Math.PI*2); ctx.fill();
+
+    // Mask
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.ellipse(0, headY, 14, 5 * headSquish, 0, 0, Math.PI*2); ctx.fill();
+    
+    // Dead Eyes "X"
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); 
+    ctx.moveTo(-6, headY-2); ctx.lineTo(-2, headY+2); ctx.moveTo(-2, headY-2); ctx.lineTo(-6, headY+2);
+    ctx.moveTo(2, headY-2); ctx.lineTo(6, headY+2); ctx.moveTo(6, headY-2); ctx.lineTo(2, headY+2);
+    ctx.stroke();
+
+    ctx.restore();
+
+    // ---------------- Draw Dona ----------------
+    ctx.save();
+    ctx.translate(cx + 80, cy);
+    ctx.scale(4, 4);
+    
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath(); ctx.ellipse(0, 18, 18, 5, 0, 0, Math.PI*2); ctx.fill();
+
+    // Arm + Club
+    ctx.save();
+    ctx.translate(-5, 5);
+    // Club rotation
+    let clubRot = -0.5 + swing * 1.5; 
+    ctx.rotate(clubRot);
+    ctx.fillStyle = '#8b4513'; // Club
+    ctx.beginPath();
+    ctx.moveTo(0, 0); ctx.lineTo(-20, -30); ctx.lineTo(-25, -27); ctx.lineTo(-5, 5); ctx.fill();
+    ctx.fillStyle = '#f5cba7'; // Hand
+    ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // Body
+    ctx.fillStyle = '#800020';
+    ctx.beginPath();
+    ctx.moveTo(0, -2); ctx.lineTo(-12, 18); ctx.lineTo(12, 18); ctx.fill();
+
+    // Head
+    ctx.fillStyle = '#f5cba7'; 
+    ctx.beginPath(); ctx.arc(0, -10, 10, 0, Math.PI*2); ctx.fill();
+
+    // Hair
+    ctx.fillStyle = '#4a2311'; 
+    ctx.beginPath(); ctx.arc(0, -18, 6, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, -12, 11, Math.PI, 0); ctx.fill();
+
+    // Angry face
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-6, -13); ctx.lineTo(-2, -10); ctx.moveTo(6, -13); ctx.lineTo(2, -10); ctx.stroke();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(-3, -9, 1.5, 0, Math.PI*2); ctx.arc(3, -9, 1.5, 0, Math.PI*2); ctx.fill();
+    // Yell
+    ctx.beginPath(); ctx.arc(0, -6, 3, 0, Math.PI*2); ctx.fill();
+
+    // ---------------- Impact Flash ----------------
+    if(swing < -0.8) {
+        ctx.fillStyle = '#ffcf40'; 
+        ctx.beginPath();
+        ctx.arc(-25, 10, 15 + Math.random()*15, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = '#ff0000';
+        ctx.font = 'bold 8px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('BAM!', -25, 10);
+    }
+
+    ctx.restore();
+}
+
 // Game Loop
 let lastTime = 0;
 function loop(timestamp) {
@@ -1035,6 +1150,8 @@ function loop(timestamp) {
     if (gameState === 'PLAYING') {
         update(dt);
         draw();
+    } else if (gameState === 'GAMEOVER') {
+        drawGameOverAnimation(dt);
     }
     requestAnimationFrame(loop);
 }

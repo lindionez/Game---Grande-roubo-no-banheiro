@@ -59,6 +59,11 @@ canvas {
     text-align: center;
 }
 
+#game-over-screen {
+    background: transparent !important;
+    backdrop-filter: none !important;
+}
+
 /* Start Screen */
 .title-anim {
     font-size: 4rem;
