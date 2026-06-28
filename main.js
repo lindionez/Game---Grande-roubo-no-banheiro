@@ -90,6 +90,7 @@ let upgrades = {
 };
 let hasAK47 = false;
 let ak47TutorialShown = false;
+let ak47VictoryShown = false;
 
 function getUpgradeVal(category, defaultVal) {
     if(upgrades[category] === 0) return defaultVal;
@@ -896,7 +897,13 @@ function update(dt) {
         spawnBlood(enemy.x, enemy.y);
         showToast("BANG!");
         
-        setTimeout(() => { player.isShooting = false; triggerAK47Win(); }, 500);
+        setTimeout(() => { 
+            player.isShooting = false; 
+            if (!ak47VictoryShown) {
+                ak47VictoryShown = true;
+                triggerAK47Win(); 
+            }
+        }, 500);
     } else {
         mousePressed = false;
     }
