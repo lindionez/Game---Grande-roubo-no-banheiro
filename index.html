@@ -9,6 +9,32 @@
 </head>
 <body>
     <div id="game-container">
+        <!-- Cheat Screen -->
+        <div id="cheat-screen" class="screen hidden" style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <h1 style="color: #ff69b4; font-size: 3rem; margin-bottom: 20px; text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; text-align: center;">🕵️ MODO CHEAT 🕵️</h1>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.3); color: white; text-align: center; font-size: 1.2rem; box-shadow: 0 0 20px rgba(255, 105, 180, 0.4); max-width: 400px; width: 90%;">
+                
+                <div style="margin-bottom: 20px; text-align: left;">
+                    <label style="color: #ffcf40; font-family: 'Fredoka One', cursive; display: block; margin-bottom: 5px;">Pular para Fase (1-35):</label>
+                    <input type="number" id="cheat-stage" min="1" max="35" value="1" style="width: 100%; font-size: 1.2rem; padding: 10px; border-radius: 8px; border: none; outline: none; background: rgba(255,255,255,0.9); color: #333; font-weight: bold; box-sizing: border-box;">
+                </div>
+                
+                <div style="margin-bottom: 30px; text-align: left;">
+                    <label style="color: #ffcf40; font-family: 'Fredoka One', cursive; display: block; margin-bottom: 5px;">Adicionar Pontos:</label>
+                    <input type="number" id="cheat-points" value="10000" style="width: 100%; font-size: 1.2rem; padding: 10px; border-radius: 8px; border: none; outline: none; background: rgba(255,255,255,0.9); color: #333; font-weight: bold; box-sizing: border-box;">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <button id="btn-cheat-apply" class="btn-large" style="width: 100%; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">APLICAR</button>
+                    
+                    <button id="btn-cheat-shop" class="btn-large" style="width: 100%; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">🛒 ABRIR LOJA</button>
+                    
+                    <button id="btn-cheat-close" class="btn-large" style="width: 100%; background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(255, 8, 68, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">FECHAR MENU</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Pause Screen -->
         <div id="pause-screen" class="screen hidden" style="background: rgba(0,0,0,0.8); z-index: 150;">
             <h1 style="color: white; font-size: 4rem; margin-bottom: 20px;">PAUSADO</h1>
@@ -44,9 +70,10 @@
                 <div id="inventory">
                     <div id="distraction-counter" class="inv-slot hidden" title="Distrações" style="width: auto; padding: 0 10px; font-size: 1.2rem;">💨 <span id="dist-count">0</span></div>
                 </div>
-                <div id="message-toast" class="hidden">Mensagem!</div>
             </div>
         </div>
+        
+        <div id="message-toast" class="hidden">Mensagem!</div>
 
         <!-- The Game Canvas -->
         <canvas id="gameCanvas" width="1200" height="800"></canvas>
@@ -169,7 +196,10 @@
 
             <div class="shop-footer" style="margin-top: 20px; text-align: center;">
                 <div class="level-progress" style="margin-bottom: 10px; font-weight: bold; color: #ffcf40;">Nível Total: <span id="total-level">0</span>/35</div>
-                <button id="btn-next-stage" class="btn-large">Próxima Fase ➡️</button>
+                <div style="display: flex; gap: 15px; justify-content: center; align-items: center;">
+                    <button id="btn-next-stage" class="btn-large">Próxima Fase ➡️</button>
+                    <button id="btn-shop-close-cheat" class="btn-large hidden" style="background: #dc3545; color: white; border: 2px solid #bd2130;">VOLTAR AO CHEAT</button>
+                </div>
             </div>
         </div>
     </div>

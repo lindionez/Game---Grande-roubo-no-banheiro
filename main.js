@@ -11,7 +11,7 @@ canvas.addEventListener('touchstart', e => {
 }, {passive: false});
 
 // Game State
-let gameState = 'START'; // START, TUTORIAL, PLAYING, GAMEOVER, VICTORY, SHOP, AK47_TUTORIAL, AK47_VICTORY
+let gameState = 'START'; // START, TUTORIAL, PLAYING, GAMEOVER, VICTORY, SHOP, AK47_TUTORIAL, AK47_VICTORY, PAUSED
 let stage = 1;
 let score = 0;
 let shopPoints = 0;
@@ -23,6 +23,12 @@ let totalCollected = 0;
 let backpackCollected = 0;
 let requiredPanties = 5;
 let distractionsLeft = 0;
+
+// Cheat System Variables
+let cheatWCount = 0;
+let cheatLastW = 0;
+let cheatHoldingSpace = false;
+let cheatTimer = 0;
 
 // Upgrades Data
 const shopData = {
@@ -94,11 +100,53 @@ let spacePressed = false;
 let ePressed = false;
 let mousePressed = false;
 
+function handleUpPress() {
+    if(keys[' '] || spacePressed) { cheatWCount = 0; return; }
+    let now = Date.now();
+    if(now - cheatLastW < 400) cheatWCount++;
+    else cheatWCount = 1;
+    cheatLastW = now;
+}
+
+function handleSpacePress() {
+    if(cheatWCount >= 2 && (Date.now() - cheatLastW) < 1000) {
+        cheatHoldingSpace = true;
+        cheatTimer = 0;
+    }
+}
+
+function handleSpaceRelease() {
+    cheatHoldingSpace = false;
+    cheatTimer = 0;
+    cheatWCount = 0;
+}
+
+function openCheatMenu() {
+    cheatLastGameState = gameState;
+    if(gameState === 'PLAYING') {
+        gameState = 'PAUSED';
+        document.getElementById('pause-screen').classList.remove('hidden');
+    }
+    document.getElementById('cheat-stage').value = stage;
+    document.getElementById('cheat-points').value = 10000;
+    document.getElementById('cheat-screen').classList.remove('hidden');
+}
+
 function bindMobileButton(id, key) {
     const btn = document.getElementById(id);
     if(!btn) return;
-    const start = (e) => { e.preventDefault(); keys[key] = true; if(key === ' ') spacePressed = true; if(key === 'e') ePressed = true; };
-    const end = (e) => { e.preventDefault(); keys[key] = false; };
+    const start = (e) => { 
+        e.preventDefault(); 
+        keys[key] = true; 
+        if(key === ' ') { spacePressed = true; handleSpacePress(); }
+        if(key === 'e') ePressed = true; 
+        if(key === 'w' || key === 'ArrowUp') handleUpPress();
+    };
+    const end = (e) => { 
+        e.preventDefault(); 
+        keys[key] = false; 
+        if(key === ' ') handleSpaceRelease();
+    };
     btn.addEventListener('touchstart', start);
     btn.addEventListener('touchend', end);
     btn.addEventListener('mousedown', start);
@@ -117,11 +165,25 @@ const shootStart = (e) => { e.preventDefault(); mousePressed = true; };
 shootBtn.addEventListener('touchstart', shootStart);
 shootBtn.addEventListener('mousedown', shootStart);
 
+const pauseAction = (e) => {
+    if(e) e.preventDefault();
+    if(gameState === 'PLAYING') {
+        gameState = 'PAUSED';
+        let isMobile = window.innerWidth <= 1250;
+        document.getElementById('pause-desc').innerHTML = isMobile ? 
+            "Toque no botão abaixo para voltar" : 
+            "Pressione ESC ou clique no botão para voltar";
+        document.getElementById('pause-screen').classList.remove('hidden');
+    }
+};
+
 window.addEventListener('keydown', e => {
     if(keys.hasOwnProperty(e.key)) keys[e.key] = true;
     if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = true;
-    if(e.key === ' ') spacePressed = true;
+    
+    if(e.key === ' ') { spacePressed = true; handleSpacePress(); }
     if(e.key.toLowerCase() === 'e') ePressed = true;
+    if(e.key.toLowerCase() === 'w' || e.key === 'ArrowUp') handleUpPress();
     
     if(e.key === 'Escape' || e.key === 'Esc') {
         if(gameState === 'PLAYING') {
@@ -135,6 +197,7 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => {
     if(keys.hasOwnProperty(e.key)) keys[e.key] = false;
     if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = false;
+    if(e.key === ' ') handleSpaceRelease();
 });
 canvas.addEventListener('mousedown', e => {
     if(hasAK47 && gameState === 'PLAYING') mousePressed = true;
@@ -223,20 +286,18 @@ let player = {
             let aim = this.isShooting ? this.shootAngle : (this.facingAngle || 0);
             ctx.rotate(aim);
             
-            // Offset to the side of the body
             ctx.translate(14, -8);
             
-            // Draw a proper looking side-view AK47
-            ctx.fillStyle = '#444'; // Metal parts
+            ctx.fillStyle = '#444'; // Metal
             ctx.fillRect(0, -2, 28, 4); // Barrel
             ctx.fillRect(26, -4, 2, 4); // Iron Sight Front
             
-            ctx.fillStyle = '#8b4513'; // Wood parts
+            ctx.fillStyle = '#8b4513'; // Wood
             ctx.fillRect(6, -3, 10, 6); // Handguard
-            ctx.fillRect(0, -3, -12, 6); // Stock Base
+            ctx.fillRect(0, -3, -12, 6); // Stock
             
-            ctx.fillStyle = '#222'; // Magazine and Grip
-            ctx.fillRect(10, 2, 4, 8); // Mag
+            ctx.fillStyle = '#222'; // Mag
+            ctx.fillRect(10, 2, 4, 8); 
             ctx.fillRect(0, 2, 3, 6);  // Grip
             
             if(this.isShooting) {
@@ -904,9 +965,9 @@ function draw() {
         ctx.fillStyle = '#888'; ctx.beginPath(); ctx.arc(w.x + 20, w.y + 7, 6, Math.PI, 0); ctx.fill();
         ctx.strokeStyle = 'rgba(0, 150, 255, 0.6)'; ctx.lineWidth = 2; ctx.beginPath();
         let dropY = (Date.now() / 20) % 15;
-        ctx.moveTo(w.x + 15, w.y + 15 + dropY); ctx.lineTo(w.x + 15, w.y + 25 + dropY);
+        ctx.moveTo(w.x + 15, w.y + 15 + dropY); ctx.lineTo(w.x + 25, w.y + 25 + dropY);
         ctx.moveTo(w.x + 20, w.y + 10 + dropY); ctx.lineTo(w.x + 20, w.y + 20 + dropY);
-        ctx.moveTo(w.x + 25, w.y + 15 + dropY); ctx.lineTo(w.x + 25, w.y + 25 + dropY); ctx.stroke();
+        ctx.moveTo(w.x + 25, w.y + 15 + dropY); ctx.lineTo(w.x + 15, w.y + 25 + dropY); ctx.stroke();
 
         ctx.fillStyle = '#f1c27d'; ctx.beginPath(); ctx.arc(cx, cy + 10, 12, Math.PI, 0); ctx.fill();
         ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI*2); ctx.fill();
@@ -1000,20 +1061,33 @@ function drawAK47VictoryAnimation(dt) {
 let lastTime = 0;
 function loop(timestamp) {
     let dt = (timestamp - lastTime)/1000; lastTime = timestamp; if(dt > 0.1) dt = 0.1;
+    
+    if(cheatHoldingSpace) {
+        cheatTimer += dt;
+        if(cheatTimer >= 5.0) {
+            cheatHoldingSpace = false;
+            cheatTimer = 0;
+            cheatWCount = 0;
+            openCheatMenu();
+        }
+    }
+    
     if(gameState === 'PLAYING') { update(dt); draw(); }
     else if(gameState === 'PAUSED') { draw(); }
     else if(gameState === 'GAMEOVER') drawGameOverAnimation(dt);
     else if(gameState === 'AK47_VICTORY') drawAK47VictoryAnimation(dt);
+    
     requestAnimationFrame(loop);
 }
 
+// UI Buttons
 document.getElementById('btn-play').addEventListener('click', () => {
     document.getElementById('start-screen').classList.add('hidden');
     let isMobile = window.innerWidth <= 1250;
     
     document.getElementById('tut-text-move').innerHTML = isMobile ?
         `Use os <strong>botões de SETAS</strong> na tela para andar.<br>Pressione o botão <strong>AÇÃO</strong> para pegar as calcinhas!` :
-        `Use <strong>WASD</strong> para andar.<br>Pressione <strong>ESPAÇO</strong> para pegar as calcinhas!`;
+        `Use <strong>WASD</strong> ou <strong>Setas</strong> para andar.<br>Pressione <strong>ESPAÇO</strong> para pegar as calcinhas!`;
         
     document.getElementById('tut-text-run').innerHTML = isMobile ?
         `Segure o botão <strong>CORRER</strong> para correr, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.` :
@@ -1036,17 +1110,6 @@ document.getElementById('btn-tut-next').addEventListener('click', () => {
 });
 document.getElementById('btn-tut-start').addEventListener('click', () => { document.getElementById('tutorial-screen').classList.add('hidden'); startLevel(); });
 
-const pauseAction = (e) => {
-    if(e) e.preventDefault();
-    if(gameState === 'PLAYING') {
-        gameState = 'PAUSED';
-        let isMobile = window.innerWidth <= 1250;
-        document.getElementById('pause-desc').innerHTML = isMobile ? 
-            "Toque no botão abaixo para voltar" : 
-            "Pressione ESC ou clique no botão para voltar";
-        document.getElementById('pause-screen').classList.remove('hidden');
-    }
-};
 document.getElementById('btn-pause-mobile').addEventListener('touchstart', pauseAction);
 document.getElementById('btn-pause-mobile').addEventListener('mousedown', pauseAction);
 
@@ -1069,7 +1132,13 @@ document.getElementById('btn-restart').addEventListener('click', () => {
     startLevel(); 
 });
 
-document.getElementById('btn-shop').addEventListener('click', () => { document.getElementById('victory-screen').classList.add('hidden'); document.getElementById('shop-screen').classList.remove('hidden'); renderShop(); });
+document.getElementById('btn-shop').addEventListener('click', () => { 
+    document.getElementById('btn-next-stage').classList.remove('hidden');
+    document.getElementById('btn-shop-close-cheat').classList.add('hidden');
+    document.getElementById('victory-screen').classList.add('hidden'); 
+    document.getElementById('shop-screen').classList.remove('hidden'); 
+    renderShop(); 
+});
 
 document.getElementById('btn-ak47-next').addEventListener('click', () => {
     shopPoints += 500; document.getElementById('ak47-victory-screen').classList.add('hidden');
@@ -1078,6 +1147,70 @@ document.getElementById('btn-ak47-next').addEventListener('click', () => {
 document.getElementById('btn-ak47-continue').addEventListener('click', () => {
     document.getElementById('ak47-tutorial-screen').classList.add('hidden');
     startLevel();
+});
+
+let cheatLastGameState = 'START';
+
+// Cheat buttons
+document.getElementById('btn-cheat-apply').addEventListener('click', () => {
+    let s = parseInt(document.getElementById('cheat-stage').value);
+    let pts = parseInt(document.getElementById('cheat-points').value);
+    
+    let changedStage = (s !== stage);
+    if(!isNaN(s) && s >= 1 && s <= 35) stage = s;
+    if(!isNaN(pts) && pts > 0) shopPoints += pts;
+    
+    showToast("✔️ Cheat Aplicado!");
+    
+    if(!document.getElementById('shop-screen').classList.contains('hidden')) {
+        renderShop();
+    } else if(changedStage && (gameState === 'PLAYING' || gameState === 'PAUSED')) {
+        startLevel();
+        gameState = 'PAUSED';
+        document.getElementById('pause-screen').classList.remove('hidden');
+    } else if (gameState === 'PLAYING' || gameState === 'PAUSED') {
+        updateHUD();
+    }
+});
+
+document.getElementById('btn-cheat-close').addEventListener('click', () => {
+    document.getElementById('cheat-screen').classList.add('hidden');
+    
+    if (gameState === 'PAUSED') {
+        if (cheatLastGameState !== 'PLAYING' && cheatLastGameState !== 'PAUSED') {
+            gameState = cheatLastGameState;
+            document.getElementById('pause-screen').classList.add('hidden');
+        }
+    }
+});
+
+document.getElementById('btn-cheat-shop').addEventListener('click', () => {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('pause-screen').classList.add('hidden');
+    document.getElementById('tutorial-screen').classList.add('hidden');
+    document.getElementById('game-over-screen').classList.add('hidden');
+    document.getElementById('victory-screen').classList.add('hidden');
+    document.getElementById('ak47-victory-screen').classList.add('hidden');
+    document.getElementById('cheat-screen').classList.add('hidden');
+    
+    cheatLastGameState = gameState;
+    gameState = 'SHOP';
+    
+    document.getElementById('btn-next-stage').classList.add('hidden');
+    document.getElementById('btn-shop-close-cheat').classList.remove('hidden');
+    
+    document.getElementById('shop-screen').classList.remove('hidden'); 
+    renderShop();
+});
+
+document.getElementById('btn-shop-close-cheat').addEventListener('click', () => {
+    document.getElementById('shop-screen').classList.add('hidden');
+    document.getElementById('cheat-screen').classList.remove('hidden');
+    
+    document.getElementById('btn-next-stage').classList.remove('hidden');
+    document.getElementById('btn-shop-close-cheat').classList.add('hidden');
+    
+    gameState = 'PAUSED';
 });
 
 let currentTab = 'mochila';
