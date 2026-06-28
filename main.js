@@ -41,11 +41,11 @@ const shopData = {
         { level: 5, name: 'Pés de Algodão', cost: 800, effect: 'Reduz barulho em 70%', val: 0.3 }
     ],
     luva: [
-        { level: 1, name: 'Dedos Grudentos', cost: 75, effect: 'Coleta a 1 tile de distância', val: 40 },
-        { level: 2, name: 'Luva de Sucção', cost: 150, effect: 'Coleta a 2 tiles de distância', val: 80 },
-        { level: 3, name: 'Ímã de Calcinha', cost: 300, effect: 'Coleta a 3 tiles de distância', val: 120 },
-        { level: 4, name: 'Telecinese Íntima', cost: 600, effect: 'Coleta a 4 tiles de distância', val: 160 },
-        { level: 5, name: 'Buraco Negro de Renda', cost: 1200, effect: 'Coleta a 5 tiles de distância', val: 200 }
+        { level: 1, name: 'Dedos Grudentos', cost: 75, effect: 'Coleta a 1 bloco de distância', val: 40 },
+        { level: 2, name: 'Luva de Sucção', cost: 150, effect: 'Coleta a 2 blocos de distância', val: 80 },
+        { level: 3, name: 'Ímã de Calcinha', cost: 300, effect: 'Coleta a 3 blocos de distância', val: 120 },
+        { level: 4, name: 'Telecinese Íntima', cost: 600, effect: 'Coleta a 4 blocos de distância', val: 160 },
+        { level: 5, name: 'Buraco Negro de Renda', cost: 1200, effect: 'Coleta a 5 blocos de distância', val: 200 }
     ],
     distracao: [
         { level: 1, name: 'Moeda no Chão', cost: 60, effect: '+1 distração por fase', val: 1 },
@@ -100,7 +100,6 @@ let spacePressed = false;
 let ePressed = false;
 let mousePressed = false;
 
-// Mobile Input mapping
 function bindMobileButton(id, key) {
     const btn = document.getElementById(id);
     if(!btn) return;
@@ -166,21 +165,25 @@ const mapLayout = [
 let player = {
     x: 100, y: 100, size: 28, baseSpeed: 120,
     isHiding: false, facing: 'down',
-    draw(ctx) {
+    draw(ctx, ox, oy, scale = 1, squish = 1) {
         ctx.save();
-        ctx.translate(this.x, this.y);
+        let dx = ox !== undefined ? ox : this.x;
+        let dy = oy !== undefined ? oy : this.y;
+        ctx.translate(dx, dy);
+        ctx.scale(scale, scale);
+
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.beginPath();
         ctx.ellipse(this.size/2, this.size - 2, this.size/2 + 2, 6, 0, 0, Math.PI*2);
         ctx.fill();
 
-        let drawSize = this.isHiding ? this.size * 0.8 : this.size;
-        let offsetY = this.isHiding ? this.size * 0.2 : (this.isMoving ? -Math.abs(Math.sin(Date.now()/100)) * 4 : 0);
+        let drawSize = (this.isHiding && ox === undefined) ? this.size * 0.8 : this.size;
+        let offsetY = (this.isHiding && ox === undefined) ? this.size * 0.2 : ((this.isMoving && ox === undefined) ? -Math.abs(Math.sin(Date.now()/100)) * 4 : 0);
         
         ctx.translate(this.size/2, this.size/2 + offsetY);
-        
-        // Weapon on back
-        if(hasAK47) {
+        ctx.scale(1, squish);
+
+        if(hasAK47 && ox === undefined) {
             ctx.save();
             ctx.rotate(Math.PI/4);
             ctx.fillStyle = '#444';
@@ -205,18 +208,29 @@ let player = {
         ctx.beginPath();
         ctx.ellipse(0, -drawSize*0.2, drawSize*0.45, drawSize*0.15, 0, 0, Math.PI*2);
         ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(-drawSize*0.15, -drawSize*0.2, drawSize*0.06, 0, Math.PI*2);
-        ctx.arc(drawSize*0.15, -drawSize*0.2, drawSize*0.06, 0, Math.PI*2);
-        ctx.fill();
+        
+        if(ox !== undefined && squish < 0.9) {
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath();
+            let eyeX = drawSize*0.15; let eyeY = -drawSize*0.2; let es = 2;
+            ctx.moveTo(-eyeX - es, eyeY - es); ctx.lineTo(-eyeX + es, eyeY + es);
+            ctx.moveTo(-eyeX + es, eyeY - es); ctx.lineTo(-eyeX - es, eyeY + es);
+            ctx.moveTo(eyeX - es, eyeY - es); ctx.lineTo(eyeX + es, eyeY + es);
+            ctx.moveTo(eyeX + es, eyeY - es); ctx.lineTo(eyeX - es, eyeY + es);
+            ctx.stroke();
+        } else {
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(-drawSize*0.15, -drawSize*0.2, drawSize*0.06, 0, Math.PI*2);
+            ctx.arc(drawSize*0.15, -drawSize*0.2, drawSize*0.06, 0, Math.PI*2);
+            ctx.fill();
+        }
+
         ctx.fillStyle = '#222';
         ctx.beginPath();
         ctx.arc(0, -drawSize*0.4, drawSize*0.35, Math.PI, 0);
         ctx.fill();
 
-        // AK47 shooting anim
-        if(this.isShooting) {
+        if(this.isShooting && ox === undefined) {
             ctx.fillStyle = '#444';
             ctx.save();
             ctx.rotate(this.shootAngle);
@@ -239,12 +253,15 @@ let enemy = {
     targetX: 0, targetY: 0,
     pathTimer: 0, nextTarget: null,
     distractionTimer: 0,
-    draw(ctx) {
-        if(!this.active) return;
+    draw(ctx, ox, oy, scale = 1, swing = 0) {
+        if(!this.active && ox === undefined) return;
         ctx.save();
-        ctx.translate(this.x, this.y);
+        let dx = ox !== undefined ? ox : this.x;
+        let dy = oy !== undefined ? oy : this.y;
+        ctx.translate(dx, dy);
+        ctx.scale(scale, scale);
         
-        if(this.dead) {
+        if(this.dead && ox === undefined) {
             ctx.fillStyle = '#800020';
             ctx.fillRect(0, 20, 30, 10);
             ctx.fillStyle = 'red';
@@ -258,12 +275,17 @@ let enemy = {
         ctx.fillStyle = 'rgba(0,0,0,0.4)';
         ctx.beginPath(); ctx.ellipse(this.size/2, this.size - 2, this.size/2 + 4, 8, 0, 0, Math.PI*2); ctx.fill();
 
-        let bob = (this.state === 'chase') ? Math.abs(Math.sin(Date.now()/100)) * 6 : Math.abs(Math.sin(Date.now()/150)) * 3;
+        let bob = (this.state === 'chase' && ox === undefined) ? Math.abs(Math.sin(Date.now()/100)) * 6 : ((ox !== undefined) ? 0 : Math.abs(Math.sin(Date.now()/150)) * 3);
         ctx.translate(this.size/2, this.size/2 - bob);
 
         ctx.save();
-        if(this.state === 'chase') ctx.rotate(Math.sin(Date.now()/100) * 0.5 + 0.5); 
-        else ctx.rotate(0.2); 
+        if(ox !== undefined) {
+            ctx.rotate(-1.2 + swing*1.8);
+        } else if(this.state === 'chase') {
+            ctx.rotate(Math.sin(Date.now()/100) * 0.5 + 0.5); 
+        } else {
+            ctx.rotate(0.2); 
+        }
         ctx.fillStyle = '#8b4513';
         ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(25, -20); ctx.lineTo(32, -18); ctx.lineTo(15, 5); ctx.fill();
         ctx.fillStyle = '#654321'; 
@@ -286,7 +308,13 @@ let enemy = {
         ctx.fillStyle = '#000';
         ctx.beginPath(); ctx.arc(-this.size*0.1, -this.size*0.25, 3, 0, Math.PI*2); ctx.arc(this.size*0.1, -this.size*0.25, 3, 0, Math.PI*2); ctx.fill();
 
-        if(this.state === 'chase') {
+        if(ox !== undefined) {
+            ctx.beginPath(); ctx.arc(0, -this.size*0.15, 4, 0, Math.PI*2); ctx.fill();
+            if(swing < -0.8) {
+                ctx.fillStyle = '#ffcf40'; ctx.beginPath(); ctx.arc(-32, 6, 15+Math.random()*10, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = 'red'; ctx.font = '8px Arial'; ctx.fillText('BAM!', -40, 8);
+            }
+        } else if(this.state === 'chase') {
             ctx.fillStyle = 'red'; ctx.font = 'bold 24px Fredoka One'; ctx.fillText('!', 0, -this.size);
         } else if(this.state === 'search') {
             ctx.fillStyle = '#ffcf40'; ctx.font = 'bold 20px Fredoka One'; ctx.fillText('?', 0, -this.size);
@@ -312,7 +340,6 @@ const pantyTypes = [
     { type: 'Armadilha', pts: -20, icon: '🩲', color: 'red', trap: true }
 ];
 
-// Utility
 function checkCollision(rect1, rect2) {
     let r1w = rect1.width || rect1.size; let r1h = rect1.height || rect1.size;
     let r2w = rect2.width || rect2.size; let r2h = rect2.height || rect2.size;
@@ -437,11 +464,10 @@ function setupBathers() {
     bathers = [];
     let batherCount = stage <= 2 ? 0 : (stage <= 5 ? 1 : (stage <= 8 ? 2 : 3 + Math.floor((stage-10)/3)));
     
-    // Slow initial speed, getting faster gradually
     let speedMult = stage <= 3 ? 0.5 : (stage <= 6 ? 0.7 : (stage <= 9 ? 0.9 : (stage <= 12 ? 1.1 : 1.3)));
-    let cone = stage <= 3 ? 90 : (stage <= 6 ? 100 : (stage <= 9 ? 110 : (stage <= 12 ? 120 : 130)));
-    let reaction = stage <= 3 ? 0.8 : (stage <= 6 ? 0.6 : (stage <= 9 ? 0.5 : (stage <= 12 ? 0.4 : 0.3)));
-    let screamSus = stage <= 3 ? 40 : (stage <= 6 ? 45 : (stage <= 9 ? 50 : (stage <= 12 ? 55 : 60)));
+    let cone = stage <= 3 ? 120 : (stage <= 6 ? 140 : (stage <= 9 ? 160 : (stage <= 12 ? 180 : 200)));
+    let reaction = stage <= 3 ? 0.6 : (stage <= 6 ? 0.5 : (stage <= 9 ? 0.4 : (stage <= 12 ? 0.3 : 0.2)));
+    let screamSus = stage <= 3 ? 50 : (stage <= 6 ? 55 : (stage <= 9 ? 60 : (stage <= 12 ? 65 : 70)));
 
     for(let i=0; i<batherCount; i++) {
         let type = 'normal';
@@ -464,7 +490,9 @@ function setupBathers() {
             state: 'walk',
             alertTimer: 0,
             seeTimer: 0,
-            angle: 0
+            angle: 0,
+            pathTimer: 0,
+            nextTarget: null
         });
     }
 }
@@ -483,7 +511,6 @@ function startLevel() {
     enemy.active = false; enemy.dead = false;
     setupBathers();
 
-    // Shower bathers
     women = [];
     for(let r=0; r<ROWS; r++) {
         for(let c=0; c<COLS; c++) {
@@ -560,7 +587,6 @@ function update(dt) {
 
     let disfarceDelay = getUpgradeVal('disfarce', 0); // 0 to 5s
     
-    // Distraction logic
     if(ePressed && distractionsLeft > 0) {
         ePressed = false; distractionsLeft--;
         distractions.push({x: player.x, y: player.y, life: 5});
@@ -592,11 +618,45 @@ function update(dt) {
 
     // Wandering Bathers Logic
     bathers.forEach(b => {
-        if(b.state === 'scream') {
-            b.alertTimer -= dt;
-            if(b.alertTimer <= 0) b.state = 'walk';
-            return;
+        let pdx = (player.x + player.size/2) - (b.x + b.size/2);
+        let pdy = (player.y + player.size/2) - (b.y + b.size/2);
+        let distToPlayer = Math.hypot(pdx, pdy);
+        let angleToPlayer = Math.atan2(pdy, pdx);
+        
+        let angleDiff = Math.abs(angleToPlayer - b.angle);
+        if(angleDiff > Math.PI) angleDiff = 2*Math.PI - angleDiff;
+        
+        // Vision check
+        let isSeeingPlayer = false;
+        if(!player.isHiding && distToPlayer < 350) {
+            if(b.cone === 360 || angleDiff < (b.cone/2 * Math.PI/180)) {
+                if(checkLoS(b.x + b.size/2, b.y + b.size/2, player.x + player.size/2, player.y + player.size/2)) {
+                    isSeeingPlayer = true;
+                }
+            }
         }
+
+        if(isSeeingPlayer) {
+            b.seeTimer += dt;
+            if(b.seeTimer >= (b.reactTime + disfarceDelay)) {
+                b.state = 'scream';
+                b.alertTimer = 1.0; 
+                suspicion += b.screamSus * dt * 2 * resMult; 
+                if(Math.random() < 0.1) {
+                    showToast("😱 AHHH! INVASOR!");
+                    spawnParticle(b.x, b.y, "😱", "#fff");
+                    spawnNoiseRing(b.x, b.y);
+                }
+            }
+        } else {
+            b.seeTimer = Math.max(0, b.seeTimer - dt);
+            if(b.state === 'scream') {
+                b.alertTimer -= dt;
+                if(b.alertTimer <= 0) b.state = 'walk';
+            }
+        }
+
+        if(b.state === 'scream') return;
 
         let distTarget = null;
         distractions.forEach(dist => {
@@ -611,48 +671,40 @@ function update(dt) {
         }
 
         if(b.state === 'walk') {
-            let edx = b.targetX - b.x; let edy = b.targetY - b.y;
-            let d = Math.hypot(edx, edy);
-            if(d < 10 || Math.random() < 0.01) {
-                let r = Math.floor(Math.random()*ROWS); let c = Math.floor(Math.random()*COLS);
-                if(!['W','B','L','E'].includes(mapLayout[r][c])) {
-                    b.targetX = c*TILE_SIZE; b.targetY = r*TILE_SIZE;
+            b.pathTimer -= dt;
+            if(b.pathTimer <= 0 || !b.nextTarget) {
+                b.pathTimer = 0.5;
+                let bc = Math.floor((b.x + b.size/2)/TILE_SIZE); let br = Math.floor((b.y + b.size/2)/TILE_SIZE);
+                let tc = Math.floor((b.targetX)/TILE_SIZE); let tr = Math.floor((b.targetY)/TILE_SIZE);
+                let step = getNextStep(br, bc, tr, tc);
+                if(step) b.nextTarget = { x: step.c*TILE_SIZE + TILE_SIZE/2 - b.size/2, y: step.r*TILE_SIZE + TILE_SIZE/2 - b.size/2 };
+                else {
+                    b.nextTarget = null;
+                    let r = Math.floor(Math.random()*ROWS); let c = Math.floor(Math.random()*COLS);
+                    if(!['W','B','L','E'].includes(mapLayout[r][c])) { b.targetX = c*TILE_SIZE; b.targetY = r*TILE_SIZE; }
                 }
             }
+
+            let mTX = b.nextTarget ? b.nextTarget.x : b.targetX;
+            let mTY = b.nextTarget ? b.nextTarget.y : b.targetY;
+            let edx = mTX - b.x; let edy = mTY - b.y;
+            let d = Math.hypot(edx, edy);
+
+            if(d < 10 && !b.nextTarget && Math.random() < 0.05) {
+                let r = Math.floor(Math.random()*ROWS); let c = Math.floor(Math.random()*COLS);
+                if(!['W','B','L','E'].includes(mapLayout[r][c])) { b.targetX = c*TILE_SIZE; b.targetY = r*TILE_SIZE; }
+            }
+
             if(d > 2) {
-                b.x += (edx/d) * b.speed * dt; b.y += (edy/d) * b.speed * dt;
+                let moveX = (edx/d)*b.speed*dt; let moveY = (edy/d)*b.speed*dt;
+                if(!checkMapCollision(b.x + moveX, b.y, b.size)) b.x += moveX;
+                if(!checkMapCollision(b.x, b.y + moveY, b.size)) b.y += moveY;
                 b.angle = Math.atan2(edy, edx);
+                if(Math.hypot(mTX - b.x, mTY - b.y) < 5) b.nextTarget = null;
             }
         }
-
-        // Vision cone check (They always scream when seeing the player because they know he shouldn't be there)
-        if(!player.isHiding) {
-            let pdx = (player.x + player.size/2) - (b.x + b.size/2);
-            let pdy = (player.y + player.size/2) - (b.y + b.size/2);
-            let dist = Math.hypot(pdx, pdy);
-            
-            if(dist < 300) {
-                let angleToPlayer = Math.atan2(pdy, pdx);
-                let angleDiff = Math.abs(angleToPlayer - b.angle);
-                if(angleDiff > Math.PI) angleDiff = 2*Math.PI - angleDiff;
-                
-                if(b.cone === 360 || angleDiff < (b.cone/2 * Math.PI/180)) {
-                    if(checkLoS(b.x + b.size/2, b.y + b.size/2, player.x + player.size/2, player.y + player.size/2)) {
-                        b.seeTimer += dt;
-                        if(b.seeTimer >= (b.reactTime + disfarceDelay)) {
-                            b.state = 'scream'; b.alertTimer = 3; b.seeTimer = 0;
-                            suspicion += b.screamSus * resMult;
-                            showToast("😱 AHHH! INVASOR!");
-                            spawnParticle(b.x, b.y, "😱", "#fff");
-                            spawnNoiseRing(b.x, b.y);
-                        }
-                    } else b.seeTimer = Math.max(0, b.seeTimer - dt);
-                } else b.seeTimer = Math.max(0, b.seeTimer - dt);
-            } else b.seeTimer = Math.max(0, b.seeTimer - dt);
-        } else b.seeTimer = 0;
     });
 
-    // Pick up panties
     if(spacePressed) {
         spacePressed = false;
         let cap = getUpgradeVal('mochila', 1);
@@ -685,7 +737,6 @@ function update(dt) {
         }
     }
     
-    // Deposit at exit
     if(currentTile === 'E' && backpackCollected > 0) {
         totalCollected += backpackCollected;
         backpackCollected = 0;
@@ -694,16 +745,14 @@ function update(dt) {
         if(totalCollected >= requiredPanties) showToast("PODE FUGIR!");
     }
 
-    // Panty Spawner
     let spawnRate = Math.max(5, 15 - stage*0.5);
     lastPantySpawn += dt;
     let maxOnScreen = 5;
-    if(panties.length >= maxOnScreen) lastPantySpawn = 0; // Pause
+    if(panties.length >= maxOnScreen) lastPantySpawn = 0;
     if(lastPantySpawn > spawnRate && panties.length < maxOnScreen) {
         spawnPanty(); lastPantySpawn = 0;
     }
 
-    // Enemy Spawn & AI
     let eSpeedMult = stage <= 2 ? 1.0 : (stage <= 4 ? 1.1 : (stage <= 6 ? 1.2 : (stage <= 8 ? 1.3 : (stage <= 10 ? 1.4 : 1.5))));
     if(suspicion >= 100 && !enemy.active && !enemy.dead) {
         enemy.active = true; enemy.speed = enemy.baseSpeed * eSpeedMult;
@@ -750,7 +799,6 @@ function update(dt) {
             if(getTileAt(enemy.x, enemy.y, enemy.size) === 'E') enemy.active = false;
         }
 
-        // Smart Pathfinding Movement
         enemy.pathTimer -= dt;
         if(enemy.pathTimer <= 0 || !enemy.nextTarget) {
             enemy.pathTimer = 0.2;
@@ -778,7 +826,6 @@ function update(dt) {
         }
     }
 
-    // Shoot AK47
     if(mousePressed && hasAK47 && enemy.active && !enemy.dead) {
         mousePressed = false;
         player.isShooting = true;
@@ -801,7 +848,6 @@ function update(dt) {
 
     if(totalCollected >= requiredPanties && currentTile === 'E' && !enemy.dead) triggerWin();
 
-    // Particles
     for(let i=particles.length-1; i>=0; i--) {
         let p = particles[i]; p.life -= dt;
         if(p.type === 'ring') p.radius += (p.maxRadius - p.radius)*5*dt;
@@ -816,8 +862,8 @@ function update(dt) {
 
 function triggerWin() {
     gameState = 'VICTORY';
-    score += timeRemaining * 5; // Time bonus
-    score += 100 + (stage * 50); // Completion bonus
+    score += timeRemaining * 5; 
+    score += 100 + (stage * 50); 
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('victory-screen').classList.remove('hidden');
@@ -864,7 +910,6 @@ function draw() {
         }
     }
 
-    // Shower bathers
     women.forEach(w => {
         let cx = w.x + w.size/2; let cy = w.y + w.size/2;
         ctx.fillStyle = '#aaa'; ctx.fillRect(w.x + 5, w.y + 5, 15, 5);
@@ -892,10 +937,9 @@ function draw() {
         }
     });
 
-    // Wandering Bathers
     bathers.forEach(b => {
         let cx = b.x + b.size/2; let cy = b.y + b.size/2;
-        ctx.fillStyle = '#f1c27d'; ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2); ctx.fill(); // body
+        ctx.fillStyle = '#f1c27d'; ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2); ctx.fill(); 
         ctx.fillStyle = b.type === 'fofoqueira' ? 'purple' : (b.type === 'atleta' ? 'blue' : 'green');
         ctx.beginPath(); ctx.arc(cx, cy, 12, b.angle - Math.PI/4, b.angle + Math.PI/4); ctx.fill();
         if(b.state === 'scream') { ctx.fillStyle = '#000'; ctx.font = '16px Arial'; ctx.fillText('😱', cx, b.y - 10); }
@@ -932,22 +976,11 @@ function drawGameOverAnimation(dt) {
     if(gameOverSnapshot) ctx.drawImage(gameOverSnapshot, 0, 0);
     let cx = canvas.width/2; let cy = canvas.height/2; let swing = Math.sin(gameOverAnimTimer*10);
     
-    ctx.save(); ctx.translate(cx-80, cy+50); ctx.scale(5, 5);
-    ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath(); ctx.ellipse(0, 12, 16, 4, 0, 0, Math.PI*2); ctx.fill();
-    ctx.scale(1, swing < -0.5 ? 0.6 : 1.0);
-    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 8, 11, Math.PI, 0); ctx.fill();
-    ctx.fillStyle = '#ffcc99'; ctx.beginPath(); ctx.arc(0, -5, 11, 0, Math.PI*2); ctx.fill();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-6, -7); ctx.lineTo(-2, -3); ctx.moveTo(-2, -7); ctx.lineTo(-6, -3); ctx.moveTo(2, -7); ctx.lineTo(6, -3); ctx.moveTo(6, -7); ctx.lineTo(2, -3); ctx.stroke();
-    ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(0, -11, 10, Math.PI, 0); ctx.fill();
-    ctx.restore();
-
-    ctx.save(); ctx.translate(cx+80, cy+20); ctx.scale(5, 5);
-    ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.beginPath(); ctx.ellipse(0, 13, 19, 5, 0, 0, Math.PI*2); ctx.fill();
-    ctx.save(); ctx.rotate(-1.2 + swing*1.8); ctx.fillStyle = '#8b4513'; ctx.beginPath(); ctx.moveTo(10,0); ctx.lineTo(25,-20); ctx.lineTo(32,-18); ctx.lineTo(15,5); ctx.fill(); ctx.restore();
-    ctx.fillStyle = '#800020'; ctx.beginPath(); ctx.moveTo(0, -3); ctx.lineTo(-18, 15); ctx.lineTo(18, 15); ctx.fill();
-    ctx.fillStyle = '#f5cba7'; ctx.beginPath(); ctx.arc(0, -9, 10, 0, Math.PI*2); ctx.fill();
-    if(swing < -0.8) { ctx.fillStyle = '#ffcf40'; ctx.beginPath(); ctx.arc(-32, 6, 15+Math.random()*10, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = 'red'; ctx.font = '8px Arial'; ctx.fillText('BAM!', -40, 8); }
-    ctx.restore();
+    let squish = swing < -0.5 ? 0.6 : 1.0;
+    player.draw(ctx, cx - 140, cy + 20, 5, squish);
+    
+    let clubSwing = (swing + 1) / 2;
+    enemy.draw(ctx, cx + 80, cy, 5, swing);
 }
 
 let lastTime = 0;
