@@ -627,7 +627,6 @@ function update(dt) {
     let oldSec = Math.floor(tempoTotalJogo);
     tempoTotalJogo += dt;
     if(Math.floor(tempoTotalJogo) > oldSec) {
-        localStorage.setItem('tempoTotalJogo', tempoTotalJogo);
         addProgressoConquista('c29', 1);
     }
     if(suspicion <= ultimaSuspeita) {
@@ -1578,13 +1577,12 @@ const conquistasData = [
     { id: 'c30', cat: 7, nome: 'Lenda', desc: 'Desbloqueie TODAS as conquistas', tipo: 'unico' }
 ];
 
-let conquistasSalvas = JSON.parse(localStorage.getItem('conquistas')) || {};
+let conquistasSalvas = {};
 conquistasData.forEach(c => {
-    if(!conquistasSalvas[c.id]) conquistasSalvas[c.id] = { desbloqueada: false, progresso: 0 };
+    conquistasSalvas[c.id] = { desbloqueada: false, progresso: 0 };
 });
 
 function salvarConquistas() {
-    localStorage.setItem('conquistas', JSON.stringify(conquistasSalvas));
     verificarLenda();
 }
 
@@ -1667,7 +1665,7 @@ function verificarLenda() {
     if(total >= 29) unlockConquista('c30');
 }
 
-let tempoTotalJogo = parseFloat(localStorage.getItem('tempoTotalJogo') || "0");
+let tempoTotalJogo = 0;
 let faseGritos = 0;
 let fasePerfeitaSemVisto = true;
 let ultimaSuspeita = 0;
