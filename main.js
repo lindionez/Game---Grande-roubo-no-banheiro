@@ -63,11 +63,11 @@ const shopData = {
         { level: 5, name: 'Clone de Fumaça', cost: 960, effect: '+5 distrações por fase', val: 5 }
     ],
     disfarce: [
-        { level: 1, name: 'Óculos de Sol', cost: 80, effect: 'Banhistas demoram 1s a mais para te ver', val: 1 },
-        { level: 2, name: 'Peruca Loiro', cost: 160, effect: 'Banhistas demoram 2s a mais para te ver', val: 2 },
-        { level: 3, name: 'Roupão Felpudo', cost: 320, effect: 'Banhistas demoram 3s a mais para te ver', val: 3 },
-        { level: 4, name: 'Pele de Banhista', cost: 640, effect: 'Banhistas demoram 4s a mais para te ver', val: 4 },
-        { level: 5, name: 'Manto da Invisibilidade Parcial', cost: 1280, effect: 'Banhistas demoram 5s a mais para te ver', val: 5 }
+        { level: 1, name: 'Óculos de Sol', cost: 80, effect: 'Banhistas demoram 0.3s a mais para te ver', val: 0.3 },
+        { level: 2, name: 'Peruca Loiro', cost: 160, effect: 'Banhistas demoram 0.6s a mais para te ver', val: 0.6 },
+        { level: 3, name: 'Roupão Felpudo', cost: 320, effect: 'Banhistas demoram 0.9s a mais para te ver', val: 0.9 },
+        { level: 4, name: 'Pele de Banhista', cost: 640, effect: 'Banhistas demoram 1.2s a mais para te ver', val: 1.2 },
+        { level: 5, name: 'Manto da Invisibilidade Parcial', cost: 1280, effect: 'Banhistas demoram 1.5s a mais para te ver', val: 1.5 }
     ],
     velocidade: [
         { level: 1, name: 'Sandália Velha', cost: 70, effect: '+5% velocidade', val: 1.05 },
