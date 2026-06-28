@@ -498,8 +498,7 @@ function setupBathers() {
 }
 
 function startLevel() {
-    timeRemaining = 90 - (stage > 2 ? (stage-2)*5 : 0);
-    if(timeRemaining < 60) timeRemaining = 60;
+    timeRemaining = 120 + (stage * 20); // Aumenta 10s por fase para compensar aumento de calcinhas
     
     suspicion = 0;
     totalCollected = 0;
@@ -994,6 +993,10 @@ function loop(timestamp) {
 // UI Buttons
 document.getElementById('btn-play').addEventListener('click', () => {
     document.getElementById('start-screen').classList.add('hidden');
+    let isMobile = window.innerWidth <= 1250;
+    document.getElementById('tut-text-distraction').innerHTML = isMobile ?
+        `Ao comprar o upgrade de Distração, você inicia a fase com cargas.<br>Use o botão 💨 para jogar um rádio e distrair as banhistas!` :
+        `Ao comprar o upgrade de Distração, você inicia a fase com cargas.<br>Aperte a tecla <strong>E</strong> para jogar um rádio e distrair as banhistas!`;
     document.getElementById('tutorial-screen').classList.remove('hidden');
 });
 document.getElementById('btn-tut-next').addEventListener('click', () => {
