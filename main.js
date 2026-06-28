@@ -2,8 +2,8 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const TILE_SIZE = 40;
-const COLS = 20;
-const ROWS = 15;
+const COLS = 30;
+const ROWS = 20;
 
 // Prevent touch actions like scrolling on canvas
 canvas.addEventListener('touchstart', e => e.preventDefault(), {passive: false});
@@ -59,25 +59,30 @@ window.addEventListener('keyup', e => {
     if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = false;
 });
 
-// Map Layout (20x15)
+// Map Layout (30x20)
 // W = Wall/Border, . = Floor, B = Bathroom Stall, C = Clothesline, R = Rug (Safe/Silent), P = Plant (Safe)
 // L = Locker, E = Enemy Spawn/Exit
 const mapLayout = [
-    "WWWWWWWWWWWWWWWWWWWW",
-    "W..................W",
-    "W.B...B...B...B....W",
-    "W.B...B...B...B....W",
-    "W..................W",
-    "W..................W",
-    "W........RRRRRR....W",
-    "W........RRRRRR....W",
-    "W...L..............W",
-    "W...L...PPPP.......W",
-    "W.......PPPP...CCC.W",
-    "W..............CCC.W",
-    "W..............CCC.W",
-    "WE.................W",
-    "WWWWWWWWWWWWWWWWWWWW"
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "W............................W",
+    "W.B...B...B...B...B...B...B..W",
+    "W.B...B...B...B...B...B...B..W",
+    "W............................W",
+    "W..PPPP..............PPPP....W",
+    "W..PPPP....RRRRRR....PPPP....W",
+    "W..........RRRRRR............W",
+    "W...L....................L...W",
+    "W...L...PPPP......PPPP...L...W",
+    "W.......PPPP......PPPP.......W",
+    "W........................CCC.W",
+    "W.......RRRRRR...........CCC.W",
+    "W.......RRRRRR...........CCC.W",
+    "W............................W",
+    "W...L........PPPP........L...W",
+    "W...L........PPPP........L...W",
+    "W............................W",
+    "WE...........................W",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
 ];
 
 // Entities
@@ -110,8 +115,11 @@ let player = {
 let enemy = {
     active: false,
     x: 0, y: 0, size: 30, speed: 100,
-    state: 'patrol', // patrol, chase
+    state: 'patrol', // patrol, chase, leave
     targetX: 0, targetY: 0,
+    loseTimer: 0,
+    pathTimer: 0,
+    nextTarget: null,
     draw(ctx) {
         if(!this.active) return;
         ctx.save();
@@ -195,6 +203,36 @@ function getTileAt(x, y, size) {
     let row = Math.floor(centerY / TILE_SIZE);
     if(row >= 0 && row < ROWS && col >= 0 && col < COLS) {
         return mapLayout[row][col];
+    }
+    return null;
+}
+
+function getNextStep(startR, startC, targetR, targetC) {
+    if(startR === targetR && startC === targetC) return null;
+    let queue = [{r: startR, c: startC, path: []}];
+    let visited = new Set();
+    visited.add(`${startR},${startC}`);
+    let dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+
+    let iterations = 0;
+    while(queue.length > 0 && iterations < 1500) {
+        iterations++;
+        let curr = queue.shift();
+        if(curr.r === targetR && curr.c === targetC) return curr.path[0];
+        
+        for(let d of dirs) {
+            let nr = curr.r + d[0];
+            let nc = curr.c + d[1];
+            if(nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+                if(!visited.has(`${nr},${nc}`)) {
+                    let tile = mapLayout[nr][nc];
+                    if(!['W', 'B', 'L'].includes(tile)) {
+                        visited.add(`${nr},${nc}`);
+                        queue.push({r: nr, c: nc, path: [...curr.path, {r: nr, c: nc}]});
+                    }
+                }
+            }
+        }
     }
     return null;
 }
@@ -320,7 +358,7 @@ function startLevel() {
     document.getElementById('hud').classList.remove('hidden');
     
     // Check mobile
-    if(window.innerWidth <= 850) {
+    if(window.innerWidth <= 1250) {
         document.getElementById('mobile-controls').classList.remove('hidden');
     }
 }
@@ -513,35 +551,98 @@ function update(dt) {
             enemy.state = 'chase';
             enemy.targetX = player.x;
             enemy.targetY = player.y;
+            enemy.speed = 160; // Runs fast
+            enemy.loseTimer = 5; // 5 seconds to give up if hid
         } else if(enemy.state === 'chase') {
-            // Player hid, move to last known position then wander
-            let dx = enemy.targetX - enemy.x;
-            let dy = enemy.targetY - enemy.y;
-            if(Math.abs(dx) < 5 && Math.abs(dy) < 5) enemy.state = 'patrol';
+            // Player hid, move to last known position then give up
+            enemy.loseTimer -= dt;
+            if(enemy.loseTimer <= 0) {
+                enemy.state = 'leave';
+                enemy.speed = 120;
+                showToast("Ufa... Ela desistiu!");
+                suspicion = 0;
+            }
         }
 
         if(enemy.state === 'patrol') {
             // Simple wander
+            enemy.speed = 100;
             if(Math.random() < 0.02) {
-                enemy.targetX = enemy.x + (Math.random() - 0.5) * 100;
-                enemy.targetY = enemy.y + (Math.random() - 0.5) * 100;
+                let r = Math.floor(Math.random() * ROWS);
+                let c = Math.floor(Math.random() * COLS);
+                if(!['W', 'B', 'L'].includes(mapLayout[r][c])) {
+                    enemy.targetX = c * TILE_SIZE;
+                    enemy.targetY = r * TILE_SIZE;
+                }
             }
         }
 
-        // Move enemy
-        let edx = enemy.targetX - enemy.x;
-        let edy = enemy.targetY - enemy.y;
-        let dist = Math.sqrt(edx*edx + edy*edy);
-        if(dist > 0) {
-            let eMoveX = (edx/dist) * enemy.speed * dt;
-            let eMoveY = (edy/dist) * enemy.speed * dt;
-            if(!checkMapCollision(enemy.x + eMoveX, enemy.y, enemy.size)) enemy.x += eMoveX;
-            if(!checkMapCollision(enemy.x, enemy.y + eMoveY, enemy.size)) enemy.y += eMoveY;
+        if(enemy.state === 'leave') {
+            // Go to exit
+            for(let r=0; r<ROWS; r++) {
+                for(let c=0; c<COLS; c++) {
+                    if(mapLayout[r][c] === 'E') {
+                        enemy.targetX = c * TILE_SIZE;
+                        enemy.targetY = r * TILE_SIZE;
+                    }
+                }
+            }
+            if(getTileAt(enemy.x, enemy.y, enemy.size) === 'E') {
+                enemy.active = false;
+            }
         }
 
-        // Check catch
-        if(!player.isHiding && checkCollision(player, enemy)) {
-            gameOver();
+        if(enemy.active) {
+            // Smart Pathfinding Movement
+            let eCol = Math.floor((enemy.x + enemy.size/2) / TILE_SIZE);
+            let eRow = Math.floor((enemy.y + enemy.size/2) / TILE_SIZE);
+            let targetCenter = (enemy.state === 'chase') ? player.size/2 : 0;
+            let tCol = Math.floor((enemy.targetX + targetCenter) / TILE_SIZE);
+            let tRow = Math.floor((enemy.targetY + targetCenter) / TILE_SIZE);
+            
+            enemy.pathTimer = (enemy.pathTimer || 0) - dt;
+            if(enemy.pathTimer <= 0 || !enemy.nextTarget) {
+                enemy.pathTimer = 0.2;
+                let step = getNextStep(eRow, eCol, tRow, tCol);
+                if(step) {
+                    enemy.nextTarget = {
+                        x: step.c * TILE_SIZE + TILE_SIZE/2 - enemy.size/2,
+                        y: step.r * TILE_SIZE + TILE_SIZE/2 - enemy.size/2
+                    };
+                } else {
+                    enemy.nextTarget = null;
+                }
+            }
+
+            let moveTargetX = enemy.nextTarget ? enemy.nextTarget.x : enemy.targetX;
+            let moveTargetY = enemy.nextTarget ? enemy.nextTarget.y : enemy.targetY;
+            
+            let edx = moveTargetX - enemy.x;
+            let edy = moveTargetY - enemy.y;
+            let dist = Math.sqrt(edx*edx + edy*edy);
+            
+            if(dist > 2) {
+                let eMoveX = (edx/dist) * enemy.speed * dt;
+                let eMoveY = (edy/dist) * enemy.speed * dt;
+                
+                // Try X and Y separately to slide on walls
+                let movedX = false; let movedY = false;
+                if(!checkMapCollision(enemy.x + eMoveX, enemy.y, enemy.size)) {
+                    enemy.x += eMoveX; movedX = true;
+                }
+                if(!checkMapCollision(enemy.x, enemy.y + eMoveY, enemy.size)) {
+                    enemy.y += eMoveY; movedY = true;
+                }
+                
+                // Check if reached next node
+                let nDist = Math.sqrt((moveTargetX - enemy.x)**2 + (moveTargetY - enemy.y)**2);
+                if(nDist < 5) enemy.nextTarget = null;
+            }
+
+            // Check catch
+            if(!player.isHiding && checkCollision(player, enemy)) {
+                gameOver();
+            }
         }
     }
 

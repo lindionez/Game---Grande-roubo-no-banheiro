@@ -22,8 +22,8 @@ h1, h2, h3, .hud-label {
 
 #game-container {
     position: relative;
-    width: 800px;
-    height: 600px;
+    width: 1200px;
+    height: 800px;
     background-color: #000;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255, 105, 180, 0.2);
@@ -389,7 +389,7 @@ canvas {
 .action-btn.primary { width: 80px; height: 80px; background: rgba(255,105,180,0.4); border-color: #ff69b4; }
 .action-btn.primary:active { background: rgba(255,105,180,0.8); }
 
-@media (max-width: 850px) {
+@media (max-width: 1250px) {
     #game-container {
         width: 100vw;
         height: 100vh;
