@@ -1041,6 +1041,8 @@ function drawGameOverAnimation(dt) {
 
 // Floating emoji particles for victory screen
 let victoryEmojis = [];
+let victoryBullets = [];
+let bloodDrips = [];
 
 function drawAK47VictoryAnimation(dt) {
     gameOverAnimTimer += dt;
@@ -1064,7 +1066,7 @@ function drawAK47VictoryAnimation(dt) {
     
     player.draw(ctx, Math.round(cx) + shakeX, Math.round(cy) + shakeY, 6, 1);
     
-    let tipX = Math.round(cx) + shakeX + 170;
+    let tipX = Math.round(cx) + shakeX + 176; // shifted a bit more right
     let tipY = Math.round(cy) + shakeY - 180;
     
     // Muzzle flash at barrel tip
@@ -1077,12 +1079,13 @@ function drawAK47VictoryAnimation(dt) {
     
     // Spawn bullets from barrel tip
     if(Math.random() < 0.5) {
-        particles.push({x: tipX, y: tipY - 10, vy: -1400, life: 0.8, maxLife: 0.8, type: 'bullet'});
+        // Spawn right at tipY (moved down slightly closer to barrel)
+        victoryBullets.push({x: tipX, y: tipY, vy: -1400, life: 0.8, maxLife: 0.8});
     }
 
     // Spawn floating emojis randomly
     if(Math.random() < 0.15) {
-        let emojis = ['💥','🔥','💀','😈','🔫','🩸','⚡','👿','😤','💪'];
+        let emojis = ['💥','🔥','💀','😈','🩸','⚡','👿','😤','💪']; // removed gun emoji
         victoryEmojis.push({
             x: Math.random() * canvas.width,
             y: canvas.height + 20,
@@ -1095,17 +1098,38 @@ function drawAK47VictoryAnimation(dt) {
             life: 1.0
         });
     }
+    
+    // Spawn blood drips from the text
+    if(Math.random() < 0.4) {
+        bloodDrips.push({
+            x: canvas.width / 2 + (Math.random() - 0.5) * 600, // Spread across text width
+            y: 80, // Start just below text
+            vy: 20 + Math.random() * 40, // Drip down slowly
+            size: 2 + Math.random() * 4,
+            life: 1.0
+        });
+    }
 
     // Draw bullets going UP
-    for(let i = particles.length - 1; i >= 0; i--) {
-        let p = particles[i];
-        if(p.type === 'bullet') {
-            p.y += p.vy * dt;
-            ctx.fillStyle = '#ffd700';
-            ctx.fillRect(Math.round(p.x) - 2, Math.round(p.y), 4, 14);
-            p.life -= dt;
-            if(p.life <= 0) particles.splice(i, 1);
-        }
+    for(let i = victoryBullets.length - 1; i >= 0; i--) {
+        let p = victoryBullets[i];
+        p.y += p.vy * dt;
+        ctx.fillStyle = '#ffd700';
+        ctx.fillRect(Math.round(p.x) - 2, Math.round(p.y), 4, 14);
+        p.life -= dt;
+        if(p.life <= 0) victoryBullets.splice(i, 1);
+    }
+    
+    // Draw blood drips
+    for(let i = bloodDrips.length - 1; i >= 0; i--) {
+        let d = bloodDrips[i];
+        d.y += d.vy * dt;
+        d.life -= dt * 0.3;
+        ctx.fillStyle = `rgba(180, 0, 0, ${Math.max(0, d.life)})`;
+        ctx.beginPath();
+        ctx.arc(Math.round(d.x), Math.round(d.y), d.size, 0, Math.PI * 2);
+        ctx.fill();
+        if(d.life <= 0) bloodDrips.splice(i, 1);
     }
     
     // Draw + update floating emojis
