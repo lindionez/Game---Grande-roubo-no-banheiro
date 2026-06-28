@@ -173,17 +173,46 @@ canvas {
 }
 
 .hud-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    position: relative;
+    width: 100%;
+    height: 100px; /* Allocate space at the top */
 }
 
-.hud-left, .hud-right {
+.hud-left {
+    position: absolute;
+    top: 0;
+    left: 0;
     background: rgba(0, 0, 0, 0.5);
     padding: 10px 15px;
     border-radius: 12px;
     border: 2px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(4px);
+    z-index: 10;
+}
+
+.hud-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px 15px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(4px);
+    text-align: right;
+    z-index: 10;
+}
+
+.hud-center {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 15;
+    width: 250px;
 }
 
 #stage-name, #timer, #score, #panty-counter {
@@ -497,17 +526,49 @@ canvas {
     .tut-icon { font-size: 2.5rem; margin-bottom: 5px; }
     .tut-slide p { font-size: 0.95rem; }
     
-    /* HUD Fixes */
+    /* Mobile HUD Scaling */
+    .hud-left, .hud-right {
+        padding: 5px 8px;
+    }
+    #stage-name, #timer, #score, #panty-counter, #backpack-counter {
+        font-size: 0.9rem !important;
+    }
+    .hud-center {
+        width: 180px;
+    }
+    .suspicion-bar-bg {
+        width: 150px;
+        height: 15px;
+    }
+    .suspicion-label {
+        font-size: 0.8rem;
+    }
+    #btn-pause-mobile {
+        font-size: 0.9rem !important;
+        padding: 5px 10px !important;
+    }
     .hud-top {
+        position: relative;
+        width: 100%;
+        height: auto;
+        display: flex;
         flex-wrap: wrap;
-        justify-content: center;
-        gap: 5px;
+        justify-content: space-between;
     }
-    .hud-left, .hud-right, .suspicion-container {
-        padding: 5px 10px;
+    .hud-left, .hud-right {
+        position: relative;
+        padding: 5px 8px;
     }
-    #stage-name, #timer, #score, #panty-counter { font-size: 1rem; margin-bottom: 2px; }
-    .suspicion-bar-bg { width: 100px; height: 10px; }
+    .hud-center {
+        position: relative;
+        transform: none;
+        left: 0;
+        width: 100%;
+        margin-top: 10px;
+        order: 3;
+    }
+    #stage-name, #timer, #score, #panty-counter { font-size: 0.9rem; margin-bottom: 2px; }
+    .suspicion-bar-bg { width: 120px; height: 12px; }
     
     /* Game Over & Victory Fixes */
     #game-over-screen h1 { font-size: 2.5rem; margin-bottom: 150px !important; }

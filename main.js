@@ -122,6 +122,15 @@ window.addEventListener('keydown', e => {
     if(keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = true;
     if(e.key === ' ') spacePressed = true;
     if(e.key.toLowerCase() === 'e') ePressed = true;
+    
+    if(e.key === 'Escape' || e.key === 'Esc') {
+        if(gameState === 'PLAYING') {
+            pauseAction();
+        } else if(gameState === 'PAUSED') {
+            gameState = 'PLAYING';
+            document.getElementById('pause-screen').classList.add('hidden');
+        }
+    }
 });
 window.addEventListener('keyup', e => {
     if(keys.hasOwnProperty(e.key)) keys[e.key] = false;
@@ -992,18 +1001,28 @@ let lastTime = 0;
 function loop(timestamp) {
     let dt = (timestamp - lastTime)/1000; lastTime = timestamp; if(dt > 0.1) dt = 0.1;
     if(gameState === 'PLAYING') { update(dt); draw(); }
+    else if(gameState === 'PAUSED') { draw(); }
     else if(gameState === 'GAMEOVER') drawGameOverAnimation(dt);
     else if(gameState === 'AK47_VICTORY') drawAK47VictoryAnimation(dt);
     requestAnimationFrame(loop);
 }
 
-// UI Buttons
 document.getElementById('btn-play').addEventListener('click', () => {
     document.getElementById('start-screen').classList.add('hidden');
     let isMobile = window.innerWidth <= 1250;
+    
+    document.getElementById('tut-text-move').innerHTML = isMobile ?
+        `Use os <strong>botões de SETAS</strong> na tela para andar.<br>Pressione o botão <strong>AÇÃO</strong> para pegar as calcinhas!` :
+        `Use <strong>WASD</strong> para andar.<br>Pressione <strong>ESPAÇO</strong> para pegar as calcinhas!`;
+        
+    document.getElementById('tut-text-run').innerHTML = isMobile ?
+        `Segure o botão <strong>CORRER</strong> para correr, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.` :
+        `Segure <strong>SHIFT</strong> para correr, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.`;
+        
     document.getElementById('tut-text-distraction').innerHTML = isMobile ?
         `Ao comprar o upgrade de Distração, você inicia a fase com cargas.<br>Use o botão 💨 para jogar um rádio e distrair as banhistas!` :
         `Ao comprar o upgrade de Distração, você inicia a fase com cargas.<br>Aperte a tecla <strong>E</strong> para jogar um rádio e distrair as banhistas!`;
+        
     document.getElementById('tutorial-screen').classList.remove('hidden');
 });
 document.getElementById('btn-tut-next').addEventListener('click', () => {
@@ -1016,6 +1035,34 @@ document.getElementById('btn-tut-next').addEventListener('click', () => {
     }
 });
 document.getElementById('btn-tut-start').addEventListener('click', () => { document.getElementById('tutorial-screen').classList.add('hidden'); startLevel(); });
+
+const pauseAction = (e) => {
+    if(e) e.preventDefault();
+    if(gameState === 'PLAYING') {
+        gameState = 'PAUSED';
+        let isMobile = window.innerWidth <= 1250;
+        document.getElementById('pause-desc').innerHTML = isMobile ? 
+            "Toque no botão abaixo para voltar" : 
+            "Pressione ESC ou clique no botão para voltar";
+        document.getElementById('pause-screen').classList.remove('hidden');
+    }
+};
+document.getElementById('btn-pause-mobile').addEventListener('touchstart', pauseAction);
+document.getElementById('btn-pause-mobile').addEventListener('mousedown', pauseAction);
+
+document.getElementById('btn-resume').addEventListener('click', () => {
+    if(gameState === 'PAUSED') {
+        gameState = 'PLAYING';
+        document.getElementById('pause-screen').classList.add('hidden');
+    }
+});
+document.getElementById('btn-resume').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if(gameState === 'PAUSED') {
+        gameState = 'PLAYING';
+        document.getElementById('pause-screen').classList.add('hidden');
+    }
+});
 
 document.getElementById('btn-restart').addEventListener('click', () => { 
     document.getElementById('game-over-screen').classList.add('hidden'); 
