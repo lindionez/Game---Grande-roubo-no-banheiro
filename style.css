@@ -24,7 +24,12 @@ h1, h2, h3, .hud-label {
     position: relative;
     width: 1200px;
     height: 800px;
-    background-color: #000;
+    background-color: #f0f0f0;
+    background-image: 
+        linear-gradient(45deg, #e0e0e0 25%, transparent 25%, transparent 75%, #e0e0e0 75%, #e0e0e0),
+        linear-gradient(45deg, #e0e0e0 25%, transparent 25%, transparent 75%, #e0e0e0 75%, #e0e0e0);
+    background-size: 80px 80px;
+    background-position: 0 0, 40px 40px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255, 105, 180, 0.2);
     overflow: hidden;
@@ -34,6 +39,7 @@ canvas {
     display: block;
     width: 100%;
     height: 100%;
+    object-fit: contain;
     image-rendering: pixelated;
 }
 
@@ -403,4 +409,43 @@ canvas {
     #mobile-controls {
         display: flex !important;
     }
+}
+
+@media (max-width: 768px) {
+    .title-anim { font-size: 2.2rem; }
+    .subtitle { font-size: 1rem; }
+    .btn-large { font-size: 1.2rem; padding: 10px 20px; }
+    
+    .tutorial-content { width: 95%; padding: 15px; min-height: 150px; }
+    .tut-icon { font-size: 2.5rem; margin-bottom: 5px; }
+    .tut-slide p { font-size: 0.95rem; }
+    
+    /* HUD Fixes */
+    .hud-top {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+    .hud-left, .hud-right, .suspicion-container {
+        padding: 5px 10px;
+    }
+    #stage-name, #timer, #score, #panty-counter { font-size: 1rem; margin-bottom: 2px; }
+    .suspicion-bar-bg { width: 100px; height: 10px; }
+    
+    /* Game Over & Victory Fixes */
+    #game-over-screen h1 { font-size: 2.5rem; margin-bottom: 150px !important; }
+    .victory-icon { font-size: 4rem; margin: 10px 0; }
+    #victory-screen h1 { font-size: 2.5rem; }
+    
+    /* Shop Fixes */
+    .shop-items { width: 95%; margin: 15px 0; gap: 10px; }
+    .shop-item { flex-direction: column; text-align: center; gap: 5px; padding: 10px; }
+    .shop-item .item-icon { font-size: 2rem; }
+    .item-info { padding: 0; }
+    
+    /* Mobile Controls Scaling */
+    .d-pad { width: 120px; height: 120px; }
+    .d-btn, .action-btn { font-size: 1.2rem; }
+    .action-btn { width: 50px; height: 50px; }
+    .action-btn.primary { width: 65px; height: 65px; }
 }

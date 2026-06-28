@@ -812,16 +812,30 @@ function update(dt) {
 }
 
 let gameOverAnimTimer = 0;
+let gameOverSnapshot = null;
 
 function gameOver() {
     gameState = 'GAMEOVER';
     gameOverAnimTimer = 0;
+    
+    // Take a blurred snapshot of the game to use as background
+    gameOverSnapshot = document.createElement('canvas');
+    gameOverSnapshot.width = canvas.width;
+    gameOverSnapshot.height = canvas.height;
+    let octx = gameOverSnapshot.getContext('2d');
+    octx.filter = 'blur(8px)';
+    octx.drawImage(canvas, 0, 0);
+    octx.fillStyle = 'rgba(0,0,0,0.6)'; // Darken it
+    octx.fillRect(0, 0, canvas.width, canvas.height);
+
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('game-over-screen').classList.remove('hidden');
     document.getElementById('game-over-screen').style.background = 'rgba(0,0,0,0.8)';
     document.getElementById('game-over-stats').textContent = `Pontuação Final: ${score}`;
 }
+
+
 
 // Drawing Logic
 function draw() {
@@ -1035,9 +1049,13 @@ function draw() {
 function drawGameOverAnimation(dt) {
     gameOverAnimTimer += dt;
     
-    // Clear background
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Draw blurred map background
+    if (gameOverSnapshot) {
+        ctx.drawImage(gameOverSnapshot, 0, 0);
+    } else {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     
     // Center coords
     let cx = canvas.width / 2;
@@ -1202,6 +1220,16 @@ function loop(timestamp) {
 document.getElementById('btn-play').addEventListener('click', () => {
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('tutorial-screen').classList.remove('hidden');
+    
+    // Check mobile text update
+    if(window.innerWidth <= 1250 || ('ontouchstart' in window)) {
+        let tutMove = document.getElementById('tut-text-move');
+        if (tutMove) tutMove.innerHTML = 'Use as <strong>Setinhas na tela</strong> para andar.<br>Pressione a <strong>Mãozinha (🖐️)</strong> para pegar!';
+        
+        let tutRun = document.getElementById('tut-text-run');
+        if (tutRun) tutRun.innerHTML = 'Segure o botão <strong>Correr (🏃)</strong>, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.';
+    }
+
     // Try play audio
     const bgm = document.getElementById('bgm');
     bgm.volume = 0.2;
