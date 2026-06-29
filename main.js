@@ -419,11 +419,11 @@ let distractions = [];
 let lastPantySpawn = 0;
 
 const pantyTypes = [
-    { type: 'Bolinhas', pts: 15, icon: '🩲', color: '#ffb3ba' },
-    { type: 'Listrada', pts: 30, icon: '🩲', color: '#baffc9' },
-    { type: 'Renda', pts: 45, icon: '👙', color: '#000', noise: true },
-    { type: 'Neon', pts: 90, icon: '👙', color: '#ffffba', rare: true },
-    { type: 'Armadilha', pts: -30, icon: '🩲', color: 'red', trap: true }
+    { type: 'Bolinhas', pts: 40, icon: '🩲', color: '#ffb3ba' },
+    { type: 'Listrada', pts: 80, icon: '🩲', color: '#baffc9' },
+    { type: 'Renda', pts: 110, icon: '👙', color: '#000', noise: true },
+    { type: 'Neon', pts: 220, icon: '👙', color: '#ffffba', rare: true },
+    { type: 'Armadilha', pts: -70, icon: '🩲', color: 'red', trap: true }
 ];
 
 function checkCollision(rect1, rect2) {
@@ -441,7 +441,8 @@ function checkBatherCollision(newX, newY, size, currentX, currentY) {
             if (currentX !== undefined && currentY !== undefined) {
                 let currentDist = Math.hypot(currentX - b.x, currentY - b.y);
                 let newDist = Math.hypot(newX - b.x, newY - b.y);
-                if (newDist >= currentDist) return true;
+                // Bloquear apenas se o movimento estiver se aproximando mais da banhista (newDist < currentDist)
+                if (newDist < currentDist) return true;
             } else {
                 return true;
             }
@@ -901,9 +902,8 @@ function update(dt) {
                         combo++; comboTimer = 2.5;
                         if (combo === 2) unlockConquista('c16');
                         if (combo === 5) unlockConquista('c17');
-                        if (window.audioMgr) window.audioMgr.collectPanty(p.type.pts >= 25);
-                        let mult = combo >= 5 ? 2 : (combo >= 3 ? 1.5 : 1);
-                        let gained = Math.floor(p.type.pts * mult); score += gained;
+                        if (window.audioMgr) window.audioMgr.collectPanty(p.type.pts > 0);
+                        let gained = p.type.pts; score += gained;
                         backpackCollected++;
                         if (p.type.noise) { suspicion += 10 * resMult; spawnNoiseRing(player.x, player.y); }
                         if (combo > 2) suspicion += 5 * resMult;
