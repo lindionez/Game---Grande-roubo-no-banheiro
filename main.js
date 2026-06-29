@@ -440,8 +440,12 @@ function checkBatherCollision(newX, newY, size, currentX, currentY) {
         if (checkCollision(rect1, rect2)) {
             if (currentX !== undefined && currentY !== undefined) {
                 let currentDist = Math.hypot(currentX - b.x, currentY - b.y);
+                
+                // Regra pedida: se estiver muito dentro (quase sobreposto), permite atravessar para destravar
+                if (currentDist < 25) continue;
+
                 let newDist = Math.hypot(newX - b.x, newY - b.y);
-                // Bloquear apenas se o movimento estiver se aproximando mais da banhista (newDist < currentDist)
+                // Bloquear apenas se o movimento estiver se aproximando mais da banhista
                 if (newDist < currentDist) return true;
             } else {
                 return true;
