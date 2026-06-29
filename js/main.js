@@ -228,140 +228,21 @@ canvas.addEventListener('mousedown', e => {
 
 // Map Generation Logic
 function generateMap(lvl) {
-    let newCols = Math.floor(22 + (lvl - 1) * 0.6); // Starts at 22
-    if (newCols % 2 === 0) newCols += 1; // Force odd number for perfect center column (23, 25...)
-    if (newCols > 71) newCols = 71;
-    COLS = newCols;
-    ROWS = Math.floor(COLS / 1.5); // Starts at 15
+    let mapToUse;
+    if (lvl <= 35) {
+        mapToUse = allMaps[lvl - 1];
+    } else {
+        mapToUse = allMaps[34];
+    }
+    
+    COLS = mapToUse[0].length;
+    ROWS = mapToUse.length;
     
     // Resize canvas logically. CSS 'object-fit: contain' handles screen zooming automatically.
     canvas.width = COLS * TILE_SIZE;
     canvas.height = ROWS * TILE_SIZE;
 
-    let board = Array.from({length: ROWS}, () => Array(COLS).fill('.'));
-
-    // Walls
-    for (let r = 0; r < ROWS; r++) {
-        board[r][0] = 'W'; board[r][COLS - 1] = 'W';
-    }
-    for (let c = 0; c < COLS; c++) {
-        board[0][c] = 'W'; board[ROWS - 1][c] = 'W';
-    }
-
-    // Entrance
-    let eRow = ROWS - 2;
-    let eCol = Math.floor(COLS / 2);
-    board[eRow][eCol] = 'E';
-
-    // Fixed bathers ('B') top row spacing (Left side only, will mirror)
-    let numB = Math.floor(4 + (lvl - 1) * 0.6);
-    let placedB = 0;
-    for (let r = 2; r <= 3; r++) {
-        for (let c = 2; c <= Math.floor(COLS / 2); c += 4) {
-            if (placedB < numB / 2 && Math.random() < 0.8) {
-                board[r][c] = 'B';
-                placedB++;
-            }
-        }
-    }
-    if (placedB === 0) { board[2][2] = 'B'; }
-
-    // Grid layout for architecture (Left half only)
-    let startRow = 5;
-    let endRow = ROWS - 3;
-    let startCol = 2;
-    let endCol = Math.floor(COLS / 2); // Center column
-    
-    let cellW = 4;
-    let cellH = 3; // Using 4x3 blocks for tighter, more structured rooms
-    
-    let hideDensity = 0.8;
-    if (lvl >= 25) hideDensity -= (lvl - 24) * 0.05; // Harder later on
-    if (hideDensity < 0.2) hideDensity = 0.2;
-    
-    let placedHidingSpot = false;
-
-    for (let r = startRow; r <= endRow - cellH; r += cellH + 1) {
-        for (let c = startCol; c <= endCol - cellW; c += cellW + 1) {
-            
-            if (Math.random() > 0.9) continue; // 10% chance to leave block completely empty
-            
-            let type = Math.floor(Math.random() * 4);
-            
-            // To make it look "well drawn", we apply solid structured shapes
-            if (type === 0) { // Locker Room (vertical double lockers)
-                for(let i=0; i<cellH; i++) {
-                    board[r+i][c+1] = 'L';
-                    board[r+i][c+2] = 'L';
-                }
-                if (Math.random() < hideDensity || !placedHidingSpot) {
-                    for(let i=0; i<cellH; i+=2) {
-                        board[r+i][c] = 'R'; 
-                        board[r+i][c+3] = 'P';
-                    }
-                    placedHidingSpot = true;
-                }
-            } else if (type === 1) { // Plant Wall
-                for(let j=1; j<cellW-1; j++) {
-                    board[r+1][c+j] = 'W';
-                }
-                if (Math.random() < hideDensity || !placedHidingSpot) {
-                    for(let j=0; j<cellW; j+=3) {
-                        board[r+1][c+j] = 'P';
-                    }
-                    placedHidingSpot = true;
-                }
-            } else if (type === 2) { // Clothes line
-                for(let i=0; i<cellH; i++) {
-                    board[r+i][c] = 'C'; 
-                    board[r+i][c+3] = 'C';
-                }
-                if(Math.random() < 0.5) {
-                    board[r+1][c+1] = 'L'; board[r+1][c+2] = 'L';
-                }
-            } else if (type === 3) { // Island of Rugs
-                if (Math.random() < hideDensity || !placedHidingSpot) {
-                    for(let i=0; i<cellH; i++) {
-                        for(let j=1; j<cellW-1; j++) {
-                            board[r+i][c+j] = Math.random() < 0.6 ? 'R' : 'P';
-                        }
-                    }
-                    placedHidingSpot = true;
-                }
-            }
-        }
-    }
-
-    // Add some random lockers on outer left wall to break visual flatness
-    for(let r=5; r<ROWS-4; r+=3) {
-        if(Math.random() < 0.4) board[r][1] = 'L';
-    }
-
-    // Ensure at least 1 hiding spot glued to a wall if none was placed
-    if (!placedHidingSpot) {
-        board[ROWS - 5][2] = 'P';
-        board[ROWS - 5][3] = 'P';
-        board[ROWS - 6][2] = 'W';
-    }
-
-    // MIRROR LEFT TO RIGHT
-    // This instantly makes the map look intentionally architected and well drawn
-    for (let r = 1; r < ROWS - 1; r++) {
-        for (let c = 1; c <= Math.floor(COLS / 2); c++) {
-            board[r][COLS - 1 - c] = board[r][c];
-        }
-    }
-
-    // Clear main center corridor out of spawn
-    for (let r = eRow - 1; r > eRow - 5; r--) {
-        if (board[r]) {
-            board[r][eCol] = '.';
-            board[r][eCol - 1] = '.';
-            board[r][eCol + 1] = '.';
-        }
-    }
-
-    return board.map(row => row.join(''));
+    return mapToUse;
 }
 
 let mapLayout = generateMap(stage);
