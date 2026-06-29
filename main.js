@@ -426,8 +426,7 @@ const pantyTypes = [
     { type: 'Renda', pts: 110, icon: '👙', color: '#000', noise: true },
     { type: 'Neon', pts: 220, icon: '👙', color: '#ffffba', rare: true },
     { type: 'Fralda', pts: 5, icon: '🧷', color: '#ffffff', rare: true },
-    { type: 'Biquíni de Praia', pts: 440, icon: '👙', color: '#00ffff', rare: true },
-    { type: 'Armadilha', pts: -70, icon: '🩲', color: 'red', trap: true }
+    { type: 'Biquíni de Praia', pts: 440, icon: '👙', color: '#00ffff', rare: true }
 ];
 
 function checkCollision(rect1, rect2) {
@@ -522,8 +521,7 @@ function spawnPanty() {
             let rand = Math.random();
             let trapChance = stage <= 5 ? 0.1 : (stage <= 10 ? 0.2 : (stage <= 15 ? 0.3 : 0.4));
             let pType = pantyTypes[0];
-            if (rand < trapChance) pType = pantyTypes[7];
-            else if (rand > 0.98) pType = pantyTypes[6]; // Biquíni de Praia
+            if (rand > 0.98) pType = pantyTypes[6]; // Biquíni de Praia
             else if (rand > 0.95) pType = pantyTypes[5]; // Fralda
             else if (rand > 0.85) pType = pantyTypes[4]; // Neon
             else if (rand > 0.7) pType = pantyTypes[3]; // Renda
@@ -531,7 +529,9 @@ function spawnPanty() {
             else if (rand > 0.2) pType = pantyTypes[1]; // Padrão
             else pType = pantyTypes[0]; // Bolinhas
 
-            panties.push({ x: col * TILE_SIZE + 5, y: row * TILE_SIZE + 5, width: 30, height: 30, type: pType, pulse: 0 });
+            let isTrap = Math.random() < trapChance;
+
+            panties.push({ x: col * TILE_SIZE + 5, y: row * TILE_SIZE + 5, width: 30, height: 30, type: pType, pulse: 0, isTrap: isTrap });
             return;
         }
         attempts++;
@@ -906,7 +906,7 @@ function update(dt) {
             for (let i = panties.length - 1; i >= 0; i--) {
                 let p = panties[i];
                 if (checkCollision(pRect, p)) {
-                    if (p.type.trap) {
+                    if (p.isTrap) {
                         unlockConquista('c32');
                         if (window.audioMgr) window.audioMgr.collectTrap();
                         score = Math.max(0, score - 10); suspicion += 30 * resMult;
@@ -1281,9 +1281,6 @@ function draw() {
             } else if (t === 'Listrada') {
                 ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
                 ctx.beginPath(); ctx.moveTo(-10, -2); ctx.lineTo(10, -2); ctx.moveTo(-8, 2); ctx.lineTo(8, 2); ctx.moveTo(-5, 6); ctx.lineTo(5, 6); ctx.stroke();
-            } else if (t === 'Armadilha') {
-                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(0, -1, 3, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.moveTo(-4, 4); ctx.lineTo(4, 4); ctx.stroke();
             }
         }
         ctx.restore();
