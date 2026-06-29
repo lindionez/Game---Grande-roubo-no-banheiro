@@ -421,9 +421,12 @@ let lastPantySpawn = 0;
 
 const pantyTypes = [
     { type: 'Bolinhas', pts: 40, icon: '🩲', color: '#ffb3ba' },
+    { type: 'Padrão', pts: 60, icon: '🩲', color: '#0400ff' },
     { type: 'Listrada', pts: 80, icon: '🩲', color: '#baffc9' },
     { type: 'Renda', pts: 110, icon: '👙', color: '#000', noise: true },
     { type: 'Neon', pts: 220, icon: '👙', color: '#ffffba', rare: true },
+    { type: 'Fralda', pts: 5, icon: '🧷', color: '#ffffff', rare: true },
+    { type: 'Biquíni de Praia', pts: 440, icon: '👙', color: '#00ffff', rare: true },
     { type: 'Armadilha', pts: -70, icon: '🩲', color: 'red', trap: true }
 ];
 
@@ -519,10 +522,14 @@ function spawnPanty() {
             let rand = Math.random();
             let trapChance = stage <= 5 ? 0.1 : (stage <= 10 ? 0.2 : (stage <= 15 ? 0.3 : 0.4));
             let pType = pantyTypes[0];
-            if (rand < trapChance) pType = pantyTypes[4];
-            else if (rand > 0.95) pType = pantyTypes[3];
-            else if (rand > 0.8) pType = pantyTypes[2];
-            else if (rand > 0.4) pType = pantyTypes[1];
+            if (rand < trapChance) pType = pantyTypes[7];
+            else if (rand > 0.98) pType = pantyTypes[6]; // Biquíni de Praia
+            else if (rand > 0.95) pType = pantyTypes[5]; // Fralda
+            else if (rand > 0.85) pType = pantyTypes[4]; // Neon
+            else if (rand > 0.7) pType = pantyTypes[3]; // Renda
+            else if (rand > 0.45) pType = pantyTypes[2]; // Listrada
+            else if (rand > 0.2) pType = pantyTypes[1]; // Padrão
+            else pType = pantyTypes[0]; // Bolinhas
 
             panties.push({ x: col * TILE_SIZE + 5, y: row * TILE_SIZE + 5, width: 30, height: 30, type: pType, pulse: 0 });
             return;
@@ -1241,7 +1248,45 @@ function draw() {
     panties.forEach(p => {
         let scale = 1 + Math.sin(p.pulse) * 0.1; ctx.save(); ctx.translate(p.x + p.width / 2, p.y + p.height / 2);
         if (p.type.rare) { ctx.shadowColor = p.type.color; ctx.shadowBlur = 10; }
-        ctx.scale(scale, scale); ctx.font = '24px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(p.type.icon, 0, 0); ctx.restore();
+        ctx.scale(scale, scale);
+        
+        let t = p.type.type;
+        let c = p.type.color;
+
+        ctx.fillStyle = c;
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1.5;
+
+        if (t === 'Fralda') {
+            ctx.beginPath(); ctx.moveTo(-12, -8); ctx.lineTo(12, -8); ctx.lineTo(8, 10); ctx.quadraticCurveTo(0, 15, -8, 10); ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = '#ccc';
+            ctx.beginPath(); ctx.moveTo(-8, -4); ctx.lineTo(-4, -4); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(8, -4); ctx.lineTo(4, -4); ctx.stroke();
+        } else if (p.type.icon === '👙') {
+            ctx.beginPath(); ctx.arc(-6, -6, 5, 0, Math.PI); ctx.arc(6, -6, 5, 0, Math.PI); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-11, -6); ctx.lineTo(-15, -10); ctx.moveTo(11, -6); ctx.lineTo(15, -10); ctx.moveTo(0, -6); ctx.lineTo(0, -12); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-10, 4); ctx.lineTo(10, 4); ctx.lineTo(0, 14); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-10, 4); ctx.lineTo(-14, 0); ctx.moveTo(10, 4); ctx.lineTo(14, 0); ctx.stroke();
+            if (t === 'Biquíni de Praia') {
+                ctx.fillStyle = '#ff00ff'; ctx.beginPath(); ctx.arc(0, 8, 2, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#ffff00'; ctx.beginPath(); ctx.arc(-6, -8, 2, 0, Math.PI*2); ctx.arc(6, -8, 2, 0, Math.PI*2); ctx.fill();
+            }
+        } else {
+            ctx.beginPath(); ctx.moveTo(-12, -6); ctx.lineTo(12, -6); ctx.quadraticCurveTo(12, 5, 5, 10); ctx.quadraticCurveTo(0, 12, -5, 10); ctx.quadraticCurveTo(-12, 5, -12, -6); ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            if (t === 'Bolinhas') {
+                ctx.fillStyle = '#fff';
+                [[-6,-2],[6,-2],[0,2],[-4,6],[4,6]].forEach(pos => { ctx.beginPath(); ctx.arc(pos[0], pos[1], 1.5, 0, Math.PI*2); ctx.fill(); });
+            } else if (t === 'Listrada') {
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(-10, -2); ctx.lineTo(10, -2); ctx.moveTo(-8, 2); ctx.lineTo(8, 2); ctx.moveTo(-5, 6); ctx.lineTo(5, 6); ctx.stroke();
+            } else if (t === 'Armadilha') {
+                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(0, -1, 3, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.moveTo(-4, 4); ctx.lineTo(4, 4); ctx.stroke();
+            }
+        }
+        ctx.restore();
     });
 
     distractions.forEach(d => {
