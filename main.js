@@ -699,7 +699,7 @@ function update(dt) {
         player.y = b.y;
         if (isRunning) {
             player.escapeTimer += dt;
-            if (player.escapeTimer >= 2.0) {
+            if (player.escapeTimer >= 0.9) {
                 player.grabbedBy = null;
                 b.stunTimer = 3.0;
                 b.state = 'stunned';
@@ -1529,7 +1529,7 @@ function loop(timestamp) {
 
     if (cheatHoldingSpace) {
         cheatTimer += dt;
-        if (cheatTimer >= 5.0) {
+        if (cheatTimer >= 3.0) {
             cheatHoldingSpace = false;
             cheatTimer = 0;
             cheatWCount = 0;
