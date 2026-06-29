@@ -1066,8 +1066,8 @@ function update(dt) {
 function triggerWin() {
     if(window.audioMgr) { window.audioMgr.setChase(false); window.audioMgr.win(); }
     gameState = 'VICTORY';
-    score += Math.floor(timeRemaining * 1.4); 
-    score += 140 + (stage * 35); 
+    score += Math.floor(timeRemaining); 
+    score += 100 + (stage * 25); 
     if(stage === 1) unlockConquista('c7');
     if(stage === 5) unlockConquista('c8');
     if(stage === 15) unlockConquista('c9');
