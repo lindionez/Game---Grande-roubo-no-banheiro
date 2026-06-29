@@ -35,60 +35,60 @@ let lastInvasionToast = 0;
 // Upgrades Data
 const shopData = {
     mochila: [
-        { level: 1, name: 'Mochila de Pano', cost: 50, effect: 'Carrega até 4 itens', val: 4 },
-        { level: 2, name: 'Mochila de Couro', cost: 100, effect: 'Carrega até 6 itens', val: 6 },
-        { level: 3, name: 'Bolsa Tática', cost: 200, effect: 'Carrega até 10 itens', val: 10 },
-        { level: 4, name: 'Mochila Militar', cost: 400, effect: 'Carrega até 15 itens', val: 15 },
-        { level: 5, name: 'Eu visto elas', cost: 1000, effect: 'Carrega até 25 itens', val: 25 }
+        { level: 1, name: 'Mochila de Pano', cost: 150, effect: 'Carrega até 4 itens', val: 4 },
+        { level: 2, name: 'Mochila de Couro', cost: 300, effect: 'Carrega até 6 itens', val: 6 },
+        { level: 3, name: 'Bolsa Tática', cost: 400, effect: 'Carrega até 10 itens', val: 10 },
+        { level: 4, name: 'Mochila Militar', cost: 500, effect: 'Carrega até 15 itens', val: 15 },
+        { level: 5, name: 'Eu visto elas', cost: 1300, effect: 'Carrega até 25 itens', val: 25 }
     ],
     tenis: [
-        { level: 1, name: 'Chinelo de Dedo', cost: 50, effect: 'Reduz barulho em 10%', val: 0.9 },
-        { level: 2, name: 'Tênis de Lona', cost: 100, effect: 'Reduz barulho em 20%', val: 0.8 },
-        { level: 3, name: 'Tênis Silencioso', cost: 200, effect: 'Reduz barulho em 35%', val: 0.65 },
-        { level: 4, name: 'Pantufa Ninja', cost: 400, effect: 'Reduz barulho em 50%', val: 0.5 },
-        { level: 5, name: 'Pés de Algodão', cost: 800, effect: 'Reduz barulho em 70%', val: 0.3 }
+        { level: 1, name: 'Chinelo de Dedo', cost: 100, effect: 'Reduz barulho em 10%', val: 0.9 },
+        { level: 2, name: 'Tênis de Lona', cost: 200, effect: 'Reduz barulho em 20%', val: 0.8 },
+        { level: 3, name: 'Tênis Silencioso', cost: 400, effect: 'Reduz barulho em 35%', val: 0.65 },
+        { level: 4, name: 'Pantufa Ninja', cost: 600, effect: 'Reduz barulho em 50%', val: 0.5 },
+        { level: 5, name: 'Pés de Algodão', cost: 1200, effect: 'Reduz barulho em 70%', val: 0.3 }
     ],
     luva: [
-        { level: 1, name: 'Dedos Grudentos', cost: 75, effect: 'Coleta a 1 bloco de distância', val: 40 },
-        { level: 2, name: 'Luva de Sucção', cost: 150, effect: 'Coleta a 2 blocos de distância', val: 80 },
-        { level: 3, name: 'Ímã de Calcinha', cost: 300, effect: 'Coleta a 3 blocos de distância', val: 120 },
-        { level: 4, name: 'Telecinese Íntima', cost: 600, effect: 'Coleta a 4 blocos de distância', val: 160 },
-        { level: 5, name: 'Buraco Negro de Renda', cost: 1200, effect: 'Coleta a 5 blocos de distância', val: 200 }
+        { level: 1, name: 'Dedos Grudentos', cost: 125, effect: 'Coleta a 1 bloco de distância', val: 40 },
+        { level: 2, name: 'Luva de Sucção', cost: 230, effect: 'Coleta a 2 blocos de distância', val: 80 },
+        { level: 3, name: 'Ímã de Calcinha', cost: 400, effect: 'Coleta a 3 blocos de distância', val: 120 },
+        { level: 4, name: 'Telecinese Íntima', cost: 800, effect: 'Coleta a 4 blocos de distância', val: 160 },
+        { level: 5, name: 'Buraco Negro de Renda', cost: 1500, effect: 'Coleta a 5 blocos de distância', val: 200 }
     ],
     distracao: [
         { level: 1, name: 'Moeda no Chão', cost: 60, effect: '+1 distração por fase', val: 1 },
-        { level: 2, name: 'Gato Falso', cost: 120, effect: '+2 distrações por fase', val: 2 },
-        { level: 3, name: 'Bombinha Fedorenta', cost: 240, effect: '+3 distrações por fase', val: 3 },
-        { level: 4, name: 'Rádio com Pagode', cost: 480, effect: '+4 distrações por fase', val: 4 },
-        { level: 5, name: 'Clone de Fumaça', cost: 960, effect: '+5 distrações por fase', val: 5 }
+        { level: 2, name: 'Gato Falso', cost: 150, effect: '+2 distrações por fase', val: 2 },
+        { level: 3, name: 'Bombinha Fedorenta', cost: 440, effect: '+3 distrações por fase', val: 3 },
+        { level: 4, name: 'Rádio com Pagode', cost: 1280, effect: '+4 distrações por fase', val: 4 },
+        { level: 5, name: 'Clone de Fumaça', cost: 1960, effect: '+5 distrações por fase', val: 5 }
     ],
     disfarce: [
         { level: 1, name: 'Óculos de Sol', cost: 80, effect: 'Banhistas demoram 0.4s a mais para te ver', val: 0.4 },
-        { level: 2, name: 'Peruca Loiro', cost: 160, effect: 'Banhistas demoram 0.8s a mais para te ver', val: 0.8 },
-        { level: 3, name: 'Roupão Felpudo', cost: 320, effect: 'Banhistas demoram 1.2s a mais para te ver', val: 1.2 },
-        { level: 4, name: 'Corpo sarado', cost: 640, effect: 'Banhistas demoram 1.5s a mais para te ver', val: 1.5 },
-        { level: 5, name: 'Manto da Invisibilidade Parcial', cost: 1280, effect: 'Banhistas demoram 2s a mais para te ver', val: 2 }
+        { level: 2, name: 'Peruca Loiro', cost: 260, effect: 'Banhistas demoram 0.8s a mais para te ver', val: 0.8 },
+        { level: 3, name: 'Roupão Felpudo', cost: 420, effect: 'Banhistas demoram 1.2s a mais para te ver', val: 1.2 },
+        { level: 4, name: 'Corpo sarado', cost: 650, effect: 'Banhistas demoram 1.5s a mais para te ver', val: 1.5 },
+        { level: 5, name: 'Manto da Invisibilidade Parcial', cost: 1580, effect: 'Banhistas demoram 2s a mais para te ver', val: 2 }
     ],
     velocidade: [
         { level: 1, name: 'Sandália Velha', cost: 70, effect: '+5% velocidade', val: 1.05 },
-        { level: 2, name: 'Crocs Esportivo', cost: 140, effect: '+10% velocidade', val: 1.10 },
-        { level: 3, name: 'Tênis de Corrida', cost: 280, effect: '+18% velocidade', val: 1.18 },
-        { level: 4, name: 'Pés de Beija-Flor', cost: 560, effect: '+25% velocidade', val: 1.25 },
-        { level: 5, name: 'Teletransporte Curto', cost: 1120, effect: '+35% velocidade', val: 1.35 }
+        { level: 2, name: 'Crocs Esportivo', cost: 240, effect: '+10% velocidade', val: 1.10 },
+        { level: 3, name: 'Tênis de Corrida', cost: 380, effect: '+18% velocidade', val: 1.18 },
+        { level: 4, name: 'Pés de Beija-Flor', cost: 660, effect: '+25% velocidade', val: 1.25 },
+        { level: 5, name: 'Teletransporte Curto', cost: 1520, effect: '+35% velocidade', val: 1.35 }
     ],
     resistencia: [
         { level: 1, name: 'Cara de Pau', cost: 90, effect: 'Suspeita enche 10% mais devagar', val: 0.9 },
         { level: 2, name: 'Histórico Limpo', cost: 180, effect: 'Suspeita enche 20% mais devagar', val: 0.8 },
-        { level: 3, name: 'Álibi Falso', cost: 360, effect: 'Suspeita enche 30% mais devagar', val: 0.7 },
-        { level: 4, name: 'Dupla Personalidade', cost: 720, effect: 'Suspeita enche 40% mais devagar', val: 0.6 },
-        { level: 5, name: 'Inocente até Provar o mel', cost: 1440, effect: 'Suspeita enche 50% mais devagar', val: 0.5 }
+        { level: 3, name: 'Álibi Falso', cost: 460, effect: 'Suspeita enche 30% mais devagar', val: 0.7 },
+        { level: 4, name: 'Dupla Personalidade', cost: 920, effect: 'Suspeita enche 40% mais devagar', val: 0.6 },
+        { level: 5, name: 'Inocente até Provar o mel', cost: 1840, effect: 'Suspeita enche 50% mais devagar', val: 0.5 }
     ],
     spawn: [
-        { level: 1, name: 'Atração Básica', cost: 100, effect: 'Calcinhas spawnam 10% mais rápido', val: 0.9 },
-        { level: 2, name: 'Cheiro Suave', cost: 200, effect: 'Calcinhas spawnam 20% mais rápido', val: 0.8 },
-        { level: 3, name: 'Ímã Natural', cost: 400, effect: 'Calcinhas spawnam 35% mais rápido', val: 0.65 },
-        { level: 4, name: 'Chuva de Renda', cost: 800, effect: 'Calcinhas spawnam 50% mais rápido', val: 0.5 },
-        { level: 5, name: 'Tempestade Íntima', cost: 1600, effect: 'Calcinhas spawnam 70% mais rápido', val: 0.3 }
+        { level: 1, name: 'Atração Básica', cost: 200, effect: 'Calcinhas spawnam 10% mais rápido', val: 0.9 },
+        { level: 2, name: 'Cheiro Suave', cost: 400, effect: 'Calcinhas spawnam 20% mais rápido', val: 0.8 },
+        { level: 3, name: 'Ímã Natural', cost: 600, effect: 'Calcinhas spawnam 35% mais rápido', val: 0.65 },
+        { level: 4, name: 'Chuva de Renda', cost: 1000, effect: 'Calcinhas spawnam 50% mais rápido', val: 0.5 },
+        { level: 5, name: 'Tempestade Íntima', cost: 2000, effect: 'Calcinhas spawnam 70% mais rápido', val: 0.3 }
     ],
     visao: [
         { level: 1, name: 'Miopia Leve', cost: 150, effect: 'Banhistas enxergam 5% menos longe', val: 0.95 },
@@ -99,10 +99,10 @@ const shopData = {
     ],
     alerta: [
         { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 20% mais rápido', val: 1.2 },
-        { level: 2, name: 'Mente Ocupada', cost: 240, effect: 'Alerta desce 50% mais rápido', val: 1.5 },
-        { level: 3, name: 'Desatenção', cost: 480, effect: 'Alerta desce 80% mais rápido', val: 1.8 },
-        { level: 4, name: 'Amnésia', cost: 960, effect: 'Alerta desce 120% mais rápido', val: 2.2 },
-        { level: 5, name: 'Paz Interna', cost: 1920, effect: 'Alerta desce 200% mais rápido', val: 3.0 }
+        { level: 2, name: 'Mente Ocupada', cost: 250, effect: 'Alerta desce 50% mais rápido', val: 1.5 },
+        { level: 3, name: 'Desatenção', cost: 600, effect: 'Alerta desce 80% mais rápido', val: 1.8 },
+        { level: 4, name: 'Amnésia', cost: 1260, effect: 'Alerta desce 120% mais rápido', val: 2.2 },
+        { level: 5, name: 'Paz Interna', cost: 2026, effect: 'Alerta desce 200% mais rápido', val: 3.0 }
     ]
 };
 
@@ -1066,8 +1066,8 @@ function update(dt) {
 function triggerWin() {
     if(window.audioMgr) { window.audioMgr.setChase(false); window.audioMgr.win(); }
     gameState = 'VICTORY';
-    score += Math.floor(timeRemaining * 2); 
-    score += 200 + (stage * 50); 
+    score += Math.floor(timeRemaining * 1.4); 
+    score += 140 + (stage * 35); 
     if(stage === 1) unlockConquista('c7');
     if(stage === 5) unlockConquista('c8');
     if(stage === 15) unlockConquista('c9');
