@@ -114,6 +114,7 @@ let hasAK47 = false;
 let ak47SecretUnlocked = false;
 let ak47TutorialShown = false;
 let ak47VictoryShown = false;
+let agarradeiraTutorialShown = false;
 
 function getUpgradeVal(category, defaultVal) {
     if (upgrades[category] === 0) return defaultVal;
@@ -692,6 +693,7 @@ function update(dt) {
     if (isMoving) player.facingAngle = Math.atan2(dy, dx);
 
     if (player.grabbedBy) {
+        document.getElementById('grab-warning').classList.remove('hidden');
         let b = player.grabbedBy;
         player.x = b.x;
         player.y = b.y;
@@ -710,6 +712,7 @@ function update(dt) {
         suspicion += 30 * dt * resMult;
         if (Math.random() < 0.1) spawnParticle(player.x, player.y, "💢", "#fff");
     } else {
+        document.getElementById('grab-warning').classList.add('hidden');
         if (!checkMapCollision(player.x + dx * dt, player.y, player.size) && !checkBatherCollision(player.x + dx * dt, player.y, player.size, player.x, player.y)) player.x += dx * dt;
         if (!checkMapCollision(player.x, player.y + dy * dt, player.size) && !checkBatherCollision(player.x, player.y + dy * dt, player.size, player.x, player.y)) player.y += dy * dt;
     }
@@ -1153,6 +1156,7 @@ function gameOver() {
     gameOverSnapshot.width = canvas.width; gameOverSnapshot.height = canvas.height;
     let octx = gameOverSnapshot.getContext('2d'); octx.filter = 'blur(8px)';
     octx.drawImage(canvas, 0, 0); octx.fillStyle = 'rgba(0,0,0,0.6)'; octx.fillRect(0, 0, canvas.width, canvas.height);
+    document.getElementById('grab-warning').classList.add('hidden');
     document.getElementById('hud').classList.add('hidden'); document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('game-over-screen').classList.remove('hidden');
     document.getElementById('game-over-stats').textContent = `Fase Alcançada: ${stage}`;
@@ -1533,6 +1537,10 @@ document.getElementById('btn-ak47-continue').addEventListener('click', () => {
     document.getElementById('ak47-tutorial-screen').classList.add('hidden');
     startLevel();
 });
+document.getElementById('btn-agarradeira-continue').addEventListener('click', () => {
+    document.getElementById('agarradeira-tutorial-screen').classList.add('hidden');
+    startLevel();
+});
 
 let cheatLastGameState = 'START';
 
@@ -1617,6 +1625,9 @@ document.getElementById('btn-next-stage').addEventListener('click', () => {
             `Acabou a furtividade. Agora é bala!<br><br>📱 <strong>Use o botão de ATIRAR</strong> no canto da tela para neutralizar a Dona do Banheiro.` :
             `Acabou a furtividade. Agora é bala!<br><br>🖥️ <strong>Clique com o botão ESQUERDO do mouse</strong> para neutralizar a Dona do Banheiro.`;
         document.getElementById('ak47-tutorial-screen').classList.remove('hidden');
+    } else if (stage >= 3 && !agarradeiraTutorialShown) {
+        agarradeiraTutorialShown = true;
+        document.getElementById('agarradeira-tutorial-screen').classList.remove('hidden');
     } else {
         startLevel();
     }

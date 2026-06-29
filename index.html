@@ -76,6 +76,18 @@
         </div>
         
         <div id="message-toast" class="hidden">Mensagem!</div>
+        
+        <!-- Grab Warning Banner -->
+        <div id="grab-warning" class="hidden" style="position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); color: #ff6666; padding: 10px 30px; border-radius: 50px; border: 2px solid rgba(255, 102, 102, 0.5); font-family: 'Fredoka One', cursive; text-align: center; z-index: 100; pointer-events: none; animation: grabPulseLite 0.8s infinite alternate; backdrop-filter: blur(4px);">
+            <span style="font-size: 1.3rem; display: block; margin-bottom: 3px; letter-spacing: 1px;">⚠️ AGARRADO!</span>
+            <span style="font-size: 1rem; color: #f0f0f0;">Segure SHIFT para soltar</span>
+            <style>
+                @keyframes grabPulseLite {
+                    from { box-shadow: 0 0 5px rgba(255, 102, 102, 0.2); }
+                    to { box-shadow: 0 0 20px rgba(255, 102, 102, 0.6); }
+                }
+            </style>
+        </div>
 
         <!-- Conquista Pop-up -->
         <div id="conquista-popup">
@@ -174,6 +186,19 @@
                 </div>
             </div>
             <button id="btn-ak47-continue" class="btn-large" style="margin-top: 30px; background: red; border-color: darkred;">VINGANÇA!</button>
+        </div>
+
+        <!-- Agarradeira Tutorial Screen -->
+        <div id="agarradeira-tutorial-screen" class="screen hidden" style="background: rgba(0,0,0,0.95); z-index: 200;">
+            <h1 style="color: #ba55d3; text-shadow: 0 0 15px purple; font-size: 3.5rem; text-align: center;">💜 NOVA AMEAÇA: AGARRADEIRA! 💜</h1>
+            <div class="tutorial-content">
+                <div class="tut-slide active">
+                    <div class="tut-icon" style="font-size: 5rem;">🫂</div>
+                    <p style="font-size: 1.5rem; line-height: 1.5; margin-top: 20px;">As banhistas com o <strong>olhar roxo</strong> (cone de visão roxo) são as agarradeiras!<br>Se elas chegarem muito perto, não vão apenas gritar, elas vão pular e te <strong>prender</strong>!</p>
+                    <p style="font-size: 1.5rem; line-height: 1.5; color: #ffcf40; margin-top: 20px;">Se for pego, a barra de Alerta sobe bem rápido! <br><strong>SEGURE O BOTÃO DE CORRER (SHIFT)</strong> por 2 segundos para se soltar!</p>
+                </div>
+            </div>
+            <button id="btn-agarradeira-continue" class="btn-large" style="margin-top: 30px; background: #8a2be2; border-color: #4b0082;">ENTENDI!</button>
         </div>
 
         <!-- Game Over Screen -->
