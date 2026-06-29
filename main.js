@@ -1258,29 +1258,84 @@ function draw() {
         ctx.lineWidth = 1.5;
 
         if (t === 'Fralda') {
-            ctx.beginPath(); ctx.moveTo(-12, -8); ctx.lineTo(12, -8); ctx.lineTo(8, 10); ctx.quadraticCurveTo(0, 15, -8, 10); ctx.closePath();
+            ctx.beginPath();
+            ctx.moveTo(-15, -6); ctx.lineTo(15, -6);
+            ctx.quadraticCurveTo(20, 10, 10, 14);
+            ctx.quadraticCurveTo(0, 18, -10, 14);
+            ctx.quadraticCurveTo(-20, 10, -15, -6);
+            ctx.closePath();
             ctx.fill(); ctx.stroke();
-            ctx.strokeStyle = '#ccc';
-            ctx.beginPath(); ctx.moveTo(-8, -4); ctx.lineTo(-4, -4); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(8, -4); ctx.lineTo(4, -4); ctx.stroke();
+            
+            ctx.strokeStyle = '#ddd'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(-10, -6); ctx.quadraticCurveTo(-8, 8, -5, 12); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(10, -6); ctx.quadraticCurveTo(8, 8, 5, 12); ctx.stroke();
+            
+            ctx.strokeStyle = '#888'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(-12, -2); ctx.lineTo(-6, -2); ctx.stroke();
+            ctx.fillStyle = '#add8e6'; ctx.beginPath(); ctx.arc(-12, -2, 2.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(12, -2); ctx.lineTo(6, -2); ctx.stroke();
+            ctx.fillStyle = '#ffb6c1'; ctx.beginPath(); ctx.arc(12, -2, 2.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
         } else if (p.type.icon === '👙') {
-            ctx.beginPath(); ctx.arc(-6, -6, 5, 0, Math.PI); ctx.arc(6, -6, 5, 0, Math.PI); ctx.fill(); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(-11, -6); ctx.lineTo(-15, -10); ctx.moveTo(11, -6); ctx.lineTo(15, -10); ctx.moveTo(0, -6); ctx.lineTo(0, -12); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(-10, 4); ctx.lineTo(10, 4); ctx.lineTo(0, 14); ctx.closePath(); ctx.fill(); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(-10, 4); ctx.lineTo(-14, 0); ctx.moveTo(10, 4); ctx.lineTo(14, 0); ctx.stroke();
+            ctx.beginPath(); 
+            ctx.moveTo(-12, -2); ctx.quadraticCurveTo(-6, -12, 0, -2);
+            ctx.moveTo(12, -2); ctx.quadraticCurveTo(6, -12, 0, -2);
+            ctx.fill(); ctx.stroke();
+            
+            ctx.beginPath(); ctx.moveTo(-6, -9); ctx.lineTo(-9, -15); ctx.moveTo(6, -9); ctx.lineTo(9, -15); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-12, -2); ctx.lineTo(-16, -4); ctx.moveTo(12, -2); ctx.lineTo(16, -4); ctx.stroke();
+            
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, -2, 2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = c;
+            ctx.beginPath();
+            ctx.moveTo(-10, 6); ctx.quadraticCurveTo(0, 8, 10, 6);
+            ctx.quadraticCurveTo(5, 16, 0, 18); ctx.quadraticCurveTo(-5, 16, -10, 6);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            
+            ctx.beginPath(); ctx.moveTo(-10, 6); ctx.lineTo(-14, 4); ctx.moveTo(10, 6); ctx.lineTo(14, 4); ctx.stroke();
+
             if (t === 'Biquíni de Praia') {
-                ctx.fillStyle = '#ff00ff'; ctx.beginPath(); ctx.arc(0, 8, 2, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = '#ffff00'; ctx.beginPath(); ctx.arc(-6, -8, 2, 0, Math.PI*2); ctx.arc(6, -8, 2, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#ff00ff'; ctx.beginPath(); ctx.arc(-6, -5, 2, 0, Math.PI*2); ctx.arc(6, -5, 2, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#ffff00'; ctx.beginPath(); ctx.arc(0, 11, 2, 0, Math.PI*2); ctx.fill();
+            } else if (t === 'Renda') {
+                ctx.strokeStyle = '#444'; ctx.lineWidth = 1; ctx.setLineDash([2, 1]);
+                ctx.beginPath(); ctx.moveTo(-10, -4); ctx.lineTo(0, -3); ctx.lineTo(10, -4); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(-8, 8); ctx.lineTo(0, 9); ctx.lineTo(8, 8); ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (t === 'Neon') {
+                ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(-8, -4); ctx.lineTo(-2, -4); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(-5, 8); ctx.lineTo(-1, 8); ctx.stroke();
             }
         } else {
-            ctx.beginPath(); ctx.moveTo(-12, -6); ctx.lineTo(12, -6); ctx.quadraticCurveTo(12, 5, 5, 10); ctx.quadraticCurveTo(0, 12, -5, 10); ctx.quadraticCurveTo(-12, 5, -12, -6); ctx.closePath();
+            ctx.beginPath();
+            ctx.moveTo(-14, -8);
+            ctx.quadraticCurveTo(0, -6, 14, -8);
+            ctx.quadraticCurveTo(16, 2, 8, 12);
+            ctx.quadraticCurveTo(0, 16, -8, 12);
+            ctx.quadraticCurveTo(-16, 2, -14, -8);
+            ctx.closePath();
             ctx.fill(); ctx.stroke();
+            
+            ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(-13, -7); ctx.quadraticCurveTo(0, -5, 13, -7); ctx.stroke();
+            
+            ctx.fillStyle = '#ff69b4'; ctx.strokeStyle = '#000'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(-3, -8); ctx.lineTo(0, -6); ctx.lineTo(3, -8); ctx.lineTo(3, -5); ctx.lineTo(0, -6); ctx.lineTo(-3, -5); ctx.closePath(); ctx.fill(); ctx.stroke();
+
             if (t === 'Bolinhas') {
                 ctx.fillStyle = '#fff';
-                [[-6,-2],[6,-2],[0,2],[-4,6],[4,6]].forEach(pos => { ctx.beginPath(); ctx.arc(pos[0], pos[1], 1.5, 0, Math.PI*2); ctx.fill(); });
+                const dots = [[-8,-3], [8,-3], [0,-4], [-5,2], [5,2], [0,7], [-10,-6], [10,-6]];
+                dots.forEach(pos => { ctx.beginPath(); ctx.arc(pos[0], pos[1], 1.5, 0, Math.PI*2); ctx.fill(); });
             } else if (t === 'Listrada') {
-                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
-                ctx.beginPath(); ctx.moveTo(-10, -2); ctx.lineTo(10, -2); ctx.moveTo(-8, 2); ctx.lineTo(8, 2); ctx.moveTo(-5, 6); ctx.lineTo(5, 6); ctx.stroke();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(-13, -4); ctx.lineTo(13, -4);
+                ctx.moveTo(-14, 0); ctx.lineTo(14, 0);
+                ctx.moveTo(-12, 4); ctx.lineTo(12, 4);
+                ctx.moveTo(-8, 8); ctx.lineTo(8, 8);
+                ctx.stroke();
             }
         }
         ctx.restore();
