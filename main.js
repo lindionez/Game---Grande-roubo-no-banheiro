@@ -1037,6 +1037,7 @@ function update(dt) {
             closestBather.state = 'dead';
             spawnBlood(closestBather.x, closestBather.y);
             showToast("BANG!");
+            unlockConquista('c33');
             
             setTimeout(() => { 
                 player.isShooting = false; 
@@ -1690,7 +1691,8 @@ const conquistasData = [
     { id: 'c29', cat: 7, nome: 'Paciência', desc: 'Jogue por 2 horas no total', tipo: 'acumulo', max: 7200 },
     { id: 'c30', cat: 7, nome: 'Lenda', desc: 'Desbloqueie TODAS as conquistas', tipo: 'unico' },
     { id: 'c31', cat: 7, nome: 'Hacker de Calcinhas', desc: 'Você abriu o menu secreto!', tipo: 'unico', secreta: true },
-    { id: 'c32', cat: 7, nome: 'Cuidado com o Vermelho', desc: 'Caiu em uma armadilha...', tipo: 'unico', secreta: true }
+    { id: 'c32', cat: 7, nome: 'Cuidado com o Vermelho', desc: 'Caiu em uma armadilha...', tipo: 'unico', secreta: true },
+    { id: 'c33', cat: 7, nome: 'Caos no Banheiro', desc: 'Derrote uma banhista com a AK-47', tipo: 'unico', secreta: true }
 ];
 
 let conquistasSalvas = {};
@@ -1779,7 +1781,7 @@ function addProgressoConquista(id, val) {
 function verificarLenda() {
     if(conquistasSalvas['c30'] && conquistasSalvas['c30'].desbloqueada) return;
     let total = Object.values(conquistasSalvas).filter(c => c.desbloqueada).length;
-    if(total >= 31) unlockConquista('c30');
+    if(total >= 32) unlockConquista('c30');
 }
 
 let tempoTotalJogo = 0;
@@ -1795,11 +1797,22 @@ function renderTelaConquistas(filtro = 'all') {
     let totalUnlocks = Object.values(conquistasSalvas).filter(c => c.desbloqueada).length;
     document.getElementById('conquistas-count').textContent = totalUnlocks;
     
+    let missingSecrets = 0;
+
     conquistasData.forEach(c => {
         let save = conquistasSalvas[c.id];
-        if(c.secreta && !save.desbloqueada) return;
-        if(filtro === 'unlocked' && !save.desbloqueada) return;
-        if(filtro === 'locked' && save.desbloqueada) return;
+        
+        if(filtro === 'secret') {
+            if(!c.secreta) return;
+            if(!save.desbloqueada) {
+                missingSecrets++;
+                return;
+            }
+        } else {
+            if(c.secreta && !save.desbloqueada) return;
+            if(filtro === 'unlocked' && !save.desbloqueada) return;
+            if(filtro === 'locked' && save.desbloqueada) return;
+        }
         
         let div = document.createElement('div');
         div.className = 'conquista-item ' + (save.desbloqueada ? 'unlocked' : '');
@@ -1827,6 +1840,20 @@ function renderTelaConquistas(filtro = 'all') {
         `;
         list.appendChild(div);
     });
+
+    if(filtro === 'secret' && missingSecrets > 0) {
+        let div = document.createElement('div');
+        div.className = 'conquista-item';
+        div.innerHTML = `
+            <div class="c-item-icon">🔒</div>
+            <div class="c-item-info">
+                <h4>Mistério...</h4>
+                <p>Faltam ${missingSecrets} conquista(s) secreta(s) para descobrir.</p>
+            </div>
+            <div class="c-status">❌</div>
+        `;
+        list.appendChild(div);
+    }
 }
 
 document.getElementById('btn-conquistas-pause').addEventListener('click', () => {
