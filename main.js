@@ -1197,13 +1197,37 @@ function draw() {
         ctx.beginPath(); ctx.arc(cx, cy - 12, 6, 0, Math.PI * 2); ctx.fill();
 
         if (w.alerted) {
-            ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(cx - 3, cy, 2, 0, Math.PI * 2); ctx.arc(cx + 3, cy, 2, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse(cx, cy + 4, 3, 5, 0, 0, Math.PI * 2); ctx.fill();
+            // Desenha uma toalha/vestido cobrindo-a
+            ctx.fillStyle = '#e0f7fa'; 
+            ctx.beginPath();
+            ctx.moveTo(cx - 12, cy + 7);
+            ctx.quadraticCurveTo(cx, cy + 5, cx + 12, cy + 7);
+            ctx.lineTo(cx + 14, cy + 20);
+            ctx.quadraticCurveTo(cx, cy + 22, cx - 14, cy + 20);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Linha da dobra da toalha
+            ctx.strokeStyle = '#b2ebf2'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(cx + 8, cy + 7); ctx.lineTo(cx - 4, cy + 20); ctx.stroke();
+            
+            // Braços cruzados segurando a toalha
+            ctx.strokeStyle = '#f1c27d'; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(cx - 10, cy + 6); ctx.lineTo(cx + 2, cy + 12); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx + 10, cy + 6); ctx.lineTo(cx - 2, cy + 12); ctx.stroke();
+
+            // Rosto assustado proporcional
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(cx - 4, cy + 1, 2.5, 0, Math.PI * 2); ctx.arc(cx + 4, cy + 1, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.arc(cx - 4, cy + 1, 1, 0, Math.PI * 2); ctx.arc(cx + 4, cy + 1, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(cx, cy + 5, 2, 3, 0, 0, Math.PI * 2); ctx.fill();
+            
             ctx.font = '24px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('😱', cx, w.y - 10);
         } else {
-            ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.beginPath();
-            ctx.moveTo(cx - 5, cy); ctx.quadraticCurveTo(cx - 3, cy + 2, cx - 1, cy);
-            ctx.moveTo(cx + 1, cy); ctx.quadraticCurveTo(cx + 3, cy + 2, cx + 5, cy); ctx.stroke();
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.lineCap = 'round'; ctx.beginPath();
+            ctx.moveTo(cx - 6, cy + 1); ctx.quadraticCurveTo(cx - 4, cy + 3, cx - 2, cy + 1);
+            ctx.moveTo(cx + 2, cy + 1); ctx.quadraticCurveTo(cx + 4, cy + 3, cx + 6, cy + 1); ctx.stroke();
         }
     });
 
