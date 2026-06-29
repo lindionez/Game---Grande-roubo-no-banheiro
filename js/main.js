@@ -141,7 +141,10 @@ function handleSpaceRelease() {
     cheatWCount = 0;
 }
 
+let cheatUnlocked = false;
+
 function openCheatMenu() {
+    cheatUnlocked = true;
     unlockConquista('c31');
     cheatLastGameState = gameState;
     if (gameState === 'PLAYING') {
@@ -206,6 +209,9 @@ window.addEventListener('keydown', e => {
     if (e.key === ' ') { spacePressed = true; handleSpacePress(); }
     if (e.key.toLowerCase() === 'e') ePressed = true;
     if (e.key.toLowerCase() === 'w' || e.key === 'ArrowUp') handleUpPress();
+    if ((e.key === 'c' || e.key === 'C') && cheatUnlocked && (gameState === 'PLAYING' || gameState === 'PAUSED')) {
+        openCheatMenu();
+    }
 
     if (e.key === 'Escape' || e.key === 'Esc') {
         if (gameState === 'PLAYING') {
@@ -1655,6 +1661,21 @@ document.getElementById('btn-agarradeira-continue').addEventListener('click', ()
 let cheatLastGameState = 'START';
 
 // Cheat buttons
+document.getElementById('btn-cheat-ak47').addEventListener('click', () => {
+    Object.keys(upgrades).forEach(k => upgrades[k] = 5); // Max out all stats
+    hasAK47 = true;
+    ak47SecretUnlocked = true;
+    updateCapacity();
+    applyUpgrades();
+    showToast("✔️ Cheat Aplicado! (Max Stats + AK-47)");
+    
+    if (!document.getElementById('shop-screen').classList.contains('hidden')) {
+        renderShop();
+    } else if (gameState === 'PLAYING' || gameState === 'PAUSED') {
+        updateHUD();
+    }
+});
+
 document.getElementById('btn-cheat-apply').addEventListener('click', () => {
     let s = parseInt(document.getElementById('cheat-stage').value);
     let pts = parseInt(document.getElementById('cheat-points').value);
