@@ -1687,7 +1687,7 @@ const conquistasData = [
     { id: 'c25', cat: 6, nome: 'Espertinho', desc: 'Escape de uma banhista antes dela gritar', tipo: 'unico' },
     { id: 'c26', cat: 6, nome: 'Sobrevivente', desc: 'Sobreviva a 3 gritos em uma fase', tipo: 'unico' },
     { id: 'c27', cat: 6, nome: 'Distraidor', desc: 'Use 10 itens de distração', tipo: 'acumulo', max: 10 },
-    { id: 'c28', cat: 6, nome: 'Vingador', desc: 'Mate a Dona do Banheiro com AK-47', tipo: 'unico' },
+    { id: 'c28', cat: 6, nome: 'Vingador', desc: 'Mate a Dona do Banheiro com AK-47', tipo: 'unico', secreta: true },
     { id: 'c29', cat: 7, nome: 'Paciência', desc: 'Jogue por 2 horas no total', tipo: 'acumulo', max: 7200 },
     { id: 'c30', cat: 7, nome: 'Lenda', desc: 'Desbloqueie TODAS as conquistas', tipo: 'unico' },
     { id: 'c31', cat: 7, nome: 'Hacker de Calcinhas', desc: 'Você abriu o menu secreto!', tipo: 'unico', secreta: true },
