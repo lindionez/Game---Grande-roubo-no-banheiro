@@ -35,11 +35,11 @@ let lastInvasionToast = 0;
 // Upgrades Data
 const shopData = {
     mochila: [
-        { level: 1, name: 'Mochila de Pano', cost: 50, effect: 'Carrega até 3 itens', val: 3 },
-        { level: 2, name: 'Mochila de Couro', cost: 100, effect: 'Carrega até 4 itens', val: 4 },
-        { level: 3, name: 'Bolsa Tática', cost: 200, effect: 'Carrega até 6 itens', val: 6 },
-        { level: 4, name: 'Mochila Militar', cost: 400, effect: 'Carrega até 8 itens', val: 8 },
-        { level: 5, name: 'Bolso Dimensional', cost: 800, effect: 'Carrega até 12 itens', val: 12 }
+        { level: 1, name: 'Mochila de Pano', cost: 50, effect: 'Carrega até 4 itens', val: 4 },
+        { level: 2, name: 'Mochila de Couro', cost: 100, effect: 'Carrega até 6 itens', val: 6 },
+        { level: 3, name: 'Bolsa Tática', cost: 200, effect: 'Carrega até 10 itens', val: 10 },
+        { level: 4, name: 'Mochila Militar', cost: 400, effect: 'Carrega até 15 itens', val: 15 },
+        { level: 5, name: 'Eu visto elas', cost: 1000, effect: 'Carrega até 25 itens', val: 25 }
     ],
     tenis: [
         { level: 1, name: 'Chinelo de Dedo', cost: 50, effect: 'Reduz barulho em 10%', val: 0.9 },
@@ -63,25 +63,25 @@ const shopData = {
         { level: 5, name: 'Clone de Fumaça', cost: 960, effect: '+5 distrações por fase', val: 5 }
     ],
     disfarce: [
-        { level: 1, name: 'Óculos de Sol', cost: 80, effect: 'Banhistas demoram 0.3s a mais para te ver', val: 0.3 },
-        { level: 2, name: 'Peruca Loiro', cost: 160, effect: 'Banhistas demoram 0.6s a mais para te ver', val: 0.6 },
-        { level: 3, name: 'Roupão Felpudo', cost: 320, effect: 'Banhistas demoram 0.9s a mais para te ver', val: 0.9 },
-        { level: 4, name: 'Pele de Banhista', cost: 640, effect: 'Banhistas demoram 1.2s a mais para te ver', val: 1.2 },
-        { level: 5, name: 'Manto da Invisibilidade Parcial', cost: 1280, effect: 'Banhistas demoram 1.5s a mais para te ver', val: 1.5 }
+        { level: 1, name: 'Óculos de Sol', cost: 80, effect: 'Banhistas demoram 0.4s a mais para te ver', val: 0.4 },
+        { level: 2, name: 'Peruca Loiro', cost: 160, effect: 'Banhistas demoram 0.8s a mais para te ver', val: 0.8 },
+        { level: 3, name: 'Roupão Felpudo', cost: 320, effect: 'Banhistas demoram 1.2s a mais para te ver', val: 1.2 },
+        { level: 4, name: 'Corpo sarado', cost: 640, effect: 'Banhistas demoram 1.5s a mais para te ver', val: 1.5 },
+        { level: 5, name: 'Manto da Invisibilidade Parcial', cost: 1280, effect: 'Banhistas demoram 2s a mais para te ver', val: 2 }
     ],
     velocidade: [
         { level: 1, name: 'Sandália Velha', cost: 70, effect: '+5% velocidade', val: 1.05 },
         { level: 2, name: 'Crocs Esportivo', cost: 140, effect: '+10% velocidade', val: 1.10 },
         { level: 3, name: 'Tênis de Corrida', cost: 280, effect: '+18% velocidade', val: 1.18 },
-        { level: 4, name: 'Pés de Beija-Flor', cost: 560, effect: '+28% velocidade', val: 1.28 },
-        { level: 5, name: 'Teletransporte Curto', cost: 1120, effect: '+40% velocidade', val: 1.40 }
+        { level: 4, name: 'Pés de Beija-Flor', cost: 560, effect: '+25% velocidade', val: 1.25 },
+        { level: 5, name: 'Teletransporte Curto', cost: 1120, effect: '+35% velocidade', val: 1.35 }
     ],
     resistencia: [
         { level: 1, name: 'Cara de Pau', cost: 90, effect: 'Suspeita enche 10% mais devagar', val: 0.9 },
         { level: 2, name: 'Histórico Limpo', cost: 180, effect: 'Suspeita enche 20% mais devagar', val: 0.8 },
         { level: 3, name: 'Álibi Falso', cost: 360, effect: 'Suspeita enche 30% mais devagar', val: 0.7 },
         { level: 4, name: 'Dupla Personalidade', cost: 720, effect: 'Suspeita enche 40% mais devagar', val: 0.6 },
-        { level: 5, name: 'Inocente até Provar', cost: 1440, effect: 'Suspeita enche 50% mais devagar', val: 0.5 }
+        { level: 5, name: 'Inocente até Provar o mel', cost: 1440, effect: 'Suspeita enche 50% mais devagar', val: 0.5 }
     ],
     spawn: [
         { level: 1, name: 'Atração Básica', cost: 100, effect: 'Calcinhas spawnam 10% mais rápido', val: 0.9 },
@@ -91,18 +91,18 @@ const shopData = {
         { level: 5, name: 'Tempestade Íntima', cost: 1600, effect: 'Calcinhas spawnam 70% mais rápido', val: 0.3 }
     ],
     visao: [
-        { level: 1, name: 'Miopia Leve', cost: 150, effect: 'Banhistas enxergam 10% menos longe', val: 0.9 },
-        { level: 2, name: 'Astigmatismo', cost: 300, effect: 'Banhistas enxergam 20% menos longe', val: 0.8 },
-        { level: 3, name: 'Vista Cansada', cost: 600, effect: 'Banhistas enxergam 30% menos longe', val: 0.7 },
-        { level: 4, name: 'Catarata Precoce', cost: 1200, effect: 'Banhistas enxergam 40% menos longe', val: 0.6 },
-        { level: 5, name: 'Quase Cegas', cost: 2400, effect: 'Banhistas enxergam 50% menos longe', val: 0.5 }
+        { level: 1, name: 'Miopia Leve', cost: 150, effect: 'Banhistas enxergam 5% menos longe', val: 0.95 },
+        { level: 2, name: 'Astigmatismo', cost: 300, effect: 'Banhistas enxergam 10% menos longe', val: 0.9 },
+        { level: 3, name: 'Vista Cansada', cost: 600, effect: 'Banhistas enxergam 15% menos longe', val: 0.85 },
+        { level: 4, name: 'Catarata Precoce', cost: 1200, effect: 'Banhistas enxergam 20% menos longe', val: 0.8 },
+        { level: 5, name: 'Quase Cegas de paixão', cost: 2400, effect: 'Banhistas enxergam 30% menos longe', val: 0.7 }
     ],
     alerta: [
         { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 20% mais rápido', val: 1.2 },
         { level: 2, name: 'Mente Ocupada', cost: 240, effect: 'Alerta desce 50% mais rápido', val: 1.5 },
         { level: 3, name: 'Desatenção', cost: 480, effect: 'Alerta desce 80% mais rápido', val: 1.8 },
         { level: 4, name: 'Amnésia', cost: 960, effect: 'Alerta desce 120% mais rápido', val: 2.2 },
-        { level: 5, name: 'Paz Interior', cost: 1920, effect: 'Alerta desce 200% mais rápido', val: 3.0 }
+        { level: 5, name: 'Paz Interna', cost: 1920, effect: 'Alerta desce 200% mais rápido', val: 3.0 }
     ]
 };
 
