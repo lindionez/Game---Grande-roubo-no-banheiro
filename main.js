@@ -62,13 +62,6 @@ const shopData = {
         { level: 4, name: 'Rádio com Pagode', cost: 1280, effect: '+4 distrações por fase', val: 4 },
         { level: 5, name: 'Clone de Fumaça', cost: 1960, effect: '+5 distrações por fase', val: 5 }
     ],
-    disfarce: [
-        { level: 1, name: 'Óculos de Sol', cost: 80, effect: 'Banhistas demoram 0.4s a mais para te ver', val: 0.4 },
-        { level: 2, name: 'Peruca Loiro', cost: 260, effect: 'Banhistas demoram 0.8s a mais para te ver', val: 0.8 },
-        { level: 3, name: 'Roupão Felpudo', cost: 420, effect: 'Banhistas demoram 1.2s a mais para te ver', val: 1.2 },
-        { level: 4, name: 'Corpo sarado', cost: 650, effect: 'Banhistas demoram 1.5s a mais para te ver', val: 1.5 },
-        { level: 5, name: 'Manto da Invisibilidade Parcial', cost: 1580, effect: 'Banhistas demoram 2s a mais para te ver', val: 2 }
-    ],
     velocidade: [
         { level: 1, name: 'Sandália Velha', cost: 70, effect: '+5% velocidade', val: 1.05 },
         { level: 2, name: 'Crocs Esportivo', cost: 240, effect: '+10% velocidade', val: 1.10 },
@@ -98,16 +91,16 @@ const shopData = {
         { level: 5, name: 'Quase Cegas de paixão', cost: 2400, effect: 'Banhistas enxergam 30% menos longe', val: 0.7 }
     ],
     alerta: [
-        { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 20% mais rápido', val: 1.2 },
-        { level: 2, name: 'Mente Ocupada', cost: 250, effect: 'Alerta desce 50% mais rápido', val: 1.5 },
-        { level: 3, name: 'Desatenção', cost: 600, effect: 'Alerta desce 80% mais rápido', val: 1.8 },
-        { level: 4, name: 'Amnésia', cost: 1260, effect: 'Alerta desce 120% mais rápido', val: 2.2 },
-        { level: 5, name: 'Paz Interna', cost: 2026, effect: 'Alerta desce 200% mais rápido', val: 3.0 }
+        { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 10% mais rápido', val: 1.1 },
+        { level: 2, name: 'Mente Ocupada', cost: 250, effect: 'Alerta desce 25% mais rápido', val: 1.25 },
+        { level: 3, name: 'Desatenção', cost: 600, effect: 'Alerta desce 40% mais rápido', val: 1.4 },
+        { level: 4, name: 'Amnésia', cost: 1260, effect: 'Alerta desce 60% mais rápido', val: 1.6 },
+        { level: 5, name: 'Paz Interna', cost: 2026, effect: 'Alerta desce 100% mais rápido', val: 2.0 }
     ]
 };
 
 let upgrades = {
-    mochila: 0, tenis: 0, luva: 0, distracao: 0, disfarce: 0, velocidade: 0, resistencia: 0,
+    mochila: 0, tenis: 0, luva: 0, distracao: 0, velocidade: 0, resistencia: 0,
     spawn: 0, visao: 0, alerta: 0
 };
 let hasAK47 = false;
@@ -752,7 +745,6 @@ function update(dt) {
         if (Math.random() < 0.2) spawnNoiseRing(player.x, player.y);
     }
 
-    let disfarceDelay = getUpgradeVal('disfarce', 0);
 
     if (ePressed && distractionsLeft > 0) {
         ePressed = false; distractionsLeft--;
@@ -823,7 +815,7 @@ function update(dt) {
         if (isSeeingPlayer) {
             if (b.seeTimer === 0 && window.audioMgr) window.audioMgr.batherHmm();
             b.seeTimer += dt;
-            if (b.seeTimer >= (b.reactTime + disfarceDelay)) {
+            if (b.seeTimer >= b.reactTime) {
                 if (window.audioMgr) window.audioMgr.batherScream();
                 b.state = 'scream'; fasePerfeitaSemVisto = false; faseGritos++;
                 if (faseGritos >= 3) unlockConquista('c26');
@@ -1768,7 +1760,7 @@ function renderShop() {
     let totalLvl = Object.values(upgrades).reduce((a, b) => a + b, 0);
     document.getElementById('total-level').textContent = totalLvl;
 
-    if (totalLvl === 50) {
+    if (totalLvl === 45) {
         document.getElementById('ak47-shop-item').classList.remove('hidden');
         drawAK47ShopCanvas();
         if (hasAK47) {
