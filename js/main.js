@@ -808,6 +808,7 @@ function update(dt) {
             player.grabbedBy = b;
             player.escapeTimer = 0;
             showToast("AGARRADO! Segure CORRER!");
+            unlockConquista('c35');
         }
 
         let isSeeingPlayer = false;
@@ -1101,6 +1102,12 @@ function update(dt) {
             showToast("BANG!");
             unlockConquista('c33');
 
+            let allDead = true;
+            for (let i = 0; i < bathers.length; i++) {
+                if (!bathers[i].dead) { allDead = false; break; }
+            }
+            if (allDead && bathers.length > 0) unlockConquista('c36');
+
             setTimeout(() => {
                 player.isShooting = false;
             }, 500);
@@ -1134,6 +1141,7 @@ function triggerWin() {
     if (stage === 15) unlockConquista('c9');
     if (stage === 20) unlockConquista('c10');
     if (stage === 30) unlockConquista('c11');
+    if (stage === 35) unlockConquista('c34');
     if (fasePerfeitaSemVisto) { unlockConquista('c12'); addProgressoConquista('c13', 1); addProgressoConquista('c14', 1); }
     if (score >= 500) unlockConquista('c18');
     if (score >= 1000) unlockConquista('c19');
@@ -2017,7 +2025,10 @@ const conquistasData = [
     { id: 'c30', cat: 7, nome: 'Lenda', desc: 'Desbloqueie TODAS as conquistas', tipo: 'unico' },
     { id: 'c31', cat: 7, nome: 'Hacker de Calcinhas', desc: 'Você abriu o menu secreto!', tipo: 'unico', secreta: true },
     { id: 'c32', cat: 7, nome: 'Cuidado com o Vermelho', desc: 'Caiu em uma armadilha...', tipo: 'unico', secreta: true },
-    { id: 'c33', cat: 7, nome: 'Caos no Banheiro', desc: 'Derrote uma banhista com a AK-47', tipo: 'unico', secreta: true }
+    { id: 'c33', cat: 7, nome: 'Caos no Banheiro', desc: 'Derrote uma banhista com a AK-47', tipo: 'unico', secreta: true },
+    { id: 'c34', cat: 2, nome: 'É o fim...', desc: 'Alcance a famigerada fase 35', tipo: 'unico' },
+    { id: 'c35', cat: 6, nome: 'Abraço de Urso', desc: 'Seja agarrado por uma fã super apegada', tipo: 'unico' },
+    { id: 'c36', cat: 7, nome: 'Psicopata à Solta', desc: 'Neutralize todas as banhistas da fase', tipo: 'unico', secreta: true }
 ];
 
 let conquistasSalvas = {};
@@ -2108,7 +2119,7 @@ function addProgressoConquista(id, val) {
 function verificarLenda() {
     if (conquistasSalvas['c30'] && conquistasSalvas['c30'].desbloqueada) return;
     let total = Object.values(conquistasSalvas).filter(c => c.desbloqueada).length;
-    if (total >= 32) unlockConquista('c30');
+    if (total >= conquistasData.length - 1) unlockConquista('c30');
 }
 
 let tempoTotalJogo = 0;
