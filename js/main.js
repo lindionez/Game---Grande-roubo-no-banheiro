@@ -1185,7 +1185,7 @@ function draw() {
             else if (tile === 'R') { ctx.fillStyle = 'rgba(255,105,180,0.5)'; ctx.fillRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4); }
             else if (tile === 'L') { ctx.fillStyle = '#8b5a2b'; ctx.fillRect(x + 5, y + 5, TILE_SIZE - 10, TILE_SIZE - 10); }
             else if (tile === 'C') { ctx.strokeStyle = '#555'; ctx.beginPath(); ctx.moveTo(x, y + TILE_SIZE / 2); ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE / 2); ctx.stroke(); }
-            else if (tile === 'E') { ctx.fillStyle = '#87CEEB'; ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE); ctx.font = '20px Arial'; ctx.fillText('🚪', x + TILE_SIZE / 2, y + TILE_SIZE / 2); }
+            else if (tile === 'E') { ctx.fillStyle = '#87CEEB'; ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE); ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🚪', x + TILE_SIZE / 2, y + TILE_SIZE / 2); }
             else if (tile === 'P') { ctx.fillStyle = '#3d2b1f'; ctx.beginPath(); ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, 10, 0, Math.PI * 2); ctx.fill(); }
         }
     }
