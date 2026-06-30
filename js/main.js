@@ -581,6 +581,12 @@ function updateHUD() {
     if (suspicion < 50) sBar.style.background = 'linear-gradient(90deg, #4facfe, #00f2fe)';
     else if (suspicion < 80) sBar.style.background = 'linear-gradient(90deg, #f6d365, #fda085)';
     else sBar.style.background = 'linear-gradient(90deg, #ff0844, #ffb199)';
+
+    if (window.innerWidth <= 1250 && cheatUnlocked) {
+        document.getElementById('btn-cheat-mobile').classList.remove('hidden');
+    } else {
+        document.getElementById('btn-cheat-mobile').classList.add('hidden');
+    }
 }
 
 function setupBathers() {
@@ -1698,7 +1704,7 @@ document.getElementById('btn-play').addEventListener('click', () => {
 
     document.getElementById('tut-text-run').innerHTML = isMobile ?
         `Segure o botão <strong>CORRER</strong> para correr, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.` :
-        `Segure <strong>SHIFT</strong> para correr, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.`;
+        `Segure <strong>CORRER <span class="pc-only">(SHIFT)</span></strong>, mas cuidado!<br>Correr faz barulho e aumenta a <strong>Suspeita</strong>.`;
 
     document.getElementById('tut-text-distraction').innerHTML = isMobile ?
         `Ao comprar o upgrade de Distração, você inicia a fase com cargas.<br>Use o botão 💨 para jogar um rádio e distrair as banhistas!` :
@@ -1719,6 +1725,14 @@ document.getElementById('btn-tut-start').addEventListener('click', () => { docum
 
 document.getElementById('btn-pause-mobile').addEventListener('touchstart', pauseAction);
 document.getElementById('btn-pause-mobile').addEventListener('mousedown', pauseAction);
+document.getElementById('btn-cheat-mobile').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (cheatUnlocked) openCheatMenu();
+});
+document.getElementById('btn-cheat-mobile').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (cheatUnlocked) openCheatMenu();
+});
 
 document.getElementById('btn-resume').addEventListener('click', () => {
     if (gameState === 'PAUSED') {

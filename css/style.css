@@ -536,7 +536,11 @@ canvas {
     animation: pulseBorder 1s infinite;
 }
 
+.mobile-only { display: none !important; }
+
 @media (max-width: 1250px) {
+    .pc-only { display: none !important; }
+    .mobile-only { display: inline-block !important; }
     #game-container {
         width: 100vw;
         height: 100vh;

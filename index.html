@@ -12,7 +12,7 @@
         <!-- Cheat Screen -->
         <div id="cheat-screen" class="screen hidden" style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <h1 style="color: #ff69b4; font-size: 3rem; margin-bottom: 5px; text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; text-align: center;">🕵️ MODO CHEAT 🕵️</h1>
-            <p style="color: #00f2fe; margin-bottom: 20px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">(Aperte 'C' durante o jogo para abrir rapidamente)</p>
+            <p class="pc-only" style="color: #00f2fe; margin-bottom: 20px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">(Aperte 'C' durante o jogo para abrir rapidamente)</p>
             
             <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.3); color: white; text-align: center; font-size: 1.2rem; box-shadow: 0 0 20px rgba(255, 105, 180, 0.4); max-width: 400px; width: 90%;">
                 
@@ -63,6 +63,7 @@
                         </div>
                     </div>
                     <button id="btn-pause-mobile" style="pointer-events: auto; margin-top: 15px; padding: 5px 20px; background: rgba(0,0,0,0.7); border: 2px solid #ffcf40; color: #ffcf40; border-radius: 8px; font-size: 1.2rem; cursor: pointer; font-family: 'Fredoka One', cursive; text-shadow: 1px 1px 0 #000;">⏸️ PAUSE</button>
+                    <button id="btn-cheat-mobile" class="hidden" style="pointer-events: auto; margin-top: 10px; padding: 5px 20px; background: rgba(0,0,0,0.7); border: 2px solid #ff69b4; color: #ff69b4; border-radius: 8px; font-size: 1.2rem; cursor: pointer; font-family: 'Fredoka One', cursive; text-shadow: 1px 1px 0 #000;">🕵️ CHEAT</button>
                 </div>
                 <div class="hud-right" style="pointer-events: auto;">
                     <div id="score">Pontos: 0</div>
@@ -84,7 +85,7 @@
         <!-- Grab Warning Banner -->
         <div id="grab-warning" class="hidden" style="position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); color: #ff6666; padding: 10px 30px; border-radius: 50px; border: 2px solid rgba(255, 102, 102, 0.5); font-family: 'Fredoka One', cursive; text-align: center; z-index: 100; pointer-events: none; animation: grabPulseLite 0.8s infinite alternate; backdrop-filter: blur(4px);">
             <span style="font-size: 1.3rem; display: block; margin-bottom: 3px; letter-spacing: 1px;">⚠️ AGARRADO!</span>
-            <span style="font-size: 1rem; color: #f0f0f0;">Segure SHIFT para soltar</span>
+            <span id="grab-warning-text" style="font-size: 1rem; color: #f0f0f0;">Segure CORRER <span class="pc-only">(SHIFT)</span> para soltar</span>
             <style>
                 @keyframes grabPulseLite {
                     from { box-shadow: 0 0 5px rgba(255, 102, 102, 0.2); }
@@ -199,7 +200,7 @@
                 <div class="tut-slide active">
                     <div class="tut-icon" style="font-size: 5rem;">🫂</div>
                     <p style="font-size: 1.5rem; line-height: 1.5; margin-top: 20px;">As banhistas com o <strong>olhar roxo</strong> (cone de visão roxo) são as agarradeiras!<br>Se elas chegarem muito perto, não vão apenas gritar, elas vão pular e te <strong>prender</strong>!</p>
-                    <p style="font-size: 1.5rem; line-height: 1.5; color: #ffcf40; margin-top: 20px;">Se for pego, a barra de Alerta sobe bem rápido! <br><strong>SEGURE O BOTÃO DE CORRER (SHIFT)</strong> por 1 segundo para se soltar!</p>
+                    <p style="font-size: 1.5rem; line-height: 1.5; color: #ffcf40; margin-top: 20px;">Se for pego, a barra de Alerta sobe bem rápido! <br><strong>SEGURE O BOTÃO DE CORRER <span class="pc-only">(SHIFT)</span></strong> por 1 segundo para se soltar!</p>
                 </div>
             </div>
             <button id="btn-agarradeira-continue" class="btn-large" style="margin-top: 30px; background: #8a2be2; border-color: #4b0082;">ENTENDI!</button>
@@ -207,7 +208,7 @@
 
         <!-- Game Over Screen -->
         <div id="game-over-screen" class="screen hidden">
-            <h1 style="text-shadow: 2px 2px 10px #000; margin-bottom: 300px;">VOCÊ FOI PEGO!</h1>
+            <h1 style="text-shadow: 2px 2px 10px #000; margin-bottom: 25vh;">VOCÊ FOI PEGO!</h1>
             <p id="game-over-stats" style="text-shadow: 2px 2px 5px #000;">Fase Alcançada: 0</p>
             <button id="btn-restart" class="btn-large">Tentar Novamente</button>
         </div>
@@ -239,28 +240,28 @@
                 #btn-cheat-menu-open:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 10px 25px rgba(255, 8, 68, 0.8) !important; cursor: pointer; filter: brightness(1.2); }
             </style>
 
-            <div style="background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.15); border-radius: 24px; padding: 50px 40px; backdrop-filter: blur(12px); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 105, 180, 0.2); max-width: 650px; width: 90%; z-index: 2; animation: slideUpFadeAnim 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;">
+            <div style="background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.15); border-radius: 24px; padding: clamp(20px, 4vh, 50px) clamp(15px, 4vw, 40px); backdrop-filter: blur(12px); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 105, 180, 0.2); max-width: 650px; width: 90%; max-height: 95vh; overflow-y: auto; z-index: 2; animation: slideUpFadeAnim 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;">
                 
-                <div style="font-size: 4.5rem; margin-bottom: -15px;">👑🏆👙</div>
+                <div style="font-size: clamp(2.5rem, 8vw, 4.5rem); margin-bottom: -10px;">👑🏆👙</div>
                 
-                <h1 style="color: #ffcf40; font-size: 4.2rem; margin-top: 15px; margin-bottom: 25px; font-family: 'Fredoka One', cursive; letter-spacing: 2px; animation: glowTitleAnim 3s ease-in-out infinite;">VOCÊ ZEROU!</h1>
+                <h1 style="color: #ffcf40; font-size: clamp(2.2rem, 9vw, 4.2rem); margin-top: 10px; margin-bottom: clamp(15px, 3vh, 25px); font-family: 'Fredoka One', cursive; letter-spacing: 2px; animation: glowTitleAnim 3s ease-in-out infinite;">VOCÊ ZEROU!</h1>
                 
-                <p style="color: #e0e0e0; font-size: 1.4rem; margin-bottom: 25px; line-height: 1.6; font-family: 'Nunito', sans-serif;">
+                <p style="color: #e0e0e0; font-size: clamp(1rem, 3.5vw, 1.4rem); margin-bottom: clamp(15px, 3vh, 25px); line-height: 1.5; font-family: 'Nunito', sans-serif;">
                     Chegar na <strong style="color: #ffcf40;">Fase 35</strong> não é pra qualquer um.<br>Você é o Mestre Furtivo supremo!
                 </p>
                 
-                <div style="background: rgba(0, 0, 0, 0.4); border-radius: 16px; padding: 25px; margin-bottom: 35px; border-left: 5px solid #ff69b4; border-right: 5px solid #00f2fe; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);">
-                    <p style="color: #fff; font-size: 1.3rem; margin: 0; line-height: 1.8;">
-                        Jogo criado por <strong style="color: #ff69b4; font-size: 1.6rem; text-shadow: 0 0 10px #ff69b4; font-family: 'Fredoka One', cursive;">Lindionez Macedo</strong><br>
-                        com ajuda do <strong style="color: #00f2fe; font-size: 1.6rem; text-shadow: 0 0 10px #00f2fe; font-family: 'Fredoka One', cursive;">Gemini Pro</strong>.
+                <div style="background: rgba(0, 0, 0, 0.4); border-radius: 16px; padding: clamp(15px, 3vw, 25px); margin-bottom: clamp(20px, 4vh, 35px); border-left: 5px solid #ff69b4; border-right: 5px solid #00f2fe; box-shadow: inset 0 0 15px rgba(0,0,0,0.8);">
+                    <p style="color: #fff; font-size: clamp(1rem, 3.5vw, 1.3rem); margin: 0; line-height: 1.6;">
+                        Jogo criado por <strong style="color: #ff69b4; font-size: clamp(1.2rem, 4.5vw, 1.6rem); text-shadow: 0 0 10px #ff69b4; font-family: 'Fredoka One', cursive;">Lindionez Macedo</strong><br>
+                        com ajuda do <strong style="color: #00f2fe; font-size: clamp(1.2rem, 4.5vw, 1.6rem); text-shadow: 0 0 10px #00f2fe; font-family: 'Fredoka One', cursive;">Gemini Pro</strong>.
                     </p>
                 </div>
                 
-                <p style="color: #fff; font-size: 1.6rem; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                <p style="color: #fff; font-size: clamp(1.1rem, 4vw, 1.6rem); font-weight: bold; margin-bottom: clamp(20px, 4vh, 40px); text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
                     Obrigado por jogar! 💖
                 </p>
                 
-                <button id="btn-cheat-menu-open" class="btn-large" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border: 3px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 15px rgba(255, 8, 68, 0.5); padding: 18px 30px; font-size: 1.5rem; width: 100%; border-radius: 12px; font-family: 'Fredoka One', cursive;">
+                <button id="btn-cheat-menu-open" class="btn-large" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border: 3px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 15px rgba(255, 8, 68, 0.5); padding: clamp(12px, 3vw, 18px) clamp(15px, 4vw, 30px); font-size: clamp(1rem, 3.5vw, 1.5rem); width: 100%; border-radius: 12px; font-family: 'Fredoka One', cursive;">
                     🕵️ ABRIR MENU CHEAT SECRETO
                 </button>
             </div>
