@@ -1736,6 +1736,18 @@ document.getElementById('btn-mute').addEventListener('click', (e) => {
     }
 });
 
+document.getElementById('btn-cheat-menu-open').addEventListener('click', () => {
+    document.getElementById('game-complete-screen').classList.add('hidden');
+    stage = 1;
+    timeSpent = 0;
+    shopPoints = 0;
+    upgrades = { mochila: 0, tenis: 0, luva: 0, distracao: 0, velocidade: 0, resistencia: 0, spawn: 0, visao: 0, alerta: 0 };
+    hasAK47 = false;
+    startLevel();
+    openCheatMenu();
+});
+
+
 document.getElementById('btn-restart').addEventListener('click', () => {
     document.getElementById('game-over-screen').classList.add('hidden');
     startLevel();
@@ -1852,6 +1864,10 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 document.getElementById('btn-next-stage').addEventListener('click', () => {
     document.getElementById('shop-screen').classList.add('hidden');
+    if (stage >= 35) {
+        document.getElementById('game-complete-screen').classList.remove('hidden');
+        return;
+    }
     if (stage < 35) { stage++; timeSpent = 0; }
 
     if (hasAK47 && !ak47TutorialShown) {
