@@ -540,6 +540,13 @@ function showToast(msg) {
     setTimeout(() => toast.classList.add('hidden'), 2000);
 }
 
+function showCheatToast(msg) {
+    const toast = document.getElementById('cheat-toast');
+    toast.textContent = msg; toast.classList.remove('hidden');
+    toast.style.animation = 'none'; toast.offsetHeight; toast.style.animation = null;
+    setTimeout(() => toast.classList.add('hidden'), 2500);
+}
+
 function spawnParticle(x, y, text, color) { particles.push({ x, y, text, color, life: 1, maxLife: 1, vy: -50, type: 'text' }); }
 function spawnNoiseRing(x, y) { particles.push({ type: 'ring', x: x + player.size / 2, y: y + player.size / 2, radius: 10, maxRadius: 60, life: 0.5, maxLife: 0.5 }); }
 function spawnBlood(x, y) { particles.push({ type: 'blood', x: x + 15, y: y + 25, radius: 10, maxRadius: 40, life: 10, maxLife: 10 }); }
@@ -1665,9 +1672,7 @@ document.getElementById('btn-cheat-ak47').addEventListener('click', () => {
     Object.keys(upgrades).forEach(k => upgrades[k] = 5); // Max out all stats
     hasAK47 = true;
     ak47SecretUnlocked = true;
-    updateCapacity();
-    applyUpgrades();
-    showToast("✔️ Cheat Aplicado! (Max Stats + AK-47)");
+    showCheatToast("✔️ Cheat Aplicado! (Max Stats + AK-47)");
     
     if (!document.getElementById('shop-screen').classList.contains('hidden')) {
         renderShop();
@@ -1684,7 +1689,7 @@ document.getElementById('btn-cheat-apply').addEventListener('click', () => {
     if (!isNaN(s) && s >= 1 && s <= 35) stage = s;
     if (!isNaN(pts) && pts > 0) shopPoints += pts;
 
-    showToast("✔️ Cheat Aplicado!");
+    showCheatToast("✔️ Cheat Aplicado!");
 
     if (!document.getElementById('shop-screen').classList.contains('hidden')) {
         renderShop();
