@@ -860,7 +860,7 @@ function update(dt) {
             b.state = 'walk';
         }
 
-        if (b.state === 'walk') {
+        if (b.state === 'walk' || b.state === 'distracted') {
             b.pathTimer -= dt;
             if (b.pathTimer <= 0 || !b.nextTarget) {
                 b.pathTimer = 0.5;
