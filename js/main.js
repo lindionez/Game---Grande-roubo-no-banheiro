@@ -88,7 +88,7 @@ const shopData = {
         { level: 2, name: 'Astigmatismo', cost: 300, effect: 'Banhistas enxergam 15% menos longe', val: 0.85 },
         { level: 3, name: 'Vista Cansada', cost: 600, effect: 'Banhistas enxergam 20% menos longe', val: 0.8 },
         { level: 4, name: 'Catarata Precoce', cost: 1100, effect: 'Banhistas enxergam 40% menos longe', val: 0.6 },
-        { level: 5, name: 'Quase Cegas', cost: 2000, effect: 'Banhistas enxergam 60% menos longe', val: 0.4 }
+        { level: 5, name: 'Quase Cegas', cost: 2000, effect: 'Banhistas enxergam 50% menos longe', val: 0.5 }
     ],
     alerta: [
         { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 10% mais rápido', val: 1.1 },
