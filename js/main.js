@@ -804,7 +804,7 @@ function update(dt) {
         let angleDiff = Math.abs(angleToPlayer - b.angle);
         if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
 
-        if (b.type === 'agarradeira' && !player.grabbedBy && b.state !== 'scream' && distToPlayer < 25) {
+        if (b.type === 'agarradeira' && !player.grabbedBy && distToPlayer <= 32) {
             player.grabbedBy = b;
             player.escapeTimer = 0;
             showToast("AGARRADO! Segure CORRER!");
