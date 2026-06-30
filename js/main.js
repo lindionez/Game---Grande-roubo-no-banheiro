@@ -17,7 +17,7 @@ let score = 0;
 let shopPoints = 0;
 let combo = 0;
 let comboTimer = 0;
-let timeRemaining = 90;
+let timeSpent = 0;
 let suspicion = 0; // 0 to 100
 let totalCollected = 0;
 let backpackCollected = 0;
@@ -553,8 +553,8 @@ function spawnBlood(x, y) { particles.push({ type: 'blood', x: x + 15, y: y + 25
 
 function updateHUD() {
     document.getElementById('stage-name').textContent = `Fase ${stage}`;
-    let m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-    let s = Math.floor(timeRemaining % 60).toString().padStart(2, '0');
+    let m = Math.floor(timeSpent / 60).toString().padStart(2, '0');
+    let s = Math.floor(timeSpent % 60).toString().padStart(2, '0');
     document.getElementById('timer').textContent = `⏱️ ${m}:${s}`;
     document.getElementById('score').textContent = `Pontos: ${score}`;
 
@@ -622,7 +622,6 @@ function setupBathers() {
 function startLevel() {
     mapLayout = generateMap(stage);
     ak47SecretUnlocked = false;
-    timeRemaining = 300 + (stage * 30);
     suspicion = 0; totalCollected = 0; backpackCollected = 0;
     score = 0; // Prevent score accumulating across game overs
     faseGritos = 0; fasePerfeitaSemVisto = true; tempoSemSuspeita = 0;
@@ -670,13 +669,7 @@ function update(dt) {
     } else { tempoSemSuspeita = 0; }
     ultimaSuspeita = suspicion;
 
-    if (timeRemaining > 0) {
-        timeRemaining -= dt;
-        if (timeRemaining <= 0) {
-            if (totalCollected >= requiredPanties) triggerWin();
-            else gameOver();
-        }
-    }
+    timeSpent += dt;
 
     if (comboTimer > 0) { comboTimer -= dt; if (comboTimer <= 0) combo = 0; }
 
@@ -1686,7 +1679,7 @@ document.getElementById('btn-cheat-apply').addEventListener('click', () => {
     let pts = parseInt(document.getElementById('cheat-points').value);
 
     let changedStage = (s !== stage);
-    if (!isNaN(s) && s >= 1 && s <= 35) stage = s;
+    if (!isNaN(s) && s >= 1 && s <= 35) { stage = s; if (changedStage) timeSpent = 0; }
     if (!isNaN(pts) && pts > 0) shopPoints += pts;
 
     showCheatToast("✔️ Cheat Aplicado!");
@@ -1752,7 +1745,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 document.getElementById('btn-next-stage').addEventListener('click', () => {
     document.getElementById('shop-screen').classList.add('hidden');
-    if (stage < 35) stage++;
+    if (stage < 35) { stage++; timeSpent = 0; }
 
     if (hasAK47 && !ak47TutorialShown) {
         ak47TutorialShown = true;
