@@ -1,3 +1,12 @@
+// Legenda do Mapa:
+// B = Gabine de banho (Obstáculo sólido)
+// W = Parede azul (Obstáculo sólido)
+// R = Tapete rosa (Esconderijo para o jogador)
+// P = Vaso de planta (Esconderijo para o jogador)
+// L = Armário de madeira (Obstáculo sólido)
+// C = Divisória / Cerca (Obstáculo sólido)
+// E = Porta de Entrada/Saída (Spawn do jogador/inimiga)
+// . = Chão livre (Área caminhável)
 const allMaps = [
     [
         "WWWWWWWWWWWWWWWWWWWWWW",
