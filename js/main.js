@@ -67,7 +67,7 @@ const shopData = {
         { level: 2, name: 'Crocs Esportivo', cost: 240, effect: '+10% velocidade', val: 1.10 },
         { level: 3, name: 'Tênis de Corrida', cost: 380, effect: '+18% velocidade', val: 1.18 },
         { level: 4, name: 'Pés de Beija-Flor', cost: 660, effect: '+25% velocidade', val: 1.25 },
-        { level: 5, name: 'Teletransporte Curto', cost: 1520, effect: '+40% velocidade', val: 1.40 }
+        { level: 5, name: 'Teletransporte Curto', cost: 1520, effect: '+35% velocidade', val: 1.35 }
     ],
     resistencia: [
         { level: 1, name: 'Cara de Pau', cost: 90, effect: 'Suspeita enche 10% mais devagar', val: 0.9 },
@@ -84,11 +84,11 @@ const shopData = {
         { level: 5, name: 'Tempestade Íntima', cost: 2222, effect: 'Calcinhas spawnam 70% mais rápido', val: 0.3 }
     ],
     visao: [
-        { level: 1, name: 'Miopia Leve', cost: 150, effect: 'Banhistas enxergam 5% menos longe', val: 0.95 },
-        { level: 2, name: 'Astigmatismo', cost: 300, effect: 'Banhistas enxergam 10% menos longe', val: 0.9 },
-        { level: 3, name: 'Vista Cansada', cost: 600, effect: 'Banhistas enxergam 15% menos longe', val: 0.85 },
-        { level: 4, name: 'Catarata Precoce', cost: 1100, effect: 'Banhistas enxergam 20% menos longe', val: 0.8 },
-        { level: 5, name: 'Quase Cegas de paixão', cost: 2000, effect: 'Banhistas enxergam 30% menos longe', val: 0.7 }
+        { level: 1, name: 'Miopia Leve', cost: 150, effect: 'Banhistas enxergam 10% menos longe', val: 0.9 },
+        { level: 2, name: 'Astigmatismo', cost: 300, effect: 'Banhistas enxergam 15% menos longe', val: 0.85 },
+        { level: 3, name: 'Vista Cansada', cost: 600, effect: 'Banhistas enxergam 20% menos longe', val: 0.8 },
+        { level: 4, name: 'Catarata Precoce', cost: 1100, effect: 'Banhistas enxergam 40% menos longe', val: 0.6 },
+        { level: 5, name: 'Quase Cegas', cost: 2000, effect: 'Banhistas enxergam 60% menos longe', val: 0.4 }
     ],
     alerta: [
         { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 10% mais rápido', val: 1.1 },
