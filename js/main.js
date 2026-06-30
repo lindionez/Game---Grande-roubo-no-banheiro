@@ -2096,10 +2096,12 @@ function addProgressoConquista(id, val) {
     if (conquistasSalvas[id].desbloqueada) return;
     conquistasSalvas[id].progresso += val;
     let c = conquistasData.find(x => x.id === id);
-    if (c && c.tipo === 'acumulo' && conquistasSalvas[id].progresso >= c.max) {
-        unlockConquista(id);
-    } else {
-        salvarConquistas();
+    if (c) {
+        if ((c.tipo === 'acumulo' && conquistasSalvas[id].progresso >= c.max) || (c.tipo === 'unico' && conquistasSalvas[id].progresso >= 1)) {
+            unlockConquista(id);
+        } else {
+            salvarConquistas();
+        }
     }
 }
 
@@ -2127,6 +2129,15 @@ function renderTelaConquistas(filtro = 'all') {
     conquistasData.forEach(c => {
         let save = conquistasSalvas[c.id];
 
+        // Auto-heal de saves bugados antigos
+        if (!save.desbloqueada) {
+            if ((c.tipo === 'acumulo' && save.progresso >= c.max) || (c.tipo === 'unico' && save.progresso >= 1)) {
+                save.desbloqueada = true;
+                save.data = new Date().toISOString().split('T')[0];
+                salvarConquistas();
+            }
+        }
+
         if (filtro === 'secret') {
             if (!c.secreta) return;
             if (!save.desbloqueada) {
@@ -2143,7 +2154,7 @@ function renderTelaConquistas(filtro = 'all') {
         div.className = 'conquista-item ' + (save.desbloqueada ? 'unlocked' : '');
 
         let icon = save.desbloqueada ? '🏆' : '🔒';
-        let statusStr = save.desbloqueada ? '✅ OK' : '❌';
+        let statusStr = save.desbloqueada ? '✅' : '❌';
 
         let prog = '';
         if (!save.desbloqueada && c.tipo === 'acumulo') {
