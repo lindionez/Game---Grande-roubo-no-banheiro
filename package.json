@@ -1,9 +1,9 @@
 {
-  "name": "leo-codigo",
+  "name": "Grande-roubo-no-banheiro",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
+  "description": "A ideia do jogo foi do meu amigo Léo, e eu transformei essa ideia em código, criando um jogo em que os jogadores roubam calcinhas.",
+  "license": "MIT",
+  "author": "Lindionez macedo",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
