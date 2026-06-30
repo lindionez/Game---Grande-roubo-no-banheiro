@@ -1161,12 +1161,12 @@ function drawVictoryCharacterAnimation(dt) {
     let cx = vCanvas.width / 2;
     let cy = vCanvas.height / 2;
     
-    let bounce = Math.abs(Math.sin(victoryAnimTimer * 8)) * 10;
+    let bounce = Math.abs(Math.sin(victoryAnimTimer * 8)) * 16;
     
     vCtx.save();
-    vCtx.translate(cx, cy + bounce + 10);
+    vCtx.translate(cx, cy + bounce + 20);
     
-    let size = 50; 
+    let size = 110; 
     
     // Player body
     vCtx.fillStyle = '#fff';
@@ -1178,27 +1178,33 @@ function drawVictoryCharacterAnimation(dt) {
     // Player Head
     vCtx.fillStyle = '#ffcc99';
     vCtx.beginPath(); vCtx.arc(0, -size * 0.2, size * 0.4, 0, Math.PI * 2); vCtx.fill();
+    // Beanie / Mask (faithful to the game)
+    vCtx.fillStyle = '#111';
+    vCtx.beginPath(); vCtx.ellipse(0, -size * 0.2, size * 0.45, size * 0.15, 0, 0, Math.PI * 2); vCtx.fill();
     
     // Laughing Face
     vCtx.strokeStyle = '#111';
-    vCtx.lineWidth = 2;
+    vCtx.lineWidth = 3;
+    let eyeX = size * 0.15;
+    let eyeY = -size * 0.2;
     // Left eye (Open, wide)
     vCtx.fillStyle = '#fff';
-    vCtx.beginPath(); vCtx.arc(-8, -size * 0.2 - 2, 4, 0, Math.PI * 2); vCtx.fill();
+    vCtx.beginPath(); vCtx.arc(-eyeX, eyeY, 6, 0, Math.PI * 2); vCtx.fill();
     vCtx.fillStyle = '#000';
-    vCtx.beginPath(); vCtx.arc(-8, -size * 0.2 - 2, 2, 0, Math.PI * 2); vCtx.fill();
+    vCtx.beginPath(); vCtx.arc(-eyeX, eyeY, 3, 0, Math.PI * 2); vCtx.fill();
     // Right eye (Closed/Laughing)
-    vCtx.beginPath(); vCtx.moveTo(8, -size * 0.2 - 2); vCtx.quadraticCurveTo(4, -size * 0.2 - 6, 0, -size * 0.2 - 2); vCtx.stroke();
+    vCtx.beginPath(); vCtx.moveTo(eyeX + 8, eyeY); vCtx.quadraticCurveTo(eyeX, eyeY - 8, eyeX - 8, eyeY); vCtx.stroke();
     
     // Mouth (Animated opening and closing)
-    let mouthOpen = 2 + Math.abs(Math.sin(victoryAnimTimer * 20)) * 6;
+    let mouthOpen = 2 + Math.abs(Math.sin(victoryAnimTimer * 20)) * 8;
     vCtx.fillStyle = '#800000';
-    vCtx.beginPath(); vCtx.ellipse(0, -size * 0.2 + 6, 6, mouthOpen, 0, 0, Math.PI, false); vCtx.fill();
+    vCtx.beginPath(); vCtx.ellipse(0, eyeY + 12, 10, mouthOpen, 0, 0, Math.PI, false); vCtx.fill();
     
-    // Panty on head (pink, tilted sideways)
+    // Panty on head (pink, tilted sideways, scaled up)
     vCtx.save();
-    vCtx.translate(0, -size * 0.2 - 12);
+    vCtx.translate(0, -size * 0.2 - 40);
     vCtx.rotate(Math.PI / 6); // Tilted 30 degrees
+    vCtx.scale(2.2, 2.2); // Scale up so it actually fits his head!
     vCtx.fillStyle = '#ffb6c1';
     vCtx.strokeStyle = '#000';
     vCtx.lineWidth = 1.5;
@@ -1221,8 +1227,11 @@ function drawVictoryCharacterAnimation(dt) {
     
     vCtx.restore();
     
-    // Floating HaHa texts (reduced spawn rate)
-    if (Math.random() < 0.02) {
+    // Floating HaHa texts (steady controlled spawn rate)
+    if (!window.hahaTimer) window.hahaTimer = 0;
+    window.hahaTimer -= dt;
+    if (window.hahaTimer <= 0) {
+        window.hahaTimer = 0.4; // Spawn one every 0.4 seconds
         if (!window.victoryHahas) window.victoryHahas = [];
         window.victoryHahas.push({
             x: cx + (Math.random() - 0.5) * 100,
