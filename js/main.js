@@ -513,21 +513,25 @@ function spawnPanty() {
     while (attempts < 50) {
         let col = Math.floor(Math.random() * COLS); let row = Math.floor(Math.random() * ROWS);
         if (['.', 'C', 'R'].includes(mapLayout[row][col])) {
-            let rand = Math.random();
-            let trapChance = stage <= 5 ? 0.05 : (stage <= 10 ? 0.12 : (stage <= 15 ? 0.20 : 0.30));
-            let pType = pantyTypes[0];
-            if (rand > 0.98) pType = pantyTypes[6]; // Biquíni de Praia
-            else if (rand > 0.95) pType = pantyTypes[5]; // Fralda
-            else if (rand > 0.85) pType = pantyTypes[4]; // Neon
-            else if (rand > 0.7) pType = pantyTypes[3]; // Renda
-            else if (rand > 0.45) pType = pantyTypes[2]; // Listrada
-            else if (rand > 0.2) pType = pantyTypes[1]; // Padrão
-            else pType = pantyTypes[0]; // Bolinhas
+            let pX = col * TILE_SIZE + 5;
+            let pY = row * TILE_SIZE + 5;
+            if (!panties.some(p => p.x === pX && p.y === pY)) {
+                let rand = Math.random();
+                let trapChance = stage <= 5 ? 0.05 : (stage <= 10 ? 0.12 : (stage <= 15 ? 0.20 : 0.30));
+                let pType = pantyTypes[0];
+                if (rand > 0.98) pType = pantyTypes[6]; // Biquíni de Praia
+                else if (rand > 0.95) pType = pantyTypes[5]; // Fralda
+                else if (rand > 0.85) pType = pantyTypes[4]; // Neon
+                else if (rand > 0.7) pType = pantyTypes[3]; // Renda
+                else if (rand > 0.45) pType = pantyTypes[2]; // Listrada
+                else if (rand > 0.2) pType = pantyTypes[1]; // Padrão
+                else pType = pantyTypes[0]; // Bolinhas
 
-            let isTrap = Math.random() < trapChance;
+                let isTrap = Math.random() < trapChance;
 
-            panties.push({ x: col * TILE_SIZE + 5, y: row * TILE_SIZE + 5, width: 30, height: 30, type: pType, pulse: 0, isTrap: isTrap });
-            return;
+                panties.push({ x: pX, y: pY, width: 30, height: 30, type: pType, pulse: 0, isTrap: isTrap });
+                return;
+            }
         }
         attempts++;
     }
