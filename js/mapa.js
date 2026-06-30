@@ -21,7 +21,7 @@ const allMaps = [
         "W......RR.WW.RR......W",
         "W.........WW.........W",
         "W....................W",
-        "WE...................W",
+        "WECC.................W",
         "WWWWWWWWWWWWWWWWWWWWWW"
     ],
     [
