@@ -514,7 +514,7 @@ function spawnPanty() {
         let col = Math.floor(Math.random() * COLS); let row = Math.floor(Math.random() * ROWS);
         if (['.', 'C', 'R'].includes(mapLayout[row][col])) {
             let rand = Math.random();
-            let trapChance = stage <= 5 ? 0.1 : (stage <= 10 ? 0.2 : (stage <= 15 ? 0.3 : 0.4));
+            let trapChance = stage <= 5 ? 0.05 : (stage <= 10 ? 0.12 : (stage <= 15 ? 0.20 : 0.30));
             let pType = pantyTypes[0];
             if (rand > 0.98) pType = pantyTypes[6]; // Biquíni de Praia
             else if (rand > 0.95) pType = pantyTypes[5]; // Fralda
