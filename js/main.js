@@ -943,7 +943,7 @@ function update(dt) {
 
     let spawnRate = Math.max(5, 15 - stage * 0.5) * getUpgradeVal('spawn', 1.0);
     lastPantySpawn += dt;
-    let maxOnScreen = 5;
+    let maxOnScreen = 7;
     if (panties.length >= maxOnScreen) lastPantySpawn = 0;
     if (lastPantySpawn > spawnRate && panties.length < maxOnScreen) {
         spawnPanty(); lastPantySpawn = 0;
