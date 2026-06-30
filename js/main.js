@@ -1150,6 +1150,99 @@ function triggerAK47Win() {
     document.getElementById('ak47-victory-screen').classList.remove('hidden');
 }
 
+let victoryAnimTimer = 0;
+function drawVictoryCharacterAnimation(dt) {
+    victoryAnimTimer += dt;
+    const vCanvas = document.getElementById('victory-anim-canvas');
+    if (!vCanvas) return;
+    const vCtx = vCanvas.getContext('2d');
+    vCtx.clearRect(0, 0, vCanvas.width, vCanvas.height);
+    
+    let cx = vCanvas.width / 2;
+    let cy = vCanvas.height / 2;
+    
+    let bounce = Math.abs(Math.sin(victoryAnimTimer * 8)) * 10;
+    
+    vCtx.save();
+    vCtx.translate(cx, cy + bounce + 10);
+    
+    let size = 50; 
+    
+    // Player body
+    vCtx.fillStyle = '#fff';
+    vCtx.beginPath(); vCtx.arc(0, size * 0.3, size * 0.4, Math.PI, 0); vCtx.fill();
+    vCtx.fillStyle = '#000';
+    vCtx.fillRect(-size * 0.4, size * 0.05, size * 0.8, size * 0.1);
+    vCtx.fillRect(-size * 0.4, size * 0.2, size * 0.8, size * 0.1);
+    
+    // Player Head
+    vCtx.fillStyle = '#ffcc99';
+    vCtx.beginPath(); vCtx.arc(0, -size * 0.2, size * 0.4, 0, Math.PI * 2); vCtx.fill();
+    
+    // Laughing Face
+    vCtx.strokeStyle = '#111';
+    vCtx.lineWidth = 2;
+    // Left eye (Open, wide)
+    vCtx.fillStyle = '#fff';
+    vCtx.beginPath(); vCtx.arc(-8, -size * 0.2 - 2, 4, 0, Math.PI * 2); vCtx.fill();
+    vCtx.fillStyle = '#000';
+    vCtx.beginPath(); vCtx.arc(-8, -size * 0.2 - 2, 2, 0, Math.PI * 2); vCtx.fill();
+    // Right eye (Closed/Laughing)
+    vCtx.beginPath(); vCtx.moveTo(8, -size * 0.2 - 2); vCtx.quadraticCurveTo(4, -size * 0.2 - 6, 0, -size * 0.2 - 2); vCtx.stroke();
+    
+    // Mouth (Animated opening and closing)
+    let mouthOpen = 2 + Math.abs(Math.sin(victoryAnimTimer * 20)) * 6;
+    vCtx.fillStyle = '#800000';
+    vCtx.beginPath(); vCtx.ellipse(0, -size * 0.2 + 6, 6, mouthOpen, 0, 0, Math.PI, false); vCtx.fill();
+    
+    // Panty on head (pink, tilted sideways)
+    vCtx.save();
+    vCtx.translate(0, -size * 0.2 - 12);
+    vCtx.rotate(Math.PI / 6); // Tilted 30 degrees
+    vCtx.fillStyle = '#ffb6c1';
+    vCtx.strokeStyle = '#000';
+    vCtx.lineWidth = 1.5;
+    vCtx.beginPath();
+    vCtx.moveTo(-16, -2);
+    vCtx.quadraticCurveTo(0, -8, 16, -2);
+    vCtx.quadraticCurveTo(18, 12, 8, 16);
+    vCtx.quadraticCurveTo(0, 8, -8, 16);
+    vCtx.quadraticCurveTo(-18, 12, -16, -2);
+    vCtx.closePath();
+    vCtx.fill(); vCtx.stroke();
+    vCtx.restore();
+    
+    // Sweat drops
+    if (Math.sin(victoryAnimTimer * 8) > 0) {
+        vCtx.fillStyle = '#add8e6';
+        vCtx.beginPath(); vCtx.arc(-16, -size * 0.2, 2, 0, Math.PI * 2); vCtx.fill();
+        vCtx.beginPath(); vCtx.arc(16, -size * 0.2 + 5, 2, 0, Math.PI * 2); vCtx.fill();
+    }
+    
+    vCtx.restore();
+    
+    // Floating HaHa texts (reduced spawn rate)
+    if (Math.random() < 0.02) {
+        if (!window.victoryHahas) window.victoryHahas = [];
+        window.victoryHahas.push({
+            x: cx + (Math.random() - 0.5) * 100,
+            y: cy + (Math.random() - 0.5) * 40 - 20,
+            life: 1.0, vx: (Math.random() - 0.5) * 20, vy: -15 - Math.random() * 15
+        });
+    }
+    if (window.victoryHahas) {
+        for (let i = window.victoryHahas.length - 1; i >= 0; i--) {
+            let h = window.victoryHahas[i];
+            h.x += h.vx * dt; h.y += h.vy * dt; h.life -= dt;
+            vCtx.fillStyle = `rgba(255, 215, 0, ${h.life})`;
+            vCtx.font = 'bold 16px Arial';
+            vCtx.textAlign = 'center';
+            vCtx.fillText('Haha!', h.x, h.y);
+            if (h.life <= 0) window.victoryHahas.splice(i, 1);
+        }
+    }
+}
+
 let gameOverAnimTimer = 0; let gameOverSnapshot = null;
 function gameOver() {
     if (window.audioMgr) { window.audioMgr.setChase(false); window.audioMgr.gameOver(); }
@@ -1568,6 +1661,7 @@ function loop(timestamp) {
     else if (gameState === 'PAUSED') { draw(); }
     else if (gameState === 'GAMEOVER') drawGameOverAnimation(dt);
     else if (gameState === 'AK47_VICTORY') drawAK47VictoryAnimation(dt);
+    else if (gameState === 'VICTORY') drawVictoryCharacterAnimation(dt);
 
     requestAnimationFrame(loop);
 }
