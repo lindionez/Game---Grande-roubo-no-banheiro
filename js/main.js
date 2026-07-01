@@ -25,6 +25,7 @@ let requiredPanties = 5;
 let distractionsLeft = 0;
 
 let gameStats = {
+    calcinhasRoubadas: 0,
     fasesConcluidas: 0,
     agarradoVezes: 0,
     fugasBemSucedidas: 0,
@@ -1041,6 +1042,7 @@ function update(dt) {
         addProgressoConquista('c5', backpackCollected);
         addProgressoConquista('c6', backpackCollected);
         totalCollected += backpackCollected;
+        gameStats.calcinhasRoubadas += backpackCollected;
         backpackCollected = 0;
         showToast("Calcinhas Guardadas!");
         spawnParticle(player.x, player.y, "✔️", "#0f0");
@@ -1908,7 +1910,7 @@ document.getElementById('btn-fullscreen-pause').addEventListener('click', (e) =>
 document.getElementById('btn-stats-pause').addEventListener('click', () => {
     const sc = document.getElementById('stats-content');
     const items = [
-        { icon: "👙", label: "Calcinhas Roubadas", val: totalCollected, color: "#ff9a9e" },
+        { icon: "👙", label: "Calcinhas Roubadas", val: gameStats.calcinhasRoubadas, color: "#ff9a9e" },
         { icon: "🚪", label: "Fases Concluídas", val: gameStats.fasesConcluidas, color: "#fecfef" },
         { icon: "⏱️", label: "Tempo de Jogo", val: `${Math.floor(gameStats.tempoTotalJogo / 60)}m ${Math.floor(gameStats.tempoTotalJogo % 60)}s`, color: "#a1c4fd" },
         { icon: "🔥", label: "Maior Combo", val: `${gameStats.maiorCombo}x`, color: "#ffecd2" },
