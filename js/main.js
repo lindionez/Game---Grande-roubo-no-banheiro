@@ -1021,19 +1021,34 @@ function update(dt) {
             else enemy.nextTarget = null;
         }
 
-        if (hasLoSToTarget && enemy.state === 'chase') enemy.nextTarget = null;
+        if (enemy.stuckTimer > 0) enemy.stuckTimer -= dt;
+        if (hasLoSToTarget && enemy.state === 'chase' && !(enemy.stuckTimer > 0)) enemy.nextTarget = null;
 
         let mTX = enemy.nextTarget ? enemy.nextTarget.x : enemy.targetX;
         let mTY = enemy.nextTarget ? enemy.nextTarget.y : enemy.targetY;
         let edx = mTX - enemy.x; let edy = mTY - enemy.y; let dist = Math.hypot(edx, edy);
 
         if (dist > 2) {
-            let moveX = (edx / dist) * enemy.speed * dt; let moveY = (edy / dist) * enemy.speed * dt;
+            let fullMove = enemy.speed * dt;
+            let moveX = (edx / dist) * fullMove; let moveY = (edy / dist) * fullMove;
             let movedX = false; let movedY = false;
+            
             if (!checkMapCollision(enemy.x + moveX, enemy.y, enemy.size)) { enemy.x += moveX; movedX = true; }
             if (!checkMapCollision(enemy.x, enemy.y + moveY, enemy.size)) { enemy.y += moveY; movedY = true; }
 
-            if (!movedX && !movedY) enemy.nextTarget = null;
+            // Slide speed recovery: if blocked in one axis, transfer full speed to the free axis
+            if (!movedX && movedY && moveY !== 0) {
+                let extraY = (fullMove - Math.abs(moveY)) * Math.sign(moveY);
+                if (!checkMapCollision(enemy.x, enemy.y + extraY, enemy.size)) enemy.y += extraY;
+            } else if (movedX && !movedY && moveX !== 0) {
+                let extraX = (fullMove - Math.abs(moveX)) * Math.sign(moveX);
+                if (!checkMapCollision(enemy.x + extraX, enemy.y, enemy.size)) enemy.x += extraX;
+            }
+
+            if (!movedX && !movedY) {
+                enemy.nextTarget = null;
+                enemy.stuckTimer = 0.5; // Force A* usage for half a second to escape the corner
+            }
             if (Math.hypot(mTX - enemy.x, mTY - enemy.y) < 5) enemy.nextTarget = null;
         } else {
             enemy.nextTarget = null;
