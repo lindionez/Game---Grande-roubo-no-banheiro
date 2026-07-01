@@ -11,33 +11,37 @@
     <div id="game-container">
         <!-- Cheat Screen -->
         <div id="cheat-screen" class="screen hidden" style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <h1 style="color: #ff69b4; font-size: 3rem; margin-bottom: 5px; text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; text-align: center;">🕵️ MODO CHEAT 🕵️</h1>
-            <p class="pc-only" style="color: #00f2fe; margin-bottom: 20px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">(Aperte 'C' durante o jogo para abrir rapidamente)</p>
+            <h1 style="color: #ff69b4; font-size: clamp(1.8rem, 6vw, 3rem); margin-bottom: 5px; text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; text-align: center;">🕵️ MODO CHEAT 🕵️</h1>
+            <p class="pc-only" style="color: #00f2fe; margin-bottom: clamp(10px, 2vh, 20px); font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">(Aperte 'C' durante o jogo para abrir rapidamente)</p>
             
-            <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.3); color: white; text-align: center; font-size: 1.2rem; box-shadow: 0 0 20px rgba(255, 105, 180, 0.4); max-width: 400px; width: 90%;">
+            <div style="background: rgba(255, 255, 255, 0.1); padding: clamp(15px, 4vw, 30px); border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.3); color: white; text-align: center; font-size: 1.2rem; box-shadow: 0 0 20px rgba(255, 105, 180, 0.4); max-width: 400px; width: 90%; max-height: 75vh; overflow-y: auto; overflow-x: hidden;">
                 
-                <div style="margin-bottom: 20px; text-align: left;">
-                    <label style="color: #ffcf40; font-family: 'Fredoka One', cursive; display: block; margin-bottom: 5px;">Pular para Fase (1-35):</label>
-                    <input type="number" id="cheat-stage" min="1" max="35" value="1" style="width: 100%; font-size: 1.2rem; padding: 10px; border-radius: 8px; border: none; outline: none; background: rgba(255,255,255,0.9); color: #333; font-weight: bold; box-sizing: border-box;">
+                <div style="margin-bottom: clamp(10px, 2vh, 20px); text-align: left;">
+                    <label style="color: #ffcf40; font-family: 'Fredoka One', cursive; display: block; margin-bottom: 5px; font-size: clamp(1rem, 4vw, 1.2rem);">Pular para Fase (1-35):</label>
+                    <input type="number" id="cheat-stage" min="1" max="35" value="1" style="width: 100%; font-size: clamp(1rem, 4vw, 1.2rem); padding: 8px 10px; border-radius: 8px; border: none; outline: none; background: rgba(255,255,255,0.9); color: #333; font-weight: bold; box-sizing: border-box;">
                 </div>
                 
-                <div style="margin-bottom: 30px; text-align: left;">
-                    <label style="color: #ffcf40; font-family: 'Fredoka One', cursive; display: block; margin-bottom: 5px;">Adicionar Pontos:</label>
-                    <input type="number" id="cheat-points" value="10000" style="width: 100%; font-size: 1.2rem; padding: 10px; border-radius: 8px; border: none; outline: none; background: rgba(255,255,255,0.9); color: #333; font-weight: bold; box-sizing: border-box;">
+                <div style="margin-bottom: clamp(15px, 3vh, 30px); text-align: left;">
+                    <label style="color: #ffcf40; font-family: 'Fredoka One', cursive; display: block; margin-bottom: 5px; font-size: clamp(1rem, 4vw, 1.2rem);">Adicionar Pontos:</label>
+                    <input type="number" id="cheat-points" value="10000" style="width: 100%; font-size: clamp(1rem, 4vw, 1.2rem); padding: 8px 10px; border-radius: 8px; border: none; outline: none; background: rgba(255,255,255,0.9); color: #333; font-weight: bold; box-sizing: border-box;">
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <button id="btn-cheat-apply" class="btn-large" style="width: 100%; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">APLICAR</button>
+                <div style="display: flex; flex-direction: column; gap: clamp(8px, 1.5vh, 15px);">
+                    <button id="btn-cheat-apply" class="btn-large" style="width: 100%; padding: clamp(10px, 2vh, 15px); font-size: clamp(1rem, 4vw, 1.2rem); background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">APLICAR</button>
                     
-                    <button id="btn-cheat-ak47" class="btn-large" style="width: 100%; background: linear-gradient(135deg, #ff0000 0%, #8b0000 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">🔫 MAX STATS + AK47</button>
+                    <button id="btn-cheat-ak47" class="btn-large" style="width: 100%; padding: clamp(10px, 2vh, 15px); font-size: clamp(1rem, 4vw, 1.2rem); background: linear-gradient(135deg, #ff0000 0%, #8b0000 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">🔫 MAX STATS + AK47</button>
                     
-                    <button id="btn-cheat-invis" class="btn-large" style="width: 100%; padding: 10px; font-size: 1.2rem; background: linear-gradient(135deg, #555 0%, #333 100%); color: #ccc; border: 2px solid #777; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); transition: all 0.3s;">👻 INVISÍVEL: OFF</button>
+                    <button id="btn-cheat-invis" class="btn-large" style="width: 100%; padding: clamp(10px, 2vh, 15px); font-size: clamp(1rem, 4vw, 1.2rem); background: linear-gradient(135deg, #555 0%, #333 100%); color: #ccc; border: 2px solid #777; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); transition: all 0.3s;">👻 INVISÍVEL: OFF</button>
                     
-                    <button id="btn-cheat-immortal" class="btn-large" style="width: 100%; padding: 10px; font-size: 1.2rem; background: linear-gradient(135deg, #555 0%, #333 100%); color: #ccc; border: 2px solid #777; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); transition: all 0.3s;">🛡️ IMORTAL: OFF</button>
+                    <button id="btn-cheat-immortal" class="btn-large" style="width: 100%; padding: clamp(10px, 2vh, 15px); font-size: clamp(1rem, 4vw, 1.2rem); background: linear-gradient(135deg, #555 0%, #333 100%); color: #ccc; border: 2px solid #777; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); transition: all 0.3s;">🛡️ IMORTAL: OFF</button>
 
-                    <button id="btn-cheat-shop" class="btn-large" style="width: 100%; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">🛒 ABRIR LOJA</button>
+                    <button id="btn-cheat-speed" class="btn-large" style="width: 100%; padding: clamp(10px, 2vh, 15px); font-size: clamp(1rem, 4vw, 1.2rem); background: linear-gradient(135deg, #555 0%, #333 100%); color: #ccc; border: 2px solid #777; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); transition: all 0.3s;">⚡ VELOCIDADE 10X: OFF</button>
                     
-                    <button id="btn-cheat-close" class="btn-large" style="width: 100%; background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(255, 8, 68, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">FECHAR MENU</button>
+                    <button id="btn-cheat-range" class="btn-large" style="width: 100%; padding: clamp(10px, 2vh, 15px); font-size: clamp(1rem, 4vw, 1.2rem); background: linear-gradient(135deg, #555 0%, #333 100%); color: #ccc; border: 2px solid #777; box-shadow: 0 4px 15px rgba(0,0,0,0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); transition: all 0.3s;">🖐️ ALCANCE INFINITO: OFF</button>
+
+                    <button id="btn-cheat-shop" class="btn-large" style="width: 100%; padding: clamp(10px, 2vh, 15px); font-size: clamp(1rem, 4vw, 1.2rem); background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(253, 160, 133, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">🛒 ABRIR LOJA</button>
+                    
+                    <button id="btn-cheat-close" class="btn-large" style="width: 100%; padding: clamp(10px, 2vh, 15px); font-size: clamp(1rem, 4vw, 1.2rem); background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(255, 8, 68, 0.4); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">FECHAR MENU</button>
                 </div>
             </div>
         </div>

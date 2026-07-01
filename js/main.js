@@ -159,6 +159,8 @@ function handleSpaceRelease() {
 let cheatUnlocked = false;
 let cheatInvis = false;
 let cheatImmortal = false;
+let cheatSpeed = false;
+let cheatRange = false;
 
 function openCheatMenu() {
     cheatUnlocked = true;
@@ -776,6 +778,7 @@ function update(dt) {
 
     let dx = 0; let dy = 0;
     let speed = player.baseSpeed * getUpgradeVal('velocidade', 1.0);
+    if (cheatSpeed) speed *= 5;
     let isRunning = false;
 
     if (keys.Shift || keys.shift) { speed *= 1.8; isRunning = true; }
@@ -1001,7 +1004,7 @@ function update(dt) {
         spacePressed = false;
         let cap = getUpgradeVal('mochila', 2);
         if (backpackCollected < cap) {
-            let pickRange = getUpgradeVal('luva', 0);
+            let pickRange = cheatRange ? 10000 : getUpgradeVal('luva', 0);
             let pRect = { x: player.x - pickRange, y: player.y - pickRange, width: player.size + pickRange * 2, height: player.size + pickRange * 2 };
 
             for (let i = panties.length - 1; i >= 0; i--) {
@@ -2056,6 +2059,38 @@ document.getElementById('btn-cheat-immortal').addEventListener('click', () => {
         btn.style.borderColor = '#fff';
     } else {
         btn.innerHTML = '🛡️ IMORTAL: OFF';
+        btn.style.background = 'linear-gradient(135deg, #555 0%, #333 100%)';
+        btn.style.color = '#ccc';
+        btn.style.borderColor = '#777';
+    }
+});
+
+document.getElementById('btn-cheat-speed').addEventListener('click', () => {
+    cheatSpeed = !cheatSpeed;
+    let btn = document.getElementById('btn-cheat-speed');
+    if (cheatSpeed) {
+        btn.innerHTML = '⚡ VELOCIDADE 5X: ON';
+        btn.style.background = 'linear-gradient(135deg, #fceabb 0%, #f8b500 100%)';
+        btn.style.color = 'black';
+        btn.style.borderColor = '#fff';
+    } else {
+        btn.innerHTML = '⚡ VELOCIDADE 5X: OFF';
+        btn.style.background = 'linear-gradient(135deg, #555 0%, #333 100%)';
+        btn.style.color = '#ccc';
+        btn.style.borderColor = '#777';
+    }
+});
+
+document.getElementById('btn-cheat-range').addEventListener('click', () => {
+    cheatRange = !cheatRange;
+    let btn = document.getElementById('btn-cheat-range');
+    if (cheatRange) {
+        btn.innerHTML = '🖐️ ALCANCE INFINITO: ON';
+        btn.style.background = 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)';
+        btn.style.color = 'black';
+        btn.style.borderColor = '#fff';
+    } else {
+        btn.innerHTML = '🖐️ ALCANCE INFINITO: OFF';
         btn.style.background = 'linear-gradient(135deg, #555 0%, #333 100%)';
         btn.style.color = '#ccc';
         btn.style.borderColor = '#777';
