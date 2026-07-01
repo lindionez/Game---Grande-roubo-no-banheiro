@@ -816,3 +816,96 @@ canvas {
     background: #4caf50;
     width: 0%;
 }
+/* Stats Screen Improvements */
+.stats-modal {
+    background: #222;
+    border: 3px solid #fbc2eb;
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+    color: white;
+}
+
+.stats-title {
+    color: #fbc2eb;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    font-family: 'Fredoka One', cursive;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    text-align: left;
+}
+
+.stat-card {
+    background: rgba(255,255,255,0.05);
+    padding: 12px 15px;
+    border-radius: 10px;
+    border-left: 5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Nunito', sans-serif;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    overflow: hidden;
+    gap: 10px;
+}
+
+.stat-card-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    text-shadow: 0 0 5px rgba(255,255,255,0.2);
+    flex-shrink: 0;
+}
+
+.stat-label {
+    color: #ccc;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-value {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .stats-title {
+        font-size: 1.5rem;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .stat-card {
+        padding: 10px 12px;
+    }
+    .stats-modal {
+        padding: 15px;
+        width: 95%;
+    }
+    .stat-label {
+        font-size: 0.85rem;
+    }
+    .stat-value {
+        font-size: 1.1rem;
+    }
+}

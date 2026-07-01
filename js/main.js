@@ -1927,12 +1927,12 @@ document.getElementById('btn-stats-pause').addEventListener('click', () => {
     }
 
     sc.innerHTML = items.map(i => `
-        <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 10px; border-left: 5px solid ${i.color}; display: flex; align-items: center; justify-content: space-between; font-family: 'Nunito', sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 1.5rem; text-shadow: 0 0 5px rgba(255,255,255,0.2);">${i.icon}</span>
-                <span style="color: #ccc; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">${i.label}</span>
+        <div class="stat-card" style="border-left-color: ${i.color};">
+            <div class="stat-card-left">
+                <span class="stat-icon">${i.icon}</span>
+                <span class="stat-label">${i.label}</span>
             </div>
-            <strong style="color: ${i.color}; font-size: 1.4rem; text-shadow: 0 0 10px ${i.color}40;">${i.val}</strong>
+            <strong class="stat-value" style="color: ${i.color}; text-shadow: 0 0 10px ${i.color}40;">${i.val}</strong>
         </div>
     `).join('');
     document.getElementById('stats-screen').classList.remove('hidden');
