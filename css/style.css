@@ -711,8 +711,8 @@ canvas {
     color: white;
     font-size: 0.85rem;
     font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
 }
 
 /* Conquistas Screen */
@@ -733,16 +733,19 @@ canvas {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .c-filter-btn {
     background: rgba(255,255,255,0.2);
     border: 1px solid #ffcf40;
     color: white;
-    padding: 5px 15px;
+    padding: 8px 18px;
     border-radius: 15px;
     cursor: pointer;
     font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
     transition: 0.2s;
 }
 
@@ -781,15 +784,18 @@ canvas {
     width: 40px;
     text-align: center;
 }
-
-.c-item-info {
+.c-item-info {
     flex-grow: 1;
     text-align: left;
+    min-width: 0;
 }
 
 .c-item-info h4 {
     margin-bottom: 3px;
     color: #ffcf40;
+    word-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.2;
 }
 
 .c-item-info p {
@@ -823,8 +829,8 @@ canvas {
     border-radius: 15px;
     padding: 20px;
     width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
+    max-width: 800px;
+    max-height: 85%;
     overflow-y: auto;
     text-align: center;
     color: white;
@@ -877,9 +883,9 @@ canvas {
     font-size: 0.95rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.1;
 }
 
 .stat-value {
@@ -901,6 +907,7 @@ canvas {
     .stats-modal {
         padding: 15px;
         width: 95%;
+        max-height: 80%;
     }
     .stat-label {
         font-size: 0.85rem;
