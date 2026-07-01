@@ -57,6 +57,7 @@
             <button id="btn-stats-pause" class="btn-large" style="margin-top: 15px; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">📊 ESTATÍSTICAS</button>
             <button id="btn-conquistas-pause" class="btn-large" style="margin-top: 15px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">🏆 CONQUISTAS</button>
             <button id="btn-mute" class="btn-large" style="margin-top: 15px; background: #555;">🔊 SOM: LIGADO</button>
+            <button id="btn-new-game-pause" class="btn-large" style="margin-top: 25px; background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);">🔄 NOVO JOGO</button>
         </div>
 
         <!-- Stats Screen -->
@@ -164,12 +165,37 @@
             </div>
         </div>
 
+        <!-- Custom Confirm Modal -->
+        <div id="custom-confirm-modal" class="screen hidden" style="z-index: 9999; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div style="background: #111; border: 3px solid #ff0844; border-radius: 15px; padding: 30px; max-width: 90%; width: 500px; box-shadow: 0 0 30px rgba(255, 8, 68, 0.5);">
+                <h2 style="color: #ff0844; margin-bottom: 20px; font-size: 2rem;">TEM CERTEZA?</h2>
+                <p id="confirm-modal-text" style="color: #fff; font-size: 1.2rem; margin-bottom: 30px; line-height: 1.5;"></p>
+                <div style="display: flex; gap: 20px; justify-content: center;">
+                    <button id="btn-confirm-yes" class="btn" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); width: 150px; font-weight: bold;">SIM</button>
+                    <button id="btn-confirm-no" class="btn" style="background: #555; width: 150px;">NÃO</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Start Screen -->
         <div id="start-screen" class="screen">
             <h1 class="title-anim">LADRÃO DE CALCINHAS</h1>
             <p class="subtitle">Um jogo furtivo casual... e muito atrapalhado!</p>
             <button id="btn-play" class="btn-large">JOGAR</button>
         </div>
+
+        <!-- Continue Screen -->
+        <div id="continue-screen" class="screen hidden" style="z-index: 100;">
+            <h1 class="title-anim">LADRÃO DE CALCINHAS</h1>
+            <h2 style="color: #ffcf40; margin-bottom: 20px;">SESSÃO SALVA ENCONTRADA!</h2>
+            <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 2px solid #555;">
+                <p style="font-size: 1.5rem; color: white; margin-bottom: 10px;">Fase Atual: <strong id="continue-stage-txt" style="color: #00f2fe;">1</strong></p>
+                <p style="font-size: 1.5rem; color: white;">Pontuação: <strong id="continue-score-txt" style="color: #ffcf40;">0</strong> pts</p>
+            </div>
+            <button id="btn-continue-game" class="btn-large" style="margin-bottom: 15px;">▶️ CONTINUAR JOGO</button>
+            <button id="btn-new-game-continue" class="btn-large" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); font-size: clamp(0.9rem, 3vw, 1.2rem);">🔄 NOVO JOGO (APAGAR SAVE)</button>
+        </div>
+
 
         <!-- Tutorial Screen -->
         <div id="tutorial-screen" class="screen hidden">

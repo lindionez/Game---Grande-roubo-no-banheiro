@@ -722,6 +722,7 @@ function startLevel() {
     mapLayout = generateMap(stage);
     ak47SecretUnlocked = false;
     suspicion = 0; totalCollected = 0; backpackCollected = 0;
+    if (typeof saveGame === 'function') saveGame();
     score = 0; // Prevent score accumulating across game overs
     faseGritos = 0; fasePerfeitaSemVisto = true; tempoSemSuspeita = 0;
     requiredPanties = 4 + stage;
@@ -1220,6 +1221,7 @@ function update(dt) {
             player.isShooting = false;
             if (!ak47VictoryShown) {
                 ak47VictoryShown = true;
+                if (typeof saveGame === 'function') saveGame();
                 triggerAK47Win();
             }
         }, 500);
@@ -1306,6 +1308,7 @@ function triggerWin() {
     document.getElementById('victory-stats').textContent = `Pontos da Fase: ${Math.floor(score)}`;
     shopPoints += Math.floor(score);
     score = 0;
+    if (typeof saveGame === 'function') saveGame();
 }
 
 function triggerAK47Win() {
@@ -1432,6 +1435,7 @@ function gameOver() {
     document.getElementById('grab-warning').classList.add('hidden');
     document.getElementById('hud').classList.add('hidden'); document.getElementById('mobile-controls').classList.add('hidden');
     document.getElementById('game-over-screen').classList.remove('hidden');
+    if (typeof saveGame === 'function') saveGame();
     document.getElementById('game-over-stats').textContent = `Fase Alcançada: ${stage}`;
 }
 
@@ -1982,6 +1986,7 @@ document.getElementById('btn-cheat-menu-open').addEventListener('click', () => {
     upgrades = { mochila: 0, tenis: 0, luva: 0, distracao: 0, velocidade: 0, resistencia: 0, spawn: 0, visao: 0, alerta: 0 };
     hasAK47 = false;
     startLevel();
+    saveGame();
     openCheatMenu();
 });
 
@@ -2219,6 +2224,7 @@ document.getElementById('btn-buy-ak47').addEventListener('click', (e) => {
         if (window.audioMgr) window.audioMgr.buyUpgrade();
         shopPoints -= 10000; hasAK47 = true; unlockConquista('c24');
         e.target.textContent = 'EQUIPADA'; e.target.disabled = true; renderShop();
+        if (typeof saveGame === 'function') saveGame();
     }
 });
 
@@ -2364,6 +2370,7 @@ conquistasData.forEach(c => {
 
 function salvarConquistas() {
     verificarLenda();
+    if (typeof saveGame === 'function') saveGame();
 }
 
 let filaConquistas = [];
@@ -2560,6 +2567,7 @@ window.buyUpgrade = function (cat, cost) {
         addProgressoConquista('c22', 1);
         addProgressoConquista('c23', 1);
         renderShop();
+        if (typeof saveGame === 'function') saveGame();
     }
 };
 
@@ -2573,28 +2581,16 @@ function drawAK47ButtonCanvas() {
     sx.translate(15, 30);
 
     const s = 1.2;
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
 
-    sx.fillStyle = '#8b4513';
-    sx.fillRect(-10 * s, -3 * s, 10 * s, 6 * s);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
 
-    sx.fillStyle = '#8b4513';
-    sx.fillRect(6 * s, -3 * s, 10 * s, 6 * s);
-
-    sx.fillStyle = '#444';
-    sx.fillRect(0, -2 * s, 28 * s, 4 * s);
-
-    sx.fillStyle = '#333';
-    sx.fillRect(26 * s, -5 * s, 2 * s, 4 * s);
-
-    sx.fillStyle = '#222';
-    sx.fillRect(10 * s, 2 * s, 4 * s, 8 * s);
-
-    sx.fillStyle = '#222';
-    sx.fillRect(0, 2 * s, 3 * s, 6 * s);
-
-    sx.restore();
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.5);
 }
-drawAK47ButtonCanvas();
 
 requestAnimationFrame(loop);
 
@@ -2604,3 +2600,102 @@ document.addEventListener('click', () => {
     }
 }, { once: true });
 
+// --- SISTEMA DE SAVE ---
+function saveGame() {
+    let data = {
+        stage: stage,
+        shopPoints: shopPoints,
+        gameStats: gameStats,
+        totalFasesVencidas: totalFasesVencidas,
+        conquistasSalvas: conquistasSalvas,
+        upgrades: upgrades,
+        cheatUnlocked: cheatUnlocked,
+        hasAK47: hasAK47,
+        ak47VictoryShown: ak47VictoryShown,
+        ak47TutorialShown: ak47TutorialShown,
+        agarradeiraTutorialShown: agarradeiraTutorialShown
+    };
+    localStorage.setItem('rouboCalcinhasSave', JSON.stringify(data));
+}
+
+function loadGame() {
+    try {
+        let saved = localStorage.getItem('rouboCalcinhasSave');
+        if (saved) {
+            let data = JSON.parse(saved);
+            stage = data.stage || 1;
+            shopPoints = data.shopPoints || 0;
+            if (data.gameStats) Object.assign(gameStats, data.gameStats);
+            if (data.totalFasesVencidas !== undefined) totalFasesVencidas = data.totalFasesVencidas;
+            if (data.conquistasSalvas) conquistasSalvas = Object.assign(conquistasSalvas, data.conquistasSalvas);
+            if (data.upgrades) upgrades = data.upgrades;
+            if (data.cheatUnlocked !== undefined) cheatUnlocked = data.cheatUnlocked;
+            if (data.hasAK47 !== undefined) hasAK47 = data.hasAK47;
+            if (data.ak47VictoryShown !== undefined) ak47VictoryShown = data.ak47VictoryShown;
+            if (data.ak47TutorialShown !== undefined) ak47TutorialShown = data.ak47TutorialShown;
+            if (data.agarradeiraTutorialShown !== undefined) agarradeiraTutorialShown = data.agarradeiraTutorialShown;
+            return true;
+        }
+    } catch(e) { console.error("Erro ao carregar save", e); }
+    return false;
+}
+
+function deleteSaveAndRestart() {
+    localStorage.removeItem('rouboCalcinhasSave');
+    location.reload();
+}
+
+window.addEventListener('load', () => {
+    if (loadGame()) {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('continue-screen').classList.remove('hidden');
+        document.getElementById('continue-stage-txt').textContent = stage;
+        document.getElementById('continue-score-txt').textContent = shopPoints;
+    }
+});
+
+document.getElementById('btn-continue-game').addEventListener('click', () => {
+    let isMobile = window.innerWidth <= 1250 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+        let elem = document.documentElement;
+        if (elem.requestFullscreen) elem.requestFullscreen().catch(err => console.log(err));
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen().catch(err => console.log(err));
+    }
+    document.getElementById('continue-screen').classList.add('hidden');
+    
+    if (window.audioMgr && !window.audioMgr.initialized) window.audioMgr.init();
+    
+    startLevel();
+    gameState = 'PLAYING';
+});
+
+let confirmCallback = null;
+
+function showConfirmModal(msg, callback) {
+    document.getElementById('confirm-modal-text').textContent = msg;
+    document.getElementById('custom-confirm-modal').classList.remove('hidden');
+    confirmCallback = callback;
+}
+
+document.getElementById('btn-confirm-yes').addEventListener('click', () => {
+    document.getElementById('custom-confirm-modal').classList.add('hidden');
+    if (confirmCallback) confirmCallback();
+    confirmCallback = null;
+});
+
+document.getElementById('btn-confirm-no').addEventListener('click', () => {
+    document.getElementById('custom-confirm-modal').classList.add('hidden');
+    confirmCallback = null;
+});
+
+document.getElementById('btn-new-game-continue').addEventListener('click', () => {
+    showConfirmModal("Todo o seu progresso, pontuação, upgrades e conquistas serão APAGADOS para sempre!", () => {
+        deleteSaveAndRestart();
+    });
+});
+
+document.getElementById('btn-new-game-pause').addEventListener('click', () => {
+    showConfirmModal("Você vai jogar todo o seu progresso no lixo e começar do zero. Isso não tem volta!", () => {
+        deleteSaveAndRestart();
+    });
+});
