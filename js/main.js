@@ -2242,7 +2242,7 @@ function renderTelaConquistas(filtro = 'all') {
                 return;
             }
         } else {
-            if (c.secreta && !save.desbloqueada) return;
+            if (c.secreta) return;
             if (filtro === 'unlocked' && !save.desbloqueada) return;
             if (filtro === 'locked' && save.desbloqueada) return;
         }
