@@ -214,6 +214,21 @@ window.addEventListener('keydown', e => {
     }
 
     if (e.key === 'Escape' || e.key === 'Esc') {
+        let cheatScreen = document.getElementById('cheat-screen');
+        let conquistasScreen = document.getElementById('conquistas-screen');
+        
+        let handled = false;
+
+        if (cheatScreen && !cheatScreen.classList.contains('hidden')) {
+            document.getElementById('btn-cheat-close').click();
+            handled = true;
+        } else if (conquistasScreen && !conquistasScreen.classList.contains('hidden')) {
+            document.getElementById('btn-conquistas-close').click();
+            handled = true;
+        }
+
+        if (handled) return; // Prevent pausing/unpausing if a menu was closed
+
         if (gameState === 'PLAYING') {
             pauseAction();
         } else if (gameState === 'PAUSED') {
