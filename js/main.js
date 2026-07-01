@@ -1132,8 +1132,15 @@ function update(dt) {
             let eC = Math.floor((enemy.x + enemy.size / 2) / TILE_SIZE); let eR = Math.floor((enemy.y + enemy.size / 2) / TILE_SIZE);
             let tC = Math.floor((enemy.targetX) / TILE_SIZE); let tR = Math.floor((enemy.targetY) / TILE_SIZE);
             let step = getNextStep(eR, eC, tR, tC);
-            if (step) enemy.nextTarget = { x: step.c * TILE_SIZE + TILE_SIZE / 2 - enemy.size / 2, y: step.r * TILE_SIZE + TILE_SIZE / 2 - enemy.size / 2 };
-            else enemy.nextTarget = null;
+            if (step) {
+                enemy.nextTarget = { x: step.c * TILE_SIZE + TILE_SIZE / 2 - enemy.size / 2, y: step.r * TILE_SIZE + TILE_SIZE / 2 - enemy.size / 2 };
+            } else {
+                enemy.nextTarget = null;
+                if ((enemy.state === 'search' || enemy.state === 'patrol') && (eR !== tR || eC !== tC)) {
+                    enemy.targetX = enemy.x;
+                    enemy.targetY = enemy.y;
+                }
+            }
         }
 
         if (enemy.stuckTimer > 0) enemy.stuckTimer -= dt;
