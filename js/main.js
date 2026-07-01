@@ -53,7 +53,7 @@ const shopData = {
         { level: 1, name: 'Mochila de Pano', cost: 150, effect: 'Carrega até 4 itens', val: 4 },
         { level: 2, name: 'Mochila de Couro', cost: 400, effect: 'Carrega até 6 itens', val: 6 },
         { level: 3, name: 'Bolsa Tática', cost: 500, effect: 'Carrega até 10 itens', val: 10 },
-        { level: 4, name: 'Mochila Militar', cost: 700, effect: 'Carrega até 15 itens', val: 15 },
+        { level: 4, name: 'Mochila Militar', cost: 700, effect: 'Carrega até 14 itens', val: 14 },
         { level: 5, name: 'Vestindo o Estoque', cost: 1300, effect: 'Carrega até 25 itens', val: 25 }
     ],
     tenis: [
@@ -107,10 +107,10 @@ const shopData = {
     ],
     alerta: [
         { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 10% mais rápido', val: 1.1 },
-        { level: 2, name: 'Mente Ocupada', cost: 200, effect: 'Alerta desce 25% mais rápido', val: 1.25 },
-        { level: 3, name: 'Desatenção', cost: 600, effect: 'Alerta desce 30% mais rápido', val: 1.3 },
-        { level: 4, name: 'Amnésia', cost: 1900, effect: 'Alerta desce 40% mais rápido', val: 1.4 },
-        { level: 5, name: 'Paz Interna', cost: 2100, effect: 'Alerta desce 100% mais rápido', val: 2.0 }
+        { level: 2, name: 'Mente Ocupada', cost: 200, effect: 'Alerta desce 15% mais rápido', val: 1.15 },
+        { level: 3, name: 'Desatenção', cost: 600, effect: 'Alerta desce 20% mais rápido', val: 1.2 },
+        { level: 4, name: 'Amnésia', cost: 1900, effect: 'Alerta desce 30% mais rápido', val: 1.3 },
+        { level: 5, name: 'Paz Interna', cost: 2500, effect: 'Alerta desce 80% mais rápido', val: 1.8 }
     ]
 };
 
@@ -507,9 +507,9 @@ const pantyTypes = [
     { type: 'Padrão', pts: 60, icon: '🩲', color: '#0400ff' },
     { type: 'Listrada', pts: 80, icon: '🩲', color: '#baffc9' },
     { type: 'Renda', pts: 110, icon: '👙', color: '#000', noise: true },
-    { type: 'Neon', pts: 220, icon: '👙', color: '#ffffba', rare: true },
-    { type: 'Fralda', pts: 5, icon: '🧷', color: '#ffffff', rare: true },
-    { type: 'Biquíni de Praia', pts: 440, icon: '👙', color: '#00ffff', rare: true }
+    { type: 'Neon', pts: 200, icon: '👙', color: '#ffffba', rare: true },
+    { type: 'Fralda', pts: 1, icon: '🧷', color: '#ffffff', rare: true },
+    { type: 'Biquíni de Praia', pts: 350, icon: '👙', color: '#00ffff', rare: true }
 ];
 
 function checkCollision(rect1, rect2) {
@@ -1022,11 +1022,17 @@ function update(dt) {
                         if (combo === 2) unlockConquista('c16');
                         if (combo === 5) unlockConquista('c17');
                         if (window.audioMgr) window.audioMgr.collectPanty(p.type.pts > 0);
-                        let gained = p.type.pts; score += gained;
+                        let gained = p.type.pts;
+                        let particleColor = '#ffcf40';
+                        if (totalCollected + backpackCollected >= requiredPanties + 3) {
+                            gained = 0;
+                            particleColor = '#ff3333';
+                        }
+                        score += gained;
                         backpackCollected++;
                         if (p.type.noise) { suspicion += 10 * resMult; spawnNoiseRing(player.x, player.y); }
                         if (combo > 2) suspicion += 5 * resMult;
-                        spawnParticle(p.x, p.y, `+${gained}`, '#ffcf40');
+                        spawnParticle(p.x, p.y, `+${gained}`, particleColor);
                         if (enemy.active && enemy.state === 'chase') unlockConquista('c38');
                     }
                     panties.splice(i, 1);
