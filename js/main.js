@@ -1160,7 +1160,7 @@ function update(dt) {
                 if (!checkMapCollision(enemy.x + extraX, enemy.y, enemy.size)) enemy.x += extraX;
             }
 
-            if (!movedX && !movedY) {
+            if ((!movedX && Math.abs(moveX) > 0.01) || (!movedY && Math.abs(moveY) > 0.01)) {
                 enemy.nextTarget = null;
                 enemy.stuckTimer = 0.5; // Force A* usage for half a second to escape the corner
             }
