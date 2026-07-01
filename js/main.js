@@ -29,7 +29,6 @@ let gameStats = {
     agarradoVezes: 0,
     fugasBemSucedidas: 0,
     distracoesUsadas: 0,
-    tirosDisparados: 0,
     inimigasAbatidas: 0,
     passosDados: 0,
     maiorCombo: 0,
@@ -800,7 +799,6 @@ function update(dt) {
             player.escapeTimer += dt;
             if (player.escapeTimer >= 0.9) {
                 player.grabbedBy = null;
-                gameStats.fugasBemSucedidas++;
                 b.stunTimer = 3.0;
                 b.state = 'stunned';
                 showToast("Escapou!");
@@ -1093,7 +1091,7 @@ function update(dt) {
                 }
             }
             suspicion -= 10 * dt * alertaMult;
-            if (suspicion <= 0) { enemy.state = 'leave'; enemy.speed = 100 * eSpeedMult; showToast("Ela desistiu!"); suspicion = 0; }
+            if (suspicion <= 0) { enemy.state = 'leave'; enemy.speed = 100 * eSpeedMult; showToast("Ela desistiu!"); suspicion = 0; gameStats.fugasBemSucedidas++; }
         } else if (enemy.state === 'patrol') {
             if (Math.random() < 0.02) {
                 let r = Math.floor(Math.random() * ROWS); let c = Math.floor(Math.random() * COLS);
@@ -1175,7 +1173,6 @@ function update(dt) {
         if (window.audioMgr) window.audioMgr.ak47Shoot();
         enemy.dead = true;
         gameStats.inimigasAbatidas++;
-        gameStats.tirosDisparados++;
         spawnParticle(px + Math.cos(player.shootAngle) * 30, py + Math.sin(player.shootAngle) * 30, "💥", "#ffcf40");
         unlockConquista('c28');
         enemy.dead = true;
@@ -1220,6 +1217,7 @@ function update(dt) {
 
             closestBather.dead = true;
             closestBather.state = 'dead';
+            gameStats.inimigasAbatidas++;
             spawnBlood(closestBather.x, closestBather.y);
             showToast("BANG!");
             unlockConquista('c33');
@@ -1923,8 +1921,7 @@ document.getElementById('btn-stats-pause').addEventListener('click', () => {
     ];
 
     if (gameStats.inimigasAbatidas > 0) {
-        items.splice(8, 0, { icon: "🔫", label: "Tiros Disparados", val: gameStats.tirosDisparados, color: "#f5576c" });
-        items.splice(9, 0, { icon: "💀", label: "Banhistas Abatidas", val: gameStats.inimigasAbatidas, color: "#a8a8a8" });
+        items.splice(8, 0, { icon: "💀", label: "Banhistas Abatidas", val: gameStats.inimigasAbatidas, color: "#a8a8a8" });
     }
 
     sc.innerHTML = items.map(i => `
