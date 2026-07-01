@@ -43,10 +43,10 @@ const shopData = {
     ],
     tenis: [
         { level: 1, name: 'Chinelo de Dedo', cost: 100, effect: 'Reduz barulho em 10%', val: 0.9 },
-        { level: 2, name: 'Tênis de Lona', cost: 200, effect: 'Reduz barulho em 20%', val: 0.8 },
-        { level: 3, name: 'Tênis Silencioso', cost: 600, effect: 'Reduz barulho em 35%', val: 0.65 },
+        { level: 2, name: 'Tênis de Lona', cost: 400, effect: 'Reduz barulho em 20%', val: 0.8 },
+        { level: 3, name: 'Tênis Silencioso', cost: 700, effect: 'Reduz barulho em 35%', val: 0.65 },
         { level: 4, name: 'Pantufa Ninja', cost: 900, effect: 'Reduz barulho em 50%', val: 0.5 },
-        { level: 5, name: 'Pés de Algodão', cost: 1800, effect: 'Reduz barulho em 70%', val: 0.3 }
+        { level: 5, name: 'Pés de Algodão', cost: 2000, effect: 'Reduz barulho em 70%', val: 0.3 }
     ],
     luva: [
         { level: 1, name: 'Dedos Grudentos', cost: 125, effect: 'Coleta a 1 bloco de distância', val: 40 },
@@ -57,17 +57,17 @@ const shopData = {
     ],
     distracao: [
         { level: 1, name: 'Moeda no Chão', cost: 60, effect: '+1 distração por fase', val: 1 },
-        { level: 2, name: 'Gato Falso', cost: 250, effect: '+2 distrações por fase', val: 2 },
+        { level: 2, name: 'Gato Falso', cost: 350, effect: '+2 distrações por fase', val: 2 },
         { level: 3, name: 'Bombinha Fedorenta', cost: 440, effect: '+3 distrações por fase', val: 3 },
         { level: 4, name: 'Rádio com Pagode', cost: 1280, effect: '+4 distrações por fase', val: 4 },
-        { level: 5, name: 'Clone de Fumaça', cost: 1960, effect: '+5 distrações por fase', val: 5 }
+        { level: 5, name: 'Clone de Fumaça', cost: 3960, effect: '+6 distrações por fase', val: 6 }
     ],
     velocidade: [
         { level: 1, name: 'Sandália Velha', cost: 70, effect: '+5% velocidade', val: 1.05 },
         { level: 2, name: 'Crocs Esportivo', cost: 240, effect: '+10% velocidade', val: 1.10 },
         { level: 3, name: 'Tênis de Corrida', cost: 380, effect: '+18% velocidade', val: 1.18 },
         { level: 4, name: 'Pés de Beija-Flor', cost: 660, effect: '+25% velocidade', val: 1.25 },
-        { level: 5, name: 'Teletransporte Curto', cost: 1520, effect: '+35% velocidade', val: 1.35 }
+        { level: 5, name: 'Teletransporte Curto', cost: 2520, effect: '+40% velocidade', val: 1.40 }
     ],
     resistencia: [
         { level: 1, name: 'Cara de Pau', cost: 90, effect: 'Suspeita enche 10% mais devagar', val: 0.9 },
@@ -81,21 +81,21 @@ const shopData = {
         { level: 2, name: 'Cheiro Suave', cost: 400, effect: 'Calcinhas spawnam 20% mais rápido', val: 0.8 },
         { level: 3, name: 'Ímã Natural', cost: 600, effect: 'Calcinhas spawnam 35% mais rápido', val: 0.65 },
         { level: 4, name: 'Chuva de Renda', cost: 1200, effect: 'Calcinhas spawnam 50% mais rápido', val: 0.5 },
-        { level: 5, name: 'Tempestade Íntima', cost: 2222, effect: 'Calcinhas spawnam 70% mais rápido', val: 0.3 }
+        { level: 5, name: 'Tempestade Íntima', cost: 3222, effect: 'Calcinhas spawnam 80% mais rápido', val: 0.2 }
     ],
     visao: [
         { level: 1, name: 'Miopia Leve', cost: 150, effect: 'Banhistas enxergam 10% menos longe', val: 0.9 },
         { level: 2, name: 'Astigmatismo', cost: 300, effect: 'Banhistas enxergam 15% menos longe', val: 0.85 },
         { level: 3, name: 'Vista Cansada', cost: 600, effect: 'Banhistas enxergam 20% menos longe', val: 0.8 },
         { level: 4, name: 'Catarata Precoce', cost: 1100, effect: 'Banhistas enxergam 40% menos longe', val: 0.6 },
-        { level: 5, name: 'Quase Cegas', cost: 2000, effect: 'Banhistas enxergam 50% menos longe', val: 0.5 }
+        { level: 5, name: 'Quase Cegas', cost: 2500, effect: 'Banhistas enxergam 55% menos longe', val: 0.45 }
     ],
     alerta: [
         { level: 1, name: 'Esquecimento', cost: 120, effect: 'Alerta desce 10% mais rápido', val: 1.1 },
         { level: 2, name: 'Mente Ocupada', cost: 200, effect: 'Alerta desce 25% mais rápido', val: 1.25 },
-        { level: 3, name: 'Desatenção', cost: 600, effect: 'Alerta desce 40% mais rápido', val: 1.4 },
-        { level: 4, name: 'Amnésia', cost: 1900, effect: 'Alerta desce 60% mais rápido', val: 1.6 },
-        { level: 5, name: 'Paz Interna', cost: 2500, effect: 'Alerta desce 100% mais rápido', val: 2.0 }
+        { level: 3, name: 'Desatenção', cost: 600, effect: 'Alerta desce 30% mais rápido', val: 1.3 },
+        { level: 4, name: 'Amnésia', cost: 1900, effect: 'Alerta desce 40% mais rápido', val: 1.4 },
+        { level: 5, name: 'Paz Interna', cost: 2100, effect: 'Alerta desce 100% mais rápido', val: 2.0 }
     ]
 };
 
