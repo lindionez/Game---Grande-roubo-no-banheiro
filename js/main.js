@@ -1369,7 +1369,7 @@ function draw() {
         }
         let cx = b.x + b.size / 2; let cy = b.y + b.size / 2;
         ctx.fillStyle = '#f1c27d'; ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = b.type === 'fofoqueira' ? 'purple' : (b.type === 'atleta' ? 'blue' : (b.type === 'agarradeira' ? '#9932CC' : 'green'));
+        ctx.fillStyle = b.type === 'fofoqueira' ? 'purple' : (b.type === 'atleta' ? 'blue' : (b.type === 'agarradeira' ? 'black' : 'green'));
         ctx.beginPath(); ctx.arc(cx, cy, 12, b.angle - Math.PI / 4, b.angle + Math.PI / 4); ctx.fill();
 
         if (b.type === 'agarradeira') {

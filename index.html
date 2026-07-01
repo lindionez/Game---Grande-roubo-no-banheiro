@@ -193,17 +193,35 @@
             <button id="btn-ak47-continue" class="btn-large" style="margin-top: 30px; background: red; border-color: darkred;">VINGANÇA!</button>
         </div>
 
-        <!-- Agarradeira Tutorial Screen -->
-        <div id="agarradeira-tutorial-screen" class="screen hidden" style="background: rgba(0,0,0,0.95); z-index: 200;">
-            <h1 style="color: #ba55d3; text-shadow: 0 0 15px purple; font-size: 3.5rem; text-align: center;">💜 NOVA AMEAÇA: AGARRADEIRA! 💜</h1>
-            <div class="tutorial-content">
-                <div class="tut-slide active">
-                    <div class="tut-icon" style="font-size: 5rem;">🫂</div>
-                    <p style="font-size: 1.5rem; line-height: 1.5; margin-top: 20px;">As banhistas com o <strong>olhar roxo</strong> (cone de visão roxo) são as agarradeiras!<br>Se elas chegarem muito perto, não vão apenas gritar, elas vão pular e te <strong>prender</strong>!</p>
-                    <p style="font-size: 1.5rem; line-height: 1.5; color: #ffcf40; margin-top: 20px;">Se for pego, a barra de Alerta sobe bem rápido! <br><strong>SEGURE O BOTÃO DE CORRER <span class="pc-only">(SHIFT)</span></strong> por 1 segundo para se soltar!</p>
+        <!-- Agarradeira Tutorial Screen (Now All Enemies) -->
+        <div id="agarradeira-tutorial-screen" class="screen hidden" style="background: rgba(0,0,0,0.95); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; width: 100%; height: 100%;">
+            <h1 style="color: #ffcf40; text-shadow: 0 0 15px rgba(255,207,64,0.6); font-size: clamp(1.8rem, 5vw, 2.5rem); text-align: center; margin: 0 0 25px 0; text-transform: uppercase; letter-spacing: 1px;">Banhistas Andarinas</h1>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 12px; width: 100%; max-width: 600px;">
+                
+                <div style="background: linear-gradient(145deg, rgba(0,255,0,0.1), rgba(0,255,0,0.02)); border: 2px solid rgba(85,255,85,0.6); border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(0,255,0,0.05);">
+                    <h2 style="color: #55ff55; font-size: clamp(1rem, 4vw, 1.2rem); margin: 0 0 8px 0; text-shadow: 0 0 5px #55ff55;">Verde (Comum)</h2>
+                    <p style="font-size: clamp(0.85rem, 3.5vw, 1rem); line-height: 1.3; margin: 0; color: #eaeaea;">Banhista padrão. Velocidade normal e enxerga apenas para frente.</p>
                 </div>
+
+                <div style="background: linear-gradient(145deg, rgba(0,0,255,0.1), rgba(0,0,255,0.02)); border: 2px solid rgba(79,172,254,0.6); border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,255,0.05);">
+                    <h2 style="color: #4facfe; font-size: clamp(1rem, 4vw, 1.2rem); margin: 0 0 8px 0; text-shadow: 0 0 5px #4facfe;">Azul (Atleta)</h2>
+                    <p style="font-size: clamp(0.85rem, 3.5vw, 1rem); line-height: 1.3; margin: 0; color: #eaeaea;">A mais veloz! Anda <strong>50% mais rápido</strong>. Fique bem longe!</p>
+                </div>
+
+                <div style="background: linear-gradient(145deg, rgba(128,0,128,0.15), rgba(128,0,128,0.02)); border: 2px solid rgba(209,85,211,0.6); border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(128,0,128,0.1);">
+                    <h2 style="color: #d155d3; font-size: clamp(1rem, 4vw, 1.2rem); margin: 0 0 8px 0; text-shadow: 0 0 5px #d155d3;">Roxa (Fofoqueira)</h2>
+                    <p style="font-size: clamp(0.85rem, 3.5vw, 1rem); line-height: 1.3; margin: 0; color: #eaeaea;">Caminha devagar, mas tem <strong>visão 360 graus</strong> ao redor!</p>
+                </div>
+
+                <div style="background: linear-gradient(145deg, rgba(50,50,50,0.5), rgba(10,10,10,0.2)); border: 2px solid rgba(120,120,120,0.8); border-radius: 12px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.6);">
+                    <h2 style="color: #ffffff; font-size: clamp(1rem, 4vw, 1.2rem); margin: 0 0 8px 0; text-shadow: 0 0 5px #aaaaaa;">Preta (Agarradeira)</h2>
+                    <p style="font-size: clamp(0.85rem, 3.5vw, 1rem); line-height: 1.3; margin: 0; color: #eaeaea;">Pula e te prende! <span style="color: #ffcf40; font-weight: bold; display: block; margin-top: 4px;">Pego? SEGURE CORRER!</span></p>
+                </div>
+
             </div>
-            <button id="btn-agarradeira-continue" class="btn-large" style="margin-top: 30px; background: #8a2be2; border-color: #4b0082;">ENTENDI!</button>
+            
+            <button id="btn-agarradeira-continue" class="btn-large" style="margin-top: 30px; background: linear-gradient(90deg, #ffcf40, #f6d365); color: #000; border: none; font-weight: bold; padding: 15px 50px; border-radius: 30px; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 15px rgba(255,207,64,0.4); font-size: 1.2rem;">ENTENDI!</button>
         </div>
 
         <!-- Game Over Screen -->
