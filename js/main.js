@@ -828,7 +828,7 @@ function update(dt) {
     player.isMoving = isMoving;
 
     let currentTile = getTileAt(player.x, player.y, player.size);
-    let wantsToHide = (currentTile === 'P' || currentTile === 'R') && !isMoving;
+    let wantsToHide = (currentTile === 'P' || currentTile === 'R') && !isRunning;
 
     if (wantsToHide) {
         if (!player.isHiding) {
@@ -1088,20 +1088,34 @@ function update(dt) {
             enemy.state = 'chase'; enemy.targetX = player.x; enemy.targetY = player.y;
             enemy.speed = 145 * eSpeedMult; suspicion = 100;
         } else if (enemy.state === 'chase' || enemy.state === 'search' || enemy.state === 'distracted') {
+            if (enemy.state === 'chase') {
+                enemy.targetX = enemy.x;
+                enemy.targetY = enemy.y;
+            }
             enemy.state = 'search'; enemy.speed = 110 * eSpeedMult;
-            if (Math.hypot(enemy.targetX - enemy.x, enemy.targetY - enemy.y) < 20 || Math.random() < 0.02) {
-                let r = Math.floor(enemy.y / TILE_SIZE) + Math.floor((Math.random() - 0.5) * 12);
-                let c = Math.floor(enemy.x / TILE_SIZE) + Math.floor((Math.random() - 0.5) * 12);
-                if (r >= 0 && r < ROWS && c >= 0 && c < COLS && !['W', 'B', 'L'].includes(mapLayout[r][c])) {
-                    enemy.targetX = c * TILE_SIZE; enemy.targetY = r * TILE_SIZE;
+            if (Math.hypot(enemy.targetX - enemy.x, enemy.targetY - enemy.y) < 20) {
+                let found = false;
+                for (let i = 0; i < 50; i++) {
+                    let r = Math.floor(Math.random() * ROWS);
+                    let c = Math.floor(Math.random() * COLS);
+                    if (!['W', 'B', 'L', 'E'].includes(mapLayout[r][c])) {
+                        enemy.targetX = c * TILE_SIZE; enemy.targetY = r * TILE_SIZE;
+                        found = true;
+                        break;
+                    }
                 }
             }
             suspicion -= 10 * dt * alertaMult;
             if (suspicion <= 0) { enemy.state = 'leave'; enemy.speed = 100 * eSpeedMult; showToast("Ela desistiu!"); suspicion = 0; gameStats.fugasBemSucedidas++; }
         } else if (enemy.state === 'patrol') {
-            if (Math.random() < 0.02) {
-                let r = Math.floor(Math.random() * ROWS); let c = Math.floor(Math.random() * COLS);
-                if (!['W', 'B', 'L'].includes(mapLayout[r][c])) { enemy.targetX = c * TILE_SIZE; enemy.targetY = r * TILE_SIZE; }
+            if (Math.hypot(enemy.targetX - enemy.x, enemy.targetY - enemy.y) < 20) {
+                for (let i = 0; i < 50; i++) {
+                    let r = Math.floor(Math.random() * ROWS); let c = Math.floor(Math.random() * COLS);
+                    if (!['W', 'B', 'L', 'E'].includes(mapLayout[r][c])) { 
+                        enemy.targetX = c * TILE_SIZE; enemy.targetY = r * TILE_SIZE; 
+                        break; 
+                    }
+                }
             }
         } else if (enemy.state === 'leave') {
             for (let r = 0; r < ROWS; r++) {
