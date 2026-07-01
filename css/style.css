@@ -470,10 +470,10 @@ canvas {
 /* Mobile Controls */
 #mobile-controls {
     position: absolute;
-    bottom: 20px;
+    bottom: 50px;
     left: 0;
     width: 100%;
-    padding: 0 20px;
+    padding: 0 10px;
     display: flex;
     justify-content: space-between;
     z-index: 60;
@@ -521,9 +521,27 @@ canvas {
 }
 
 .action-buttons {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
+    position: relative;
+    width: 180px;
+    height: 180px;
+}
+
+#btn-space {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+#btn-shoot {
+    position: absolute;
+    bottom: 80px;
+    right: 90px;
+}
+
+#btn-shift {
+    position: absolute;
+    top: 0px;
+    right: 20px;
 }
 
 .action-btn { width: 60px; height: 60px; }
@@ -618,10 +636,27 @@ canvas {
     .tab-btn { font-size: 1.2rem; padding: 5px 10px; }
     
     /* Mobile Controls Scaling */
-    .d-pad { width: 120px; height: 120px; }
-    .d-btn, .action-btn { font-size: 1.2rem; }
-    .action-btn { width: 50px; height: 50px; }
-    .action-btn.primary { width: 65px; height: 65px; }
+    .d-pad { width: 180px; height: 180px; }
+    .d-btn, .action-btn { font-size: 2rem; }
+    .action-btn { width: 75px; height: 75px; }
+    .action-btn.primary { width: 95px; height: 95px; }
+
+    .action-buttons {
+        width: 200px;
+        height: 200px;
+    }
+    #btn-space {
+        bottom: 10px;
+        right: 10px;
+    }
+    #btn-shoot {
+        bottom: 100px;
+        right: 110px;
+    }
+    #btn-shift {
+        top: -10px;
+        right: 10px;
+    }
 }
 
 /* Conquistas Pop-up */

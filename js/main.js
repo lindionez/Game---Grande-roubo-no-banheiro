@@ -178,10 +178,60 @@ function bindMobileButton(id, key) {
     btn.addEventListener('mousedown', start);
     btn.addEventListener('mouseup', end);
 }
-bindMobileButton('btn-up', 'w');
-bindMobileButton('btn-down', 's');
-bindMobileButton('btn-left', 'a');
-bindMobileButton('btn-right', 'd');
+// Joystick Logic
+let joystickActive = false;
+let joystickCenter = { x: 0, y: 0 };
+const joyZone = document.getElementById('joystick-zone');
+const joyKnob = document.getElementById('joystick-knob');
+
+joyZone.addEventListener('touchstart', (e) => {
+    joystickActive = true;
+    let rect = joyZone.getBoundingClientRect();
+    joystickCenter.x = rect.left + rect.width / 2;
+    joystickCenter.y = rect.top + rect.height / 2;
+    handleJoystick(e.touches[0]);
+}, { passive: false });
+
+joyZone.addEventListener('touchmove', (e) => {
+    if (joystickActive) {
+        e.preventDefault();
+        handleJoystick(e.touches[0]);
+    }
+}, { passive: false });
+
+joyZone.addEventListener('touchend', (e) => {
+    joystickActive = false;
+    joyKnob.style.transform = `translate(0px, 0px)`;
+    keys['w'] = false;
+    keys['s'] = false;
+    keys['a'] = false;
+    keys['d'] = false;
+});
+
+function handleJoystick(touch) {
+    let dx = touch.clientX - joystickCenter.x;
+    let dy = touch.clientY - joystickCenter.y;
+    let dist = Math.sqrt(dx*dx + dy*dy);
+    let maxDist = 45;
+    
+    if (dist > maxDist) {
+        dx = (dx / dist) * maxDist;
+        dy = (dy / dist) * maxDist;
+    }
+    
+    joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+    
+    let prevW = keys['w'];
+    let threshold = 15;
+    keys['d'] = dx > threshold;
+    keys['a'] = dx < -threshold;
+    keys['s'] = dy > threshold;
+    keys['w'] = dy < -threshold;
+    
+    if (keys['w'] && !prevW) {
+        handleUpPress();
+    }
+}
 bindMobileButton('btn-shift', 'Shift');
 bindMobileButton('btn-space', ' ');
 bindMobileButton('btn-distraction', 'e');
@@ -1731,8 +1781,19 @@ function loop(timestamp) {
 
 // UI Buttons
 document.getElementById('btn-play').addEventListener('click', () => {
+    let isMobile = window.innerWidth <= 1250 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Tenta entrar em tela cheia se for mobile
+    if (isMobile) {
+        let elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(err => console.log(err));
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen().catch(err => console.log(err));
+        }
+    }
+
     document.getElementById('start-screen').classList.add('hidden');
-    let isMobile = window.innerWidth <= 1250;
 
     document.getElementById('tut-text-move').innerHTML = isMobile ?
         `Use os <strong>botões de SETAS</strong> na tela para andar.<br>Pressione o botão <strong>AÇÃO</strong> para pegar as calcinhas!` :
@@ -1841,6 +1902,7 @@ let cheatLastGameState = 'START';
 document.getElementById('btn-cheat-ak47').addEventListener('click', () => {
     Object.keys(upgrades).forEach(k => upgrades[k] = 5); // Max out all stats
     hasAK47 = true;
+    document.getElementById('btn-shoot').classList.remove('hidden');
     ak47SecretUnlocked = true;
     showCheatToast("✔️ Cheat Aplicado! (Max Stats + AK-47)");
     
@@ -2327,6 +2389,39 @@ window.buyUpgrade = function (cat, cost) {
         renderShop();
     }
 };
+
+function drawAK47ButtonCanvas() {
+    const sc = document.getElementById('ak47-btn-icon-canvas');
+    if (!sc) return;
+    const sx = sc.getContext('2d');
+    sx.clearRect(0, 0, sc.width, sc.height);
+
+    sx.save();
+    sx.translate(15, 30);
+
+    const s = 1.2;
+
+    sx.fillStyle = '#8b4513';
+    sx.fillRect(-10 * s, -3 * s, 10 * s, 6 * s);
+
+    sx.fillStyle = '#8b4513';
+    sx.fillRect(6 * s, -3 * s, 10 * s, 6 * s);
+
+    sx.fillStyle = '#444';
+    sx.fillRect(0, -2 * s, 28 * s, 4 * s);
+
+    sx.fillStyle = '#333';
+    sx.fillRect(26 * s, -5 * s, 2 * s, 4 * s);
+
+    sx.fillStyle = '#222';
+    sx.fillRect(10 * s, 2 * s, 4 * s, 8 * s);
+
+    sx.fillStyle = '#222';
+    sx.fillRect(0, 2 * s, 3 * s, 6 * s);
+
+    sx.restore();
+}
+drawAK47ButtonCanvas();
 
 requestAnimationFrame(loop);
 

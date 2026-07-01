@@ -112,18 +112,17 @@
 
         <!-- Mobile Controls -->
         <div id="mobile-controls" class="hidden">
-            <div class="d-pad">
-                <button class="d-btn up" id="btn-up">▲</button>
-                <button class="d-btn left" id="btn-left">◀</button>
-                <button class="d-btn right" id="btn-right">▶</button>
-                <button class="d-btn down" id="btn-down">▼</button>
+            <div id="joystick-zone" style="width: 150px; height: 150px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; position: relative; touch-action: none; pointer-events: auto; transform: translateY(20px);">
+                <div id="joystick-knob" style="width: 60px; height: 60px; background: rgba(255,255,255,0.5); border-radius: 50%; position: absolute; top: 45px; left: 45px; pointer-events: none; backdrop-filter: blur(4px);"></div>
             </div>
             <div class="action-buttons-container">
                 <button class="action-btn top-btn hidden" id="btn-distraction" style="background: rgba(100,100,255,0.6);">💨</button>
                 <div class="action-buttons">
                     <button class="action-btn" id="btn-shift">🏃</button>
                     <button class="action-btn primary" id="btn-space">🖐️</button>
-                    <button class="action-btn ak47-btn hidden" id="btn-shoot">🔫</button>
+                    <button class="action-btn ak47-btn hidden" id="btn-shoot" style="padding: 0; display: flex; justify-content: center; align-items: center;">
+                        <canvas id="ak47-btn-icon-canvas" width="60" height="60" style="image-rendering: pixelated; display: block;"></canvas>
+                    </button>
                 </div>
             </div>
         </div>
