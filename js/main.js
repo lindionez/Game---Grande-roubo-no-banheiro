@@ -24,6 +24,20 @@ let backpackCollected = 0;
 let requiredPanties = 5;
 let distractionsLeft = 0;
 
+let gameStats = {
+    fasesConcluidas: 0,
+    agarradoVezes: 0,
+    fugasBemSucedidas: 0,
+    distracoesUsadas: 0,
+    tirosDisparados: 0,
+    inimigasAbatidas: 0,
+    passosDados: 0,
+    maiorCombo: 0,
+    dinheiroGasto: 0,
+    tempoTotalJogo: 0,
+    mortesDonaBanheiro: 0
+};
+
 // Cheat System Variables
 let cheatWCount = 0;
 let cheatLastW = 0;
@@ -268,11 +282,15 @@ window.addEventListener('keydown', e => {
     if (e.key === 'Escape' || e.key === 'Esc') {
         let cheatScreen = document.getElementById('cheat-screen');
         let conquistasScreen = document.getElementById('conquistas-screen');
+        let statsScreen = document.getElementById('stats-screen');
         
         let handled = false;
 
         if (cheatScreen && !cheatScreen.classList.contains('hidden')) {
             document.getElementById('btn-cheat-close').click();
+            handled = true;
+        } else if (statsScreen && !statsScreen.classList.contains('hidden')) {
+            document.getElementById('btn-stats-close').click();
             handled = true;
         } else if (conquistasScreen && !conquistasScreen.classList.contains('hidden')) {
             document.getElementById('btn-conquistas-close').click();
@@ -747,6 +765,7 @@ function update(dt) {
     ultimaSuspeita = suspicion;
 
     timeSpent += dt;
+    gameStats.tempoTotalJogo += dt;
 
     if (comboTimer > 0) { comboTimer -= dt; if (comboTimer <= 0) combo = 0; }
 
@@ -781,6 +800,7 @@ function update(dt) {
             player.escapeTimer += dt;
             if (player.escapeTimer >= 0.9) {
                 player.grabbedBy = null;
+                gameStats.fugasBemSucedidas++;
                 b.stunTimer = 3.0;
                 b.state = 'stunned';
                 showToast("Escapou!");
@@ -793,8 +813,14 @@ function update(dt) {
         if (Math.random() < 0.1) spawnParticle(player.x, player.y, "💢", "#fff");
     } else {
         document.getElementById('grab-warning').classList.add('hidden');
-        if (!checkMapCollision(player.x + dx * dt, player.y, player.size) && !checkBatherCollision(player.x + dx * dt, player.y, player.size, player.x, player.y)) player.x += dx * dt;
-        if (!checkMapCollision(player.x, player.y + dy * dt, player.size) && !checkBatherCollision(player.x, player.y + dy * dt, player.size, player.x, player.y)) player.y += dy * dt;
+        if (!checkMapCollision(player.x + dx * dt, player.y, player.size) && !checkBatherCollision(player.x + dx * dt, player.y, player.size, player.x, player.y)) {
+            player.x += dx * dt;
+            gameStats.passosDados += Math.abs(dx * dt) / TILE_SIZE;
+        }
+        if (!checkMapCollision(player.x, player.y + dy * dt, player.size) && !checkBatherCollision(player.x, player.y + dy * dt, player.size, player.x, player.y)) {
+            player.y += dy * dt;
+            gameStats.passosDados += Math.abs(dy * dt) / TILE_SIZE;
+        }
     }
     player.isMoving = isMoving;
 
@@ -828,6 +854,7 @@ function update(dt) {
 
     if (ePressed && distractionsLeft > 0) {
         ePressed = false; distractionsLeft--;
+        gameStats.distracoesUsadas++;
         addProgressoConquista('c27', 1);
         distractions.push({ x: player.x, y: player.y, life: 5 });
         spawnParticle(player.x, player.y, "🎶", "#fff");
@@ -879,6 +906,7 @@ function update(dt) {
 
         if (b.type === 'agarradeira' && !player.grabbedBy && !player.isHiding && !cheatInvis && distToPlayer <= 32) {
             player.grabbedBy = b;
+            gameStats.agarradoVezes++;
             player.escapeTimer = 0;
             showToast("AGARRADO! Segure CORRER!");
             unlockConquista('c35');
@@ -987,6 +1015,7 @@ function update(dt) {
                         spawnNoiseRing(player.x, player.y);
                     } else {
                         combo++; comboTimer = 2.5;
+                        if (combo > gameStats.maiorCombo) gameStats.maiorCombo = combo;
                         if (combo === 2) unlockConquista('c16');
                         if (combo === 5) unlockConquista('c17');
                         if (window.audioMgr) window.audioMgr.collectPanty(p.type.pts > 0);
@@ -1124,6 +1153,7 @@ function update(dt) {
 
         if (!cheatInvis && !cheatImmortal && checkCollision(player, enemy)) {
             if (player.isHiding) { showToast("Te achei!"); }
+            gameStats.mortesDonaBanheiro++;
             gameOver();
         }
 
@@ -1143,6 +1173,9 @@ function update(dt) {
         player.shootAngle = Math.atan2(ey - py, ex - px);
 
         if (window.audioMgr) window.audioMgr.ak47Shoot();
+        enemy.dead = true;
+        gameStats.inimigasAbatidas++;
+        gameStats.tirosDisparados++;
         spawnParticle(px + Math.cos(player.shootAngle) * 30, py + Math.sin(player.shootAngle) * 30, "💥", "#ffcf40");
         unlockConquista('c28');
         enemy.dead = true;
@@ -1872,6 +1905,44 @@ document.getElementById('btn-fullscreen-pause').addEventListener('click', (e) =>
     }
 });
 
+
+
+document.getElementById('btn-stats-pause').addEventListener('click', () => {
+    const sc = document.getElementById('stats-content');
+    const items = [
+        { icon: "👙", label: "Calcinhas Roubadas", val: totalCollected, color: "#ff9a9e" },
+        { icon: "🚪", label: "Fases Concluídas", val: gameStats.fasesConcluidas, color: "#fecfef" },
+        { icon: "⏱️", label: "Tempo de Jogo", val: `${Math.floor(gameStats.tempoTotalJogo / 60)}m ${Math.floor(gameStats.tempoTotalJogo % 60)}s`, color: "#a1c4fd" },
+        { icon: "🔥", label: "Maior Combo", val: `${gameStats.maiorCombo}x`, color: "#ffecd2" },
+        { icon: "👣", label: "Passos Dados", val: Math.floor(gameStats.passosDados), color: "#cfd9df" },
+        { icon: "😱", label: "Vezes Agarrado", val: gameStats.agarradoVezes, color: "#ff758c" },
+        { icon: "🏃", label: "Fugas Bem Sucedidas", val: gameStats.fugasBemSucedidas, color: "#d4fc79" },
+        { icon: "💨", label: "Distrações Usadas", val: gameStats.distracoesUsadas, color: "#e0c3fc" },
+        { icon: "💰", label: "Dinheiro Gasto", val: `$${gameStats.dinheiroGasto}`, color: "#f6d365" },
+        { icon: "👿", label: "Mortes para a Dona", val: gameStats.mortesDonaBanheiro, color: "#e74c3c" }
+    ];
+
+    if (gameStats.inimigasAbatidas > 0) {
+        items.splice(8, 0, { icon: "🔫", label: "Tiros Disparados", val: gameStats.tirosDisparados, color: "#f5576c" });
+        items.splice(9, 0, { icon: "💀", label: "Banhistas Abatidas", val: gameStats.inimigasAbatidas, color: "#a8a8a8" });
+    }
+
+    sc.innerHTML = items.map(i => `
+        <div style="background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 10px; border-left: 5px solid ${i.color}; display: flex; align-items: center; justify-content: space-between; font-family: 'Nunito', sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.5rem; text-shadow: 0 0 5px rgba(255,255,255,0.2);">${i.icon}</span>
+                <span style="color: #ccc; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px;">${i.label}</span>
+            </div>
+            <strong style="color: ${i.color}; font-size: 1.4rem; text-shadow: 0 0 10px ${i.color}40;">${i.val}</strong>
+        </div>
+    `).join('');
+    document.getElementById('stats-screen').classList.remove('hidden');
+});
+
+document.getElementById('btn-stats-close').addEventListener('click', () => {
+    document.getElementById('stats-screen').classList.add('hidden');
+});
+
 document.getElementById('btn-cheat-menu-open').addEventListener('click', () => {
     document.getElementById('game-complete-screen').classList.add('hidden');
     stage = 1;
@@ -2045,7 +2116,7 @@ document.getElementById('btn-next-stage').addEventListener('click', () => {
         document.getElementById('game-complete-screen').classList.remove('hidden');
         return;
     }
-    if (stage < 35) { stage++; timeSpent = 0; }
+    if (stage < 35) { stage++; timeSpent = 0; gameStats.fasesConcluidas++; }
 
     if (hasAK47 && !ak47TutorialShown) {
         ak47TutorialShown = true;
@@ -2400,6 +2471,7 @@ window.buyUpgrade = function (cat, cost) {
     if (shopPoints >= cost && upgrades[cat] < 5) {
         if (window.audioMgr) window.audioMgr.buyUpgrade();
         shopPoints -= cost; upgrades[cat]++;
+        gameStats.dinheiroGasto += cost;
         addProgressoConquista('c21', 1);
         addProgressoConquista('c22', 1);
         addProgressoConquista('c23', 1);

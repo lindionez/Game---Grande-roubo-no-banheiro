@@ -48,8 +48,20 @@
             <p id="pause-desc" style="color: #ffcf40; font-size: 1.5rem; margin-bottom: 40px;">Pressione ESC ou clique no botão para voltar</p>
             <button id="btn-resume" class="btn-large">RETOMAR O ROUBO</button>
             <button id="btn-fullscreen-pause" class="btn-large" style="margin-top: 15px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🔲 TELA CHEIA</button>
+            <button id="btn-stats-pause" class="btn-large" style="margin-top: 15px; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);">📊 ESTATÍSTICAS</button>
             <button id="btn-conquistas-pause" class="btn-large" style="margin-top: 15px; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">🏆 CONQUISTAS</button>
             <button id="btn-mute" class="btn-large" style="margin-top: 15px; background: #555;">🔊 SOM: LIGADO</button>
+        </div>
+
+        <!-- Stats Screen -->
+        <div id="stats-screen" class="screen hidden" style="background: rgba(0,0,0,0.9); z-index: 200; display: flex; align-items: center; justify-content: center;">
+            <div class="stats-modal" style="background: #222; border: 3px solid #fbc2eb; border-radius: 15px; padding: 20px; width: 90%; max-width: 600px; text-align: center; color: white;">
+                <h1 style="color: #fbc2eb; font-size: 2.5rem; margin-bottom: 20px; font-family: 'Fredoka One', cursive;">📊 ESTATÍSTICAS DO ROUBO</h1>
+                <div id="stats-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; font-size: 1.1rem;">
+                    <!-- Preenchido via JS -->
+                </div>
+                <button id="btn-stats-close" class="btn-large" style="margin-top: 30px; background: #555;">FECHAR</button>
+            </div>
         </div>
 
         <!-- HUD / UI during gameplay -->
