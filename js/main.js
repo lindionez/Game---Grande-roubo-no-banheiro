@@ -161,6 +161,7 @@ let cheatInvis = false;
 let cheatImmortal = false;
 let cheatSpeed = false;
 let cheatRange = false;
+let cheatFastSpawn = false;
 
 function openCheatMenu() {
     cheatUnlocked = true;
@@ -1063,7 +1064,7 @@ function update(dt) {
     lastPantySpawn += dt;
     let maxOnScreen = 7;
     if (panties.length >= maxOnScreen) lastPantySpawn = 0;
-    if (lastPantySpawn > spawnRate && panties.length < maxOnScreen) {
+    if ((lastPantySpawn > spawnRate || cheatFastSpawn) && panties.length < maxOnScreen) {
         spawnPanty(); lastPantySpawn = 0;
     }
 
@@ -2118,6 +2119,22 @@ document.getElementById('btn-cheat-range').addEventListener('click', () => {
         btn.style.borderColor = '#fff';
     } else {
         btn.innerHTML = '🖐️ ALCANCE INFINITO: OFF';
+        btn.style.background = 'linear-gradient(135deg, #555 0%, #333 100%)';
+        btn.style.color = '#ccc';
+        btn.style.borderColor = '#777';
+    }
+});
+
+document.getElementById('btn-cheat-fastspawn').addEventListener('click', () => {
+    cheatFastSpawn = !cheatFastSpawn;
+    let btn = document.getElementById('btn-cheat-fastspawn');
+    if (cheatFastSpawn) {
+        btn.innerHTML = '👙 SPAWN INSTANTÂNEO: ON';
+        btn.style.background = 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)';
+        btn.style.color = 'black';
+        btn.style.borderColor = '#fff';
+    } else {
+        btn.innerHTML = '👙 SPAWN INSTANTÂNEO: OFF';
         btn.style.background = 'linear-gradient(135deg, #555 0%, #333 100%)';
         btn.style.color = '#ccc';
         btn.style.borderColor = '#777';
