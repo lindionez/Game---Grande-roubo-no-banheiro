@@ -787,7 +787,7 @@ function update(dt) {
                     showToast("😱 AHHH! UM INVASOR!");
                     lastInvasionToast = Date.now();
                 }
-                suspicion += 50 * resMult; spawnParticle(w.x + w.size / 2, w.y, "😱", "#fff");
+                suspicion += 100 * resMult; spawnParticle(w.x + w.size / 2, w.y, "😱", "#fff");
                 spawnNoiseRing(w.x, w.y); spawnNoiseRing(w.x, w.y);
             }
         }
