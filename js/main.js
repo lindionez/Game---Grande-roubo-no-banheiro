@@ -142,6 +142,8 @@ function handleSpaceRelease() {
 }
 
 let cheatUnlocked = false;
+let cheatInvis = false;
+let cheatImmortal = false;
 
 function openCheatMenu() {
     cheatUnlocked = true;
@@ -793,7 +795,7 @@ function update(dt) {
         let pcdy = (player.y + player.size / 2) - (w.y + w.size / 2);
         let dist = Math.hypot(pcdx, pcdy);
 
-        if (dist < 350 && !player.isHiding && pcdx > -20 && Math.abs(pcdy) < 120) {
+        if (!cheatInvis && dist < 350 && !player.isHiding && pcdx > -20 && Math.abs(pcdy) < 120) {
             let hasLoS = checkLoS(w.x + w.size / 2, w.y + w.size / 2, player.x + player.size / 2, player.y + player.size / 2);
             if (hasLoS) {
                 w.alerted = true; fasePerfeitaSemVisto = false;
@@ -825,7 +827,7 @@ function update(dt) {
         let angleDiff = Math.abs(angleToPlayer - b.angle);
         if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
 
-        if (b.type === 'agarradeira' && !player.grabbedBy && distToPlayer <= 32) {
+        if (b.type === 'agarradeira' && !player.grabbedBy && !player.isHiding && !cheatInvis && distToPlayer <= 32) {
             player.grabbedBy = b;
             player.escapeTimer = 0;
             showToast("AGARRADO! Segure CORRER!");
@@ -833,7 +835,7 @@ function update(dt) {
         }
 
         let isSeeingPlayer = false;
-        if (!player.isHiding && distToPlayer < (350 * getUpgradeVal('visao', 1.0))) {
+        if (!cheatInvis && !player.isHiding && distToPlayer < (350 * getUpgradeVal('visao', 1.0))) {
             if (b.cone === 360 || angleDiff < (b.cone / 2 * Math.PI / 180)) {
                 if (checkLoS(b.x + b.size / 2, b.y + b.size / 2, player.x + player.size / 2, player.y + player.size / 2)) {
                     isSeeingPlayer = true;
@@ -996,7 +998,7 @@ function update(dt) {
         if (distTarget) {
             enemy.state = 'distracted'; enemy.targetX = distTarget.x; enemy.targetY = distTarget.y; enemy.speed = enemy.baseSpeed * eSpeedMult;
             suspicion = Math.max(0, suspicion - 25 * dt * alertaMult);
-        } else if ((suspicion >= 100 && !player.isHiding) || (hasLoS && distToPlayer < 400 && !player.isHiding)) {
+        } else if (!cheatInvis && ((suspicion >= 100 && !player.isHiding) || (hasLoS && distToPlayer < 400 && !player.isHiding))) {
             fasePerfeitaSemVisto = false;
             if (enemy.state !== 'chase' && window.audioMgr) window.audioMgr.donaMad();
             enemy.state = 'chase'; enemy.targetX = player.x; enemy.targetY = player.y;
@@ -1069,7 +1071,7 @@ function update(dt) {
             enemy.nextTarget = null;
         }
 
-        if (checkCollision(player, enemy)) {
+        if (!cheatInvis && !cheatImmortal && checkCollision(player, enemy)) {
             if (player.isHiding) { showToast("Te achei!"); }
             gameOver();
         }
@@ -1863,6 +1865,46 @@ document.getElementById('btn-cheat-apply').addEventListener('click', () => {
         document.getElementById('pause-screen').classList.remove('hidden');
     } else if (gameState === 'PLAYING' || gameState === 'PAUSED') {
         updateHUD();
+    }
+});
+
+document.getElementById('btn-cheat-invis').addEventListener('click', () => {
+    cheatInvis = !cheatInvis;
+    let btn = document.getElementById('btn-cheat-invis');
+    if (cheatInvis) {
+        btn.innerHTML = '👻 INVISÍVEL: ON';
+        btn.style.background = 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)';
+        btn.style.color = 'white';
+        btn.style.borderColor = '#fff';
+        
+        // If boss is chasing, immediately reset her
+        if (enemy && enemy.active && enemy.state === 'chase') {
+            enemy.state = 'search';
+            enemy.speed = 110 * (1 + getUpgradeVal('velocidade', 1.0) * 0.1);
+            suspicion = 0;
+            showToast("Você desapareceu nas sombras!");
+        }
+    } else {
+        btn.innerHTML = '👻 INVISÍVEL: OFF';
+        btn.style.background = 'linear-gradient(135deg, #555 0%, #333 100%)';
+        btn.style.color = '#ccc';
+        btn.style.borderColor = '#777';
+    }
+});
+
+document.getElementById('btn-cheat-immortal').addEventListener('click', () => {
+    cheatImmortal = !cheatImmortal;
+    let btn = document.getElementById('btn-cheat-immortal');
+    if (cheatImmortal) {
+        btn.innerHTML = '🛡️ IMORTAL: ON';
+        btn.style.background = 'linear-gradient(135deg, #f12711 0%, #f5af19 100%)';
+        btn.style.color = 'white';
+        btn.style.borderColor = '#fff';
+    } else {
+        btn.innerHTML = '🛡️ IMORTAL: OFF';
+        btn.style.background = 'linear-gradient(135deg, #555 0%, #333 100%)';
+        btn.style.color = '#ccc';
+        btn.style.borderColor = '#777';
     }
 });
 
