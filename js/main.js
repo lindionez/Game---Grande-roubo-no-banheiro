@@ -26,7 +26,6 @@ let distractionsLeft = 0;
 
 let gameStats = {
     calcinhasRoubadas: 0,
-    fasesConcluidas: 0,
     agarradoVezes: 0,
     fugasBemSucedidas: 0,
     distracoesUsadas: 0,
@@ -37,6 +36,8 @@ let gameStats = {
     tempoTotalJogo: 0,
     mortesDonaBanheiro: 0
 };
+
+let totalFasesVencidas = 0;
 
 // Cheat System Variables
 let cheatWCount = 0;
@@ -1911,7 +1912,7 @@ document.getElementById('btn-stats-pause').addEventListener('click', () => {
     const sc = document.getElementById('stats-content');
     const items = [
         { icon: "👙", label: "Calcinhas Roubadas", val: gameStats.calcinhasRoubadas, color: "#ff9a9e" },
-        { icon: "🚪", label: "Fases Concluídas", val: gameStats.fasesConcluidas, color: "#fecfef" },
+        { icon: "🚪", label: "Fases Concluídas", val: totalFasesVencidas, color: "#fecfef" },
         { icon: "⏱️", label: "Tempo de Jogo", val: `${Math.floor(gameStats.tempoTotalJogo / 60)}m ${Math.floor(gameStats.tempoTotalJogo % 60)}s`, color: "#a1c4fd" },
         { icon: "🔥", label: "Maior Combo", val: `${gameStats.maiorCombo}x`, color: "#ffecd2" },
         { icon: "👣", label: "Passos Dados", val: Math.floor(gameStats.passosDados), color: "#cfd9df" },
@@ -1919,7 +1920,7 @@ document.getElementById('btn-stats-pause').addEventListener('click', () => {
         { icon: "🏃", label: "Fugas Bem Sucedidas", val: gameStats.fugasBemSucedidas, color: "#d4fc79" },
         { icon: "💨", label: "Distrações Usadas", val: gameStats.distracoesUsadas, color: "#e0c3fc" },
         { icon: "💰", label: "Dinheiro Gasto", val: `$${gameStats.dinheiroGasto}`, color: "#f6d365" },
-        { icon: "👿", label: "Mortes para a Dona", val: gameStats.mortesDonaBanheiro, color: "#e74c3c" }
+        { icon: "👿", label: "Game overs", val: gameStats.mortesDonaBanheiro, color: "#e74c3c" }
     ];
 
     if (gameStats.inimigasAbatidas > 0) {
@@ -2111,11 +2112,12 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 document.getElementById('btn-next-stage').addEventListener('click', () => {
     document.getElementById('shop-screen').classList.add('hidden');
+    totalFasesVencidas++;
     if (stage >= 35) {
         document.getElementById('game-complete-screen').classList.remove('hidden');
         return;
     }
-    if (stage < 35) { stage++; timeSpent = 0; gameStats.fasesConcluidas++; }
+    if (stage < 35) { stage++; timeSpent = 0; }
 
     if (hasAK47 && !ak47TutorialShown) {
         ak47TutorialShown = true;
