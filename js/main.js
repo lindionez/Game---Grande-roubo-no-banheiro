@@ -945,6 +945,7 @@ function update(dt) {
                         if (p.type.noise) { suspicion += 10 * resMult; spawnNoiseRing(player.x, player.y); }
                         if (combo > 2) suspicion += 5 * resMult;
                         spawnParticle(p.x, p.y, `+${gained}`, '#ffcf40');
+                        if (enemy.active && enemy.state === 'chase') unlockConquista('c38');
                     }
                     panties.splice(i, 1);
                     break;
@@ -1304,6 +1305,9 @@ function drawVictoryCharacterAnimation(dt) {
 
 let gameOverAnimTimer = 0; let gameOverSnapshot = null;
 function gameOver() {
+    if (timeSpent < 2.0) {
+        unlockConquista('c37');
+    }
     if (window.audioMgr) { window.audioMgr.setChase(false); window.audioMgr.gameOver(); }
     gameState = 'GAMEOVER'; gameOverAnimTimer = 0;
     gameOverSnapshot = document.createElement('canvas');
@@ -2114,7 +2118,9 @@ const conquistasData = [
     { id: 'c33', cat: 7, nome: 'Caos no Banheiro', desc: 'Derrote uma banhista com a AK-47', tipo: 'unico', secreta: true },
     { id: 'c34', cat: 2, nome: 'É o fim...', desc: 'Alcance a famigerada fase 35', tipo: 'unico' },
     { id: 'c35', cat: 6, nome: 'Abraço de Urso', desc: 'Seja agarrado por uma fã super apegada', tipo: 'unico' },
-    { id: 'c36', cat: 7, nome: 'Psicopata à Solta', desc: 'Neutralize todas as banhistas da fase', tipo: 'unico', secreta: true }
+    { id: 'c36', cat: 7, nome: 'Psicopata à Solta', desc: 'Neutralize todas as banhistas da fase', tipo: 'unico', secreta: true },
+    { id: 'c37', cat: 7, nome: 'Jogo bugado pra caralho', desc: 'Morra em menos de 2 segundos após iniciar a fase', tipo: 'unico', secreta: true },
+    { id: 'c38', cat: 7, nome: 'Cara de Pau', desc: 'Roube uma calcinha em plena perseguição da Dona', tipo: 'unico', secreta: true }
 ];
 
 let conquistasSalvas = {};
@@ -2220,6 +2226,9 @@ function renderTelaConquistas(filtro = 'all') {
 
     let totalUnlocks = Object.values(conquistasSalvas).filter(c => c.desbloqueada).length;
     document.getElementById('conquistas-count').textContent = totalUnlocks;
+    if (document.getElementById('conquistas-total')) {
+        document.getElementById('conquistas-total').textContent = conquistasData.length;
+    }
 
     let missingSecrets = 0;
 
