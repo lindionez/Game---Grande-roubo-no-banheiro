@@ -1855,6 +1855,23 @@ document.getElementById('btn-mute').addEventListener('click', (e) => {
     }
 });
 
+document.getElementById('btn-fullscreen-pause').addEventListener('click', (e) => {
+    let elem = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(err => console.log(err));
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen().catch(err => console.log(err));
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+    }
+});
+
 document.getElementById('btn-cheat-menu-open').addEventListener('click', () => {
     document.getElementById('game-complete-screen').classList.add('hidden');
     stage = 1;
