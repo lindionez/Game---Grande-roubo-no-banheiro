@@ -2133,7 +2133,8 @@ document.getElementById('btn-next-stage').addEventListener('click', () => {
 });
 
 document.getElementById('btn-buy-ak47').addEventListener('click', (e) => {
-    if (shopPoints >= 10000 && !hasAK47) {
+    let totalLvl = Object.values(upgrades).reduce((a, b) => a + b, 0);
+    if (shopPoints >= 10000 && !hasAK47 && totalLvl === 45) {
         if (window.audioMgr) window.audioMgr.buyUpgrade();
         shopPoints -= 10000; hasAK47 = true; unlockConquista('c24');
         e.target.textContent = 'EQUIPADA'; e.target.disabled = true; renderShop();
@@ -2177,8 +2178,11 @@ function renderShop() {
             document.getElementById('btn-buy-ak47').textContent = 'EQUIPADA';
             document.getElementById('btn-buy-ak47').disabled = true;
         } else {
+            document.getElementById('btn-buy-ak47').textContent = '10000 pts';
             document.getElementById('btn-buy-ak47').disabled = (shopPoints < 10000);
         }
+    } else {
+        document.getElementById('ak47-shop-item').classList.add('hidden');
     }
 }
 
